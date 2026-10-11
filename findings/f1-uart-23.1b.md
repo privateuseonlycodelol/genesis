@@ -9,7 +9,7 @@ The live **23.1.b** image is not on disk. The only firmware file is the offline 
 
 ## Case and header
 
-The case is open. `findings/serial-header.jpg` shows the UART connector **CN1**: four pins, silkscreen `3.3V GND TX RX`. The 16-pin header below it is **TEST_CN20**, a separate test connector.
+The case is open. [Top-side overview of AP-BCM114-0001](board-top.png). `findings/serial-header.jpg` shows the UART connector **CN1**: four pins, silkscreen `3.3V GND TX RX`. The 16-pin header below it is **TEST_CN20**, a separate test connector.
 
 A CP2102-class 3.3 V USB-serial adapter (parts note: Electrokit 41016396, USB-C to USB-A, male-female Dupont) is for a **boot log only**. No boot log has been captured yet.
 
