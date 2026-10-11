@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-11T19:35:28Z
+**Generated:** 2026-10-11T20:10:59Z
 **Host:** (omitted)
 
 ## `artifacts/firmware`
@@ -61,6 +61,7 @@ drwxr-xr-x@  3 user  staff    96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLAS
 - [`admin-url-hunt.md`](findings/admin-url-hunt.md)
 - [`decomp-kickoff.md`](findings/decomp-kickoff.md)
 - [`f1-advanced-ui.md`](findings/f1-advanced-ui.md)
+- [`f1-api-map.md`](findings/f1-api-map.md)
 - [`f1-logviewer.md`](findings/f1-logviewer.md)
 - [`f1-uart-23.1b.md`](findings/f1-uart-23.1b.md)
 - [`f1-ui-leads-23.1b.md`](findings/f1-ui-leads-23.1b.md)
@@ -69,6 +70,7 @@ drwxr-xr-x@  3 user  staff    96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLAS
 - [`mirror-test.md`](findings/mirror-test.md)
 - [`rbi-crypto-attempt2.md`](findings/rbi-crypto-attempt2.md)
 - [`rbi-crypto-debug.md`](findings/rbi-crypto-debug.md)
+- [`tried.md`](findings/tried.md)
 - [`wan-pcap.md`](findings/wan-pcap.md)
 - [`wan2-tagged-frames.md`](findings/wan2-tagged-frames.md)
 - [`want-pcap.md`](findings/want-pcap.md)
@@ -100,5 +102,5 @@ decrypt_success: False
 note: no trial passed B7 OSCK unwrap (bad_osck); GCNT-X.osck not published
 ```
 
-Notes: `findings/gcnt-x-19x-deep.md` · Crypto: `findings/rbi-crypto-attempt2.md` · Root path (lab): `findings/gcnt-x-root-path.md`
+Deep dive: `findings/gcnt-x-19x-deep.md` · Crypto: `findings/rbi-crypto-attempt2.md` · Root path (lab): `findings/gcnt-x-root-path.md`
 
