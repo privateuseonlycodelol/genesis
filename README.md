@@ -1,12 +1,11 @@
-# genesis — Telia F1 GCNT-X firmware RE
+# genesis
 
-Device: Telia F1, GCNT-X, FW `23.1.b.0448-7241017-20260223134332`
+Notes on the Telia F1 I have open. Vantiva board GCNT-X, firmware 23.1.b.0448-7241017-20260223134332.
 
-After any step run `./scripts/report.sh` — tell Project **check genesis**
+`findings/` is the writeups. `scripts/` is the tooling. Packet captures go in `artifacts/captures/`. Firmware images go in `artifacts/firmware/`. Those two stay out of git.
 
-1. Put captures in `artifacts/captures/`, firmware in `artifacts/firmware/`.
-2. `./scripts/wan-capture.sh <iface>` — SG108E mirror capture + telia/rbi/SNI summary.
-3. `./scripts/lcm-probe.sh` — optional LCM manifest probe.
-4. Record sha256 in `findings/`.
+`./scripts/wan-capture.sh <iface>` takes a mirror capture and prints any Telia host, `.rbi`, or TLS name it sees. `./scripts/lcm-probe.sh` checks the LCM manifest. `./scripts/report.sh` rebuilds `findings/latest.md`.
 
-Never commit firmware blobs. See [hack-technicolor #321](https://github.com/hack-technicolor/hack-technicolor/issues/321).
+Write the sha256 next to an image if you keep one. Don't commit the image.
+
+Public thread for this board: https://github.com/hack-technicolor/hack-technicolor/issues/321
