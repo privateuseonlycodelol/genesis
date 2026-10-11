@@ -1,6 +1,6 @@
 # genesis
 
-![findings/board-top.png](findings/board-top.png)
+![findings/board-top.jpg](findings/board-top.jpg)
 
 Notes on the Telia F1 I have open. Vantiva board GCNT-X, firmware 23.1.b.0448-7241017-20260223134332.
 
