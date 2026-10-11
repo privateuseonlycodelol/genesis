@@ -76,6 +76,6 @@ tools/venv/bin/python3 scripts/attempt_rbi_decrypt.py --compare-sibling artifact
 
 ## Best new lead (one sentence)
 
-**GCNT-X OSCK is not derivable from published formulas or sibling RBI metadata; the only credible unlock remains per-device `RIP_ID_OSCK` from eRIPv2 (UART/`eripv2.py` + ECK) or a WAN capture while the CPE still receives a 403-gated `:7577` RBI/STS — offline guessing only produces random PKCS oracle noise.**
+**GCNT-X OSCK is not derivable from published formulas or sibling RBI metadata; what is left is per-device `RIP_ID_OSCK` from eRIPv2 (UART/`eripv2.py` + ECK) or a WAN capture while the CPE still receives a 403-gated `:7577` RBI/STS — offline guessing only produces random PKCS oracle noise.**
 
 See also: `findings/rbi-crypto-debug.md` (attempt 1), Project doc [gcnt-x-19x-community-path.md](/cursor/stores/bc-1cfc75c5-aae2-44ff-a156-ad36d8520fd9/files/docs/gcnt-x-19x-community-path.md).

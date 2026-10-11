@@ -98,5 +98,5 @@ decrypt_success: False
 note: no trial passed B7 OSCK unwrap (bad_osck); GCNT-X.osck not published
 ```
 
-Deep dive: `findings/gcnt-x-19x-deep.md` · Crypto: `findings/rbi-crypto-attempt2.md` · Root path (lab): `findings/gcnt-x-root-path.md`
+Notes: `findings/gcnt-x-19x-deep.md` · Crypto: `findings/rbi-crypto-attempt2.md` · Root path (lab): `findings/gcnt-x-root-path.md`
 

@@ -1,4 +1,4 @@
-# GCNT-X reference RBI (19.x) — deep offline analysis
+# GCNT-X reference RBI (19.x) — offline notes
 
 **Scope:** Mac-only analysis of `artifacts/firmware/REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi`. **Do not flash** on the live Telia F1 running **23.1.b**.
 
