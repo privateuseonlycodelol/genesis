@@ -1,5 +1,7 @@
 # genesis
 
+![findings/board-top.png](findings/board-top.png)
+
 Notes on the Telia F1 I have open. Vantiva board GCNT-X, firmware 23.1.b.0448-7241017-20260223134332.
 
 `findings/` is the writeups. `scripts/` is the tooling. Packet captures go in `artifacts/captures/`. Firmware images go in `artifacts/firmware/`. Those two stay out of git.

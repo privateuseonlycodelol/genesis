@@ -34,6 +34,18 @@ def sha256_hex_bytes(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
 
+def even_hex(h: str) -> str:
+    h = h.strip()
+    if len(h) % 2:
+        h = "0" + h
+    return h
+
+
+def sha256_hex_of_hex(hexstr: str) -> str:
+    """Match jsSHA(input, \"HEX\").getHash(\"SHA-256\", \"HEX\")."""
+    return hashlib.sha256(bytes.fromhex(even_hex(hexstr))).hexdigest()
+
+
 def utf8_encode_js(s: str) -> str:
     out = []
     i = 0
@@ -153,21 +165,21 @@ class SRPClient:
             return 400, "bad B"
 
         user_pass = utf8_encode_js(f"{username}:{password}")
-        x = int(sha256_hex_text(salt + sha256_hex_text(user_pass)), 16)
+        x = int(sha256_hex_of_hex(even_hex(salt) + sha256_hex_text(user_pass)), 16)
         n = pow(G, x, N)
         u_part = (K_MULT * n) % N
         t = (B_int - u_part) % N
         exp = (self.F + u_scramble * x) % N
         client_key = pow(t, exp, N)
-        self.B_proof = format(client_key, "x")
-        if len(self.B_proof) % 2:
-            self.B_proof = "0" + self.B_proof
+        s_hex = even_hex(format(client_key, "x"))
+        s_hash = sha256_hex_of_hex(s_hex)
+        self.B_proof = s_hash
 
         user_hash = sha256_hex_text(utf8_encode_js(username))
-        self.y_hex = sha256_hex_text(
-            U_HASH + user_hash + salt + self.A_hex + B_hex + self.B_proof
+        self.y_hex = sha256_hex_of_hex(
+            U_HASH + user_hash + even_hex(salt) + even_hex(self.A_hex) + even_hex(B_hex) + s_hash
         )
-        self.v_hex = sha256_hex_text(self.A_hex + self.y_hex + self.B_proof)
+        self.v_hex = sha256_hex_of_hex(even_hex(self.A_hex) + self.y_hex + s_hash)
 
         post2 = urllib.parse.urlencode({"CSRFtoken": self.csrf, "M": self.y_hex}).encode()
         code2, body2 = self._open(f"{self.base}/authenticate", post2, "POST")
@@ -205,19 +217,20 @@ def crypto_proof(
     if B_int % N == 0 or u_scramble == 0:
         raise ValueError("bad B")
     user_pass = utf8_encode_js(f"{username}:{password}")
-    x = int(sha256_hex_text(salt + sha256_hex_text(user_pass)), 16)
+    x = int(sha256_hex_of_hex(even_hex(salt) + sha256_hex_text(user_pass)), 16)
     n = pow(G, x, N)
     u_part = (K_MULT * n) % N
     t = (B_int - u_part) % N
     exp = (F + u_scramble * x) % N
     client_key = pow(t, exp, N)
-    B_proof = format(client_key, "x")
-    if len(B_proof) % 2:
-        B_proof = "0" + B_proof
+    s_hex = even_hex(format(client_key, "x"))
+    s_hash = sha256_hex_of_hex(s_hex)
     user_hash = sha256_hex_text(utf8_encode_js(username))
-    y_hex = sha256_hex_text(U_HASH + user_hash + salt + A_hex + B_hex + B_proof)
-    v_hex = sha256_hex_text(A_hex + y_hex + B_proof)
-    return {"M": y_hex, "v": v_hex, "B_proof": B_proof}
+    y_hex = sha256_hex_of_hex(
+        U_HASH + user_hash + even_hex(salt) + even_hex(A_hex) + even_hex(B_hex) + s_hash
+    )
+    v_hex = sha256_hex_of_hex(even_hex(A_hex) + y_hex + s_hash)
+    return {"M": y_hex, "v": v_hex, "B_proof": s_hash}
 
 
 def main():
