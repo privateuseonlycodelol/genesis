@@ -1,0 +1,15 @@
+artifacts/
+tools/venv/
+tools/**/.git/
+*.rbi
+*.bin
+*.pcapng
+*.pcap
+*.etl
+*.har
+*cookies*
+.env
+.DS_Store
+__pycache__/
+_findings.tmp/
+**/_*.extracted/
