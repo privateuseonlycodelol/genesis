@@ -10,7 +10,7 @@
 | Frames | 8729 |
 | Duration (s) | 303,1 |
 
-## Telia F1 WAN MAC (`a0:b5:3c:c6:62:82`)
+## Telia F1 WAN MAC (redacted in public repo)
 
 | Role | Frames |
 | --- | ---: |

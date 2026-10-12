@@ -19,7 +19,7 @@ After that, `GET` of a `*.lp` path with the cookie returns the admin fragment. `
 
 A poll, `GET /gateway.lp?auto_update=true&getSessionStatus=true`, returns the current role. That poll was already in an older capture. It was not repeated here.
 
-There is no separate JSON API. The `.lp` pages are the API. Each saved modal is a form whose `method` is `post` and whose `action` is its own path, plus `CSRFtoken`.
+The saved admin surface is mostly **forms** and **`.lp` GETs**, including a **session-status poll** on `gateway.lp`. A `.lp` URL can still return **structured data** (JSON) for some `action=` query parameters; that is not a separate REST API beside the Homeware page model. Each modal is also a form whose `method` is `post` and whose `action` is its own path, plus `CSRFtoken`.
 
 ## Ordinary pages (verified GET 200)
 
@@ -72,9 +72,11 @@ Posting these would change the gateway. This pass only downloaded them.
 
 The upload accepts file extensions `rbi`, `fw`, and `pkgtb`. A failed upgrade string says “build signed with wrong key”.
 
-**Verified:** the configuration HTML does not contain `#file-upgradefw`, `#btn-system-bootp`, or the export/import controls. Those handlers are in the script only.
+**Verified:** the saved configuration HTML does not contain `#file-upgradefw`, `#btn-system-bootp`, or the export/import controls.
 
-**Hypothesis:** the 23.1.b template dropped the upgrade and backup controls and left the shared script. Whether a hand-built POST would still be accepted was not tested.
+**Verified:** `system-config-min.js` still defines an **upgrade handler** (`upgradefw`, `upgradefwstatus`, `getbanksize`, import/export, BOOTP confirm).
+
+**Not tested:** whether the backend would accept those actions without the on-page controls. A hand-built `POST` with `action=upgradefwstatus` returned **403** from nginx in a later pass (see `findings/tried.md`).
 
 `main-min.js` also GETs `/gateway.lp?action=scheduleReboot` to read a scheduled time. That URL was not called again.
 
@@ -98,7 +100,7 @@ hack-technicolor’s firmware table does not list a GCNT-X bank dump. Issue 321 
 
 The public note `docs/gcnt-x-public-hardware.md` already says: no SoC part, no flash part, no Wi-Fi chip, NAND in a TSOP48 package as a guess, CFE shell removed, 23.1.b not downgradable, serial input often dead.
 
-This UI pass adds nothing on Linux hardware, boot, or OpenWrt. It confirms the running software string `23.1.b` and the hardware version string `GCNT-X`, and it shows the admin UI is ordinary forms plus a log table. The log’s `restricted_shell` lines match the issue’s “no serial root” reports. They are not a shell from this Mac.
+This UI pass adds nothing on Linux hardware, boot, or OpenWrt. It confirms the running software string `23.1.b` and the hardware version string `GCNT-X`, and it shows the admin UI is ordinary forms plus a log table. Syslog lines mentioning `restricted_shell` do **not** establish UART behavior on this unit — **no boot log has been captured** yet.
 
 ## Next
 

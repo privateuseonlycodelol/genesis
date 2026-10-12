@@ -50,7 +50,7 @@ The PC `curl` saved the HTTP error page, not `wan.pcapng` from disk (same failur
 ## Until a valid `wan.pcapng` lands locally
 
 - **Mirror evidence on disk:** only **`want.pcapng`** (~4.4 min SG108E mirror, 06:40–06:44 +0200).
-- **Firmware strings / RBI URLs:** none in `want.pcapng`; F1 seen only as DHCP hostname `Telia F1-CP2242AD8AN` and 24 DHCP Discovers (details in `findings/want-pcap.md`).
+- **Firmware strings / RBI URLs:** none in `want.pcapng`; F1 seen only as DHCP hostname `Telia F1` (serial suffix redacted) and 24 DHCP Discovers (details in `findings/want-pcap.md`).
 - **Next step:** re-aim mirror + recapture, or rely on parent’s analysis of the **cloud-uploaded** WAN pcap if that file is the real capture.
 
 ## Verdict (local `wan.pcapng` only)

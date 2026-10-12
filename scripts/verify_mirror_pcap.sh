@@ -5,8 +5,16 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PCAP="${1:-$ROOT/artifacts/captures/test.pcapng}"
 OUT="$ROOT/findings/mirror-test.md"
-F1_MAC="a0:b5:3c:c6:62:82"
-F1_MAC_LC="$(printf '%s' "$F1_MAC" | tr '[:upper:]' '[:lower:]')"
+if [[ -z "${GENESIS_MAC_HEX:-}" ]]; then
+  echo "Set GENESIS_MAC_HEX (12 hex digits, optional colons; not stored in the public repo)." >&2
+  exit 1
+fi
+_mac_norm="$(printf '%s' "$GENESIS_MAC_HEX" | tr -d ':' | tr '[:upper:]' '[:lower:]')"
+if [[ ${#_mac_norm} -ne 12 ]]; then
+  echo "GENESIS_MAC_HEX must be 6 bytes / 12 hex digits." >&2
+  exit 1
+fi
+F1_MAC_LC="$(printf '%s' "$_mac_norm" | sed 's/\(..\)/\1:/g;s/:$//')"
 
 if ! command -v tshark >/dev/null 2>&1; then
   echo "tshark not found — install Wireshark CLI." >&2
@@ -61,7 +69,7 @@ reason="insufficient WAN signal"
 if [[ "$frame_count" -lt 10 ]]; then
   reason="capture too short (${frame_count} frames)"
 elif [[ "$f1_any" -eq 0 ]]; then
-  reason="Telia F1 MAC $F1_MAC never seen on Ethernet"
+  reason="Telia F1 WAN MAC (from GENESIS_MAC_HEX) never seen on Ethernet"
 elif [[ "$lan_pct" -ge 85 && "$public_both" -lt 20 && "$dns_resp" -eq 0 && "$syn_ack" -lt 5 ]]; then
   reason="mostly 192.168.0.x LAN/PC traffic (${lan_pct}% of IP), little public IP/DNS/TCP reply"
 elif [[ "$f1_ip" -lt 10 && "$public_both" -lt 50 ]]; then
@@ -89,7 +97,7 @@ pcap_name="$(basename "$PCAP")"
   echo "| Frames | $frame_count |"
   echo "| Duration (s) | $duration_s |"
   echo
-  echo "## Telia F1 WAN MAC (\`$F1_MAC\`)"
+  echo "## Telia F1 WAN MAC (redacted in public repo)"
   echo
   echo "| Role | Frames |"
   echo "| --- | ---: |"

@@ -10,7 +10,11 @@ mkdir -p "$LOG_DIR"
 
 BOARD="${GENESIS_BOARD:-GCNT-X}"
 CHAN="${GENESIS_CHAN:-f1_1.0-1}"
-SERIAL="${GENESIS_SERIAL:-CP2242AD8AN}"
+if [[ -z "${GENESIS_SERIAL:-}" ]]; then
+  echo "Set GENESIS_SERIAL (unit serial; not stored in the public repo)." >&2
+  exit 1
+fi
+SERIAL="$GENESIS_SERIAL"
 BASE="${GENESIS_LCM_BASE:-http://lcm.teliasmartrgw.com/ipk/hw}"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 

@@ -25,3 +25,8 @@
 /modals/wireless-wps-modal-newEM.lp — 200 — WPS form
 /password.lp — 200 — change-password form
 /modals/basicview-accesscode-modal.lp — 200 — guided setup form
+POST /modals/system-config-modal.lp action=upgradefwstatus — 403 — nginx forbidden HTML, no update or bank JSON
+GET /gateway.lp?action=scheduleReboot — 200 — JSON schedule/time fields, no firmware URL
+GET /gateway.lp?auto_update=true&getSessionStatus=true — 200 — JSON current_role admin
+GET /modals/parental-modal.lp?action=smartwifi — 200 — JSON smartwifi state only
+GET /modals/system-config-modal.lp?action=upgradefwstatus — 200 — configuration HTML modal, not JSON status

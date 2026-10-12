@@ -14,9 +14,9 @@ This is not F1 WAN traffic. It is LAN traffic from an ASUS PC, plus the switch.
 
 The SG108E (`ec:75:0c:46:d5:4c`, TP-Link, DHCP name `TL-SG108E`) answers ARP for `192.168.0.1`, and that MAC is the Ethernet destination for the ASUS host. The switch is where this traffic stops.
 
-The Telia F1 (`a0:b5:3c:c6:62:82`, Vantiva, DHCP name `Telia F1-CP2242AD8AN`) appears only as 24 DHCP Discovers from `0.0.0.0` and 4 ARP requests. No public WAN address, no ISP DHCP offer, no download.
+The Telia F1 (WAN MAC redacted, Vantiva, DHCP name `Telia F1` with serial suffix redacted) appears only as 24 DHCP Discovers from `0.0.0.0` and 4 ARP requests. No public WAN address, no ISP DHCP offer, no download.
 
-This Mac is on `192.168.2.38`. Its MAC is not the ASUS source. The SSDP user-agent is Chromium on Windows, so `192.168.0.10` is another PC on the switch, not this capture machine and not the router’s WAN session.
+This Mac is on the F1 LAN (`192.168.2.0/24`, host address redacted). Its MAC is not the ASUS source. The SSDP user-agent is Chromium on Windows, so `192.168.0.10` is another PC on the switch, not this capture machine and not the router’s WAN session.
 
 ## Protocol hierarchy
 
@@ -71,4 +71,4 @@ Other addresses, not firmware hosts:
 
 None.
 
-No `.rbi` URL. No frame contains `.rbi`, `smartrgw`, `teliacompany`, or `firmware`. The only `telia` match is the DHCP hostname `Telia F1-CP2242AD8AN` (24 Discover packets). The only HTTP URI is SSDP `*`.
+No `.rbi` URL. No frame contains `.rbi`, `smartrgw`, `teliacompany`, or `firmware`. The only `telia` match is the DHCP hostname `Telia F1` (serial suffix redacted; 24 Discover packets). The only HTTP URI is SSDP `*`.

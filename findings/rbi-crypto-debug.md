@@ -2,7 +2,7 @@
 
 **RBI:** `artifacts/firmware/REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi`  
 **SHA-256:** `2d46e728b73fda7fd2f5af2d5a4b06f8a5d5dfb1409bdaebe1f6447b6b1453de`  
-**Live unit (not touched):** SN `CP2242AD8AN`, MAC `A0:B5:3C:C6:62:82`, FW `23.1.b`
+**Live unit (not touched):** serial and MAC redacted in public notes; FW `23.1.b`
 
 ## Algorithm (Type 2 Homeware / BLI2)
 
@@ -86,8 +86,8 @@ Categories:
 1. **All community `.osck`** under `tools/hack-technicolor/osck/` (37 boards, incl. `GCNT-R`, Telia `VDNT-O_Telia`, etc.)
 2. **Ansuel `board.java` embedded hex keys** (every `addOsKeys` 64-char string, incl. `GCNT-N`)
 3. **Logviewer leak [#321](https://github.com/hack-technicolor/hack-technicolor/issues/321):** `4d17f88a54003ce68362bbf7b1c70d1d` as pad32, doubled to 32 B, SHA-256 — **not OSCK** (16-byte diagnostic token per issue discussion)
-4. **Serial variants** for live SN `CP2242AD8AN` (case, strip `CP`, pad32, SHA-256)
-5. **MAC** `a0:b5:3c:c6:62:82` (raw 6 B pad32, colon forms, SHA-256)
+4. **Serial variants** for a user-supplied serial via `GENESIS_SERIAL` (case, strip `CP`, pad32, SHA-256)
+5. **MAC** from `GENESIS_MAC_HEX` (raw 6 B pad32, colon forms, SHA-256)
 6. **Board/product strings** (`GCNT-X`, `EWA1330`, `BLI223KN`, serial+board combos)
 
 **GitHub code search** for `GCNT-X.osck`: API requires auth; manual review shows **no published GCNT-X OSCK** (repo docs: “OSCK Not Known” for this board).

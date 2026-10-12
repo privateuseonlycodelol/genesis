@@ -1,7 +1,7 @@
 # Admin URL hunt — Telia F1 (no new capture)
 
 **When:** 2026-10-11 ~06:12–06:14Z  
-**Host:** this Mac, Wi-Fi `en0` `192.168.2.38/24`  
+**Host:** this Mac, Wi-Fi `en0` on `192.168.2.0/24` (host address redacted in public notes)  
 **Default route:** `192.168.2.1` via `en0` (`route -n get default`; router ARP verified)  
 **Router settings:** not changed. No packet capture. No login.
 

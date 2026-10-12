@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import hmac
+import os
 import struct
 import sys
 from pathlib import Path
@@ -21,10 +22,15 @@ OSCK_DIR = ROOT / "tools" / "hack-technicolor" / "osck"
 DECRYPT_UTIL_BOARDS = ROOT / "tools" / "Decrypt_RBI_Firmware_Utility" / "src" / "main" / "board.java"
 RIP_ID_OSCK = 0x0121
 
-# Live F1 identifiers (for derivation trials only — not used on-device here).
-DEFAULT_SERIAL = "CP2242AD8AN"
-DEFAULT_MAC_HEX = "a0b53cc66282"
 LOGVIEWER_16 = bytes.fromhex("4d17f88a54003ce68362bbf7b1c70d1d")
+
+
+def _env_serial() -> str:
+    return os.environ.get("GENESIS_SERIAL", "").strip()
+
+
+def _env_mac_hex() -> str:
+    return os.environ.get("GENESIS_MAC_HEX", "").strip().replace(":", "").lower()
 
 
 def process_payload(buf: memoryview, osck: bytes, depth: int = 0) -> tuple[bytes | None, str]:
@@ -133,66 +139,82 @@ def _parse_board_java_osck_hex() -> list[tuple[str, bytes]]:
 
 
 def derived_key_candidates(
-    serial: str = DEFAULT_SERIAL,
-    mac_hex: str = DEFAULT_MAC_HEX,
+    serial: str | None = None,
+    mac_hex: str | None = None,
     header: dict[str, str] | None = None,
 ) -> list[tuple[str, bytes]]:
-    keys: list[tuple[str, bytes]] = []
-    serials = [
-        serial,
-        serial.upper(),
-        serial.lower(),
-        serial.strip(),
-        serial.replace("CP", ""),
-        serial[2:] if serial.startswith("CP") else serial,
-    ]
-    seen_s: set[str] = set()
-    for s in serials:
-        if s in seen_s:
-            continue
-        seen_s.add(s)
-        raw = s.encode("ascii")
-        keys.append((f"serial_pad32:{s}", raw.ljust(32, b"\0")[:32]))
-        keys.append((f"sha256_serial:{s}", _sha256(raw)))
+    if serial is None:
+        serial = _env_serial()
+    if mac_hex is None:
+        mac_hex = _env_mac_hex()
 
-    mac = bytes.fromhex(mac_hex)
-    mac_colon = ":".join(mac_hex[i : i + 2] for i in range(0, 12, 2)).upper()
-    for label, material in [
-        ("mac6_raw", mac),
-        ("mac6_colon_upper", mac_colon.encode()),
-        ("mac6_nocolon_upper", mac_hex.upper().encode()),
-    ]:
-        keys.append((label, material.ljust(32, b"\0")[:32]))
-        keys.append((f"sha256_{label}", _sha256(material)))
+    keys: list[tuple[str, bytes]] = []
+    if serial:
+        serials = [
+            serial,
+            serial.upper(),
+            serial.lower(),
+            serial.strip(),
+            serial.replace("CP", ""),
+            serial[2:] if serial.startswith("CP") else serial,
+        ]
+        seen_s: set[str] = set()
+        for s in serials:
+            if not s or s in seen_s:
+                continue
+            seen_s.add(s)
+            raw = s.encode("ascii")
+            keys.append((f"serial_pad32:{s}", raw.ljust(32, b"\0")[:32]))
+            keys.append((f"sha256_serial:{s}", _sha256(raw)))
+
+    if mac_hex and len(mac_hex) == 12:
+        mac = bytes.fromhex(mac_hex)
+        mac_colon = ":".join(mac_hex[i : i + 2] for i in range(0, 12, 2)).upper()
+        for label, material in [
+            ("mac6_raw", mac),
+            ("mac6_colon_upper", mac_colon.encode()),
+            ("mac6_nocolon_upper", mac_hex.upper().encode()),
+        ]:
+            keys.append((label, material.ljust(32, b"\0")[:32]))
+            keys.append((f"sha256_{label}", _sha256(material)))
 
     keys.append(("logviewer16_pad32", LOGVIEWER_16.ljust(32, b"\0")))
     keys.append(("logviewer16_x2", LOGVIEWER_16 * 2))
     keys.append(("sha256_logviewer16", _sha256(LOGVIEWER_16)))
 
-    for label, text in [
+    static_strings: list[tuple[str, str]] = [
         ("GCNT-X", "GCNT-X"),
         ("EWA1330", "EWA1330"),
         ("EWA1331", "EWA1331"),
         ("BLI223KN", "BLI223KN"),
-        ("serial+board", f"{serial}:GCNT-X"),
-        ("mac+board", f"{mac_hex}:GCNT-X"),
         ("TCH", "TCH"),
         ("TL", "TL"),
         ("Technicolor", "Technicolor"),
-    ]:
+    ]
+    if serial:
+        static_strings.append(("serial+board", f"{serial}:GCNT-X"))
+    if mac_hex:
+        static_strings.append(("mac+board", f"{mac_hex}:GCNT-X"))
+    for label, text in static_strings:
         keys.append((f"sha256_{label}", _sha256(text.encode())))
 
     rip_salt = struct.pack(">H", RIP_ID_OSCK)
-    for label, msg in [
-        ("rip0121_serial", serial.encode()),
-        ("rip0121_mac", mac_hex.encode()),
+    rip_msgs: list[tuple[str, bytes]] = [
         ("rip0121_board", b"GCNT-X"),
         ("rip0121_varid_TL", b"TL"),
-    ]:
+    ]
+    if serial:
+        rip_msgs.append(("rip0121_serial", serial.encode()))
+    if mac_hex:
+        rip_msgs.append(("rip0121_mac", mac_hex.encode()))
+    for label, msg in rip_msgs:
         keys.append((f"hmac_sha256_{label}", _hmac_sha256(rip_salt, msg)))
-        keys.append((f"hmac_sha256_serial_{label}", _hmac_sha256(serial.encode(), rip_salt + msg)))
+        if serial:
+            keys.append(
+                (f"hmac_sha256_serial_{label}", _hmac_sha256(serial.encode(), rip_salt + msg))
+            )
 
-    if header:
+    if header and (serial or mac_hex):
         keys.extend(_header_derived_candidates(header, serial, mac_hex))
 
     keys.extend(_parse_board_java_osck_hex())

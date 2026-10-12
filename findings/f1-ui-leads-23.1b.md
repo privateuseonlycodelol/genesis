@@ -1,6 +1,6 @@
 # F1 UI leads — Telia GCNT-X **23.1.b** (live LAN)
 
-**Router:** SN `CP2242AD8AN` (user-owned)  
+**Router:** user-owned Telia F1 (serial redacted in public notes)  
 **Gateway:** `http://192.168.2.1/` on `192.168.2.0/24`  
 **Firmware (from login assets):** `23.1.b.0448-7241017-20260223134332-1bc56e11012dfec7d96d5c28eb498c16c196a568`  
 **When:** 2026-10-11 (UTC+2)  

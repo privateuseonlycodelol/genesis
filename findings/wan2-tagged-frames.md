@@ -9,7 +9,7 @@
 
 ## Verdict
 
-The frames behind ethertypes `0x8899`, `0x6466`, `0x6464`, and `0xa1e0` do not hide a WAN firmware download. `0x8899` is the switch talking to itself. The other three values are bare IPv4 and IPv6 from a Windows Tailscale host (DNS, empty TCP SYNs to port 53, SSDP). No TLS, no HTTP GET, no `telia` / `rbi` / `teliasmartrgw`, and neither `100.77.230.213` nor F1 MAC `a0:b5:3c:c6:62:82` occurs in those frames.
+The frames behind ethertypes `0x8899`, `0x6466`, `0x6464`, and `0xa1e0` do not hide a WAN firmware download. `0x8899` is the switch talking to itself. The other three values are bare IPv4 and IPv6 from a Windows Tailscale host (DNS, empty TCP SYNs to port 53, SSDP). No TLS, no HTTP GET, no `telia` / `rbi` / `teliasmartrgw`, and neither the F1 CGNAT WAN address (redacted) nor the F1 WAN MAC (redacted) occurs in those frames.
 
 ## Unwrap test
 
@@ -118,8 +118,8 @@ Case-insensitive ASCII search of the 6,770 bare-IP frames (469,856 bytes):
 | `teliasmartrgw` / `smartrgw` | 0 |
 | `firmware` | 0 |
 | `http://` / `https://` / `GET /` | 0 |
-| `100.77.230.213` (text and `64 4d e6 d5`) | 0 |
-| F1 MAC `a0:b5:3c:c6:62:82` | 0 |
+| F1 CGNAT WAN (redacted) | 0 |
+| F1 WAN MAC (redacted) | 0 |
 
 `Host:` occurs 88 times, all of them the SSDP host above. `user-agent` occurs 72 times, all Chromium SSDP.
 
@@ -133,8 +133,8 @@ These were not part of the unwrap. They are the only place the F1 shows up:
 
 | Frames | What |
 | ---: | --- |
-| 6 | ARP who-has `100.77.192.1` tell `100.77.230.213`, source MAC `a0:b5:3c:c6:62:82`, destination broadcast |
-| 6 | DHCP Discover/Request, hostname `Telia F1-CP2242AD8AN`, `0.0.0.0` → `255.255.255.255` |
+| 6 | ARP who-has on CGNAT gateway (100.64.0.0/10, addresses redacted), source F1 WAN MAC (redacted), destination broadcast |
+| 6 | DHCP Discover/Request, hostname `Telia F1` (serial suffix redacted), `0.0.0.0` → `255.255.255.255` |
 | 183 | SG108E DHCP, hostname `TL-SG108E`, `192.168.0.1` → broadcast |
 
-F1 as Ethernet destination: 0. The address `100.77.230.213` is only inside those ARP/DHCP frames, not inside the bare IP.
+F1 as Ethernet destination: 0. The CGNAT WAN address (redacted) is only inside those ARP/DHCP frames, not inside the bare IP.

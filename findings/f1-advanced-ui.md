@@ -2,7 +2,7 @@
 
 **When:** 2026-10-11 ~21:20 (UTC+2)  
 **Gateway:** `http://192.168.2.1`  
-**This Mac:** Wi-Fi `en0` `192.168.2.38/24`  
+**This Mac:** Wi-Fi `en0` on `192.168.2.0/24` (host address redacted in public notes)  
 **Config changed:** none  
 **Requests:** 5 (login page, two SRP posts, two page GETs). No HTTP 503.
 

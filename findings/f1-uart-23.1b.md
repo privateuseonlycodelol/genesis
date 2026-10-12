@@ -27,7 +27,7 @@ A CP2102 boot log does **not** root 23.1.b. On this board a serial log can show 
 
 `wan2-real` verdict (`findings/mirror-test.md`, `findings/wan2-tagged-frames.md`):
 
-- F1 MAC `a0:b5:3c:c6:62:82` is source on 12 frames and destination on 0. Those frames are ARP who-has `100.77.192.1` tell `100.77.230.213`, plus DHCP Discover/Request, hostname `Telia F1-CP2242AD8AN`. No Offer, no Ack, no TCP.
+- F1 WAN MAC (redacted) is source on 12 frames and destination on 0. Those frames are ARP who-has on the CGNAT gateway (100.64.0.0/10, addresses redacted), plus DHCP Discover/Request, hostname `Telia F1` (serial suffix redacted). No Offer, no Ack, no TCP.
 - 97% of IP frames are `192.168.0.0/24` (switch `TL-SG108E` at `192.168.0.1`). No DNS to 1.1.1.1, no TLS, no HTTP, no `.rbi`, no `teliasmartrgw`.
 - Ethertypes `0x6466`, `0x6464`, and `0xa1e0` are bare IPv4/IPv6 from a Windows Tailscale host (DNS, empty TCP SYNs to port 53, SSDP), misread as Ethernet. `0x8899` is the TP-Link switch talking to itself. Stripping a VLAN-sized tag does not reveal an inner WAN frame.
 
