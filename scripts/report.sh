@@ -24,7 +24,7 @@ shasum_rbi() {
   echo "# Genesis report"
   echo
   echo "**Generated:** $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  echo "**Host:** $(hostname -s 2>/dev/null || hostname)"
+  echo "**Host:** (omitted)"
   echo
   echo "## UI grab reviews (newest first)"
   echo "- [\`f1-grab-notloggedin-2026-10-12.md\`](findings/f1-grab-notloggedin-2026-10-12.md) — \`notloggedin.zip\` is admin duplicate of ~05:57 grab, not logged-out"
@@ -41,7 +41,8 @@ shasum_rbi() {
   for dir in artifacts/firmware artifacts/captures artifacts/logs; do
     echo "## \`$dir\`"
     echo '```'
-    ls -la "$dir" 2>/dev/null || echo "(missing)"
+    _u="$(whoami 2>/dev/null || echo user)"
+    ls -la "$dir" 2>/dev/null | sed -E "s/ ${_u}  staff / user  staff /g" || echo "(missing)"
     echo '```'
     echo
   done

@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-12T06:13:42Z
+**Generated:** 2026-10-12T06:16:32Z
 **Host:** (omitted)
 
 ## UI grab reviews (newest first)
@@ -17,50 +17,50 @@
 ## `artifacts/firmware`
 ```
 total 63984
-drwxr-xr-x   3 user  staff       96 Oct 12 08:08 .
-drwxr-xr-x  13 user  staff      416 Oct 12 07:13 ..
--rw-r--r--@  1 user  staff 32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
+drwxr-xr-x   3 user  staff        96 Oct 12 08:08 .
+drwxr-xr-x  13 user  staff       416 Oct 12 07:13 ..
+-rw-r--r--@  1 user  staff  32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
 ```
 
 ## `artifacts/captures`
 ```
 total 31104
-drwxr-xr-x   7 user  staff     224 Oct 11 17:46 .
-drwxr-xr-x  13 user  staff     416 Oct 12 07:13 ..
--rw-------   1 user  staff    1708 Oct 11 05:39 f1-reboot.pcapng
--rw-r--r--   1 user  staff     335 Oct 11 08:01 wan.pcapng
--rw-r--r--   1 user  staff  926664 Oct 11 17:46 wan2-real.pcapng
--rw-r--r--   1 user  staff 9635526 Oct 11 17:41 wan2.pcapng
--rw-r--r--   1 user  staff 5347036 Oct 11 07:02 want.pcapng
+drwxr-xr-x   7 user  staff      224 Oct 11 17:46 .
+drwxr-xr-x  13 user  staff      416 Oct 12 07:13 ..
+-rw-------   1 user  staff     1708 Oct 11 05:39 f1-reboot.pcapng
+-rw-r--r--   1 user  staff      335 Oct 11 08:01 wan.pcapng
+-rw-r--r--   1 user  staff   926664 Oct 11 17:46 wan2-real.pcapng
+-rw-r--r--   1 user  staff  9635526 Oct 11 17:41 wan2.pcapng
+-rw-r--r--   1 user  staff  5347036 Oct 11 07:02 want.pcapng
 ```
 
 ## `artifacts/logs`
 ```
 total 264
-drwxr-xr-x  24 user  staff   768 Oct 12 04:28 .
-drwxr-xr-x  13 user  staff   416 Oct 12 07:13 ..
--rw-r--r--@  1 user  staff 49359 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.png
-drwxr-xr-x@  3 user  staff    96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.extracted
--rw-r--r--@  1 user  staff   231 Oct 11 09:02 binwalk-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.txt
--rw-r--r--@  1 user  staff   410 Oct 11 05:48 binwalk-reference-rbi-extra.txt
--rw-r--r--@  1 user  staff    82 Oct 11 05:48 binwalk-reference-rbi.txt
--rw-r--r--@  1 user  staff   320 Oct 11 09:05 decrypt-attempt-19x.txt
--rw-r--r--@  1 user  staff  4858 Oct 11 09:09 decrypt-attempt2.txt
--rw-r--r--   1 user  staff    53 Oct 11 05:41 lcm-23.1.b.json
--rw-r--r--   1 user  staff    51 Oct 11 05:41 lcm-23.1.json
--rw-r--r--@  1 user  staff  2525 Oct 11 05:48 rbi-download-attempts.txt
--rw-r--r--@  1 user  staff  1880 Oct 11 09:02 rbi-inspect-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.txt
--rw-r--r--@  1 user  staff  1514 Oct 11 05:48 rbi-inspect.txt
--rw-r--r--@  1 user  staff  4339 Oct 12 04:22 software-pass-capture-selftest.txt
--rw-r--r--@  1 user  staff   968 Oct 12 04:27 software-pass-crypto-validation.txt
--rw-------@  1 user  staff   271 Oct 12 04:28 software-pass-dns.json
-drwx------@  7 user  staff   224 Oct 12 04:16 software-pass-http-services
--rw-------@  1 user  staff    48 Oct 12 04:18 software-pass-ipv6-default.private.json
--rw-r--r--@  1 user  staff   433 Oct 12 04:27 software-pass-related-csrf.txt
--rw-------@  1 user  staff    59 Oct 12 04:15 software-pass-router-ipv6.private.json
--rw-r--r--@  1 user  staff   937 Oct 12 04:15 software-pass-router-tcp.txt
-drwx------@  7 user  staff   224 Oct 12 04:17 software-pass-ssdp
--rw-r--r--@  1 user  staff   125 Oct 11 09:02 verify-squashfs-19x-reference.txt
+drwxr-xr-x  24 user  staff    768 Oct 12 04:28 .
+drwxr-xr-x  13 user  staff    416 Oct 12 07:13 ..
+-rw-r--r--@  1 user  staff  49359 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.png
+drwxr-xr-x@  3 user  staff     96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.extracted
+-rw-r--r--@  1 user  staff    231 Oct 11 09:02 binwalk-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.txt
+-rw-r--r--@  1 user  staff    410 Oct 11 05:48 binwalk-reference-rbi-extra.txt
+-rw-r--r--@  1 user  staff     82 Oct 11 05:48 binwalk-reference-rbi.txt
+-rw-r--r--@  1 user  staff    320 Oct 11 09:05 decrypt-attempt-19x.txt
+-rw-r--r--@  1 user  staff   4858 Oct 11 09:09 decrypt-attempt2.txt
+-rw-r--r--   1 user  staff     53 Oct 11 05:41 lcm-23.1.b.json
+-rw-r--r--   1 user  staff     51 Oct 11 05:41 lcm-23.1.json
+-rw-r--r--@  1 user  staff   2525 Oct 11 05:48 rbi-download-attempts.txt
+-rw-r--r--@  1 user  staff   1880 Oct 11 09:02 rbi-inspect-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.txt
+-rw-r--r--@  1 user  staff   1514 Oct 11 05:48 rbi-inspect.txt
+-rw-r--r--@  1 user  staff   4339 Oct 12 04:22 software-pass-capture-selftest.txt
+-rw-r--r--@  1 user  staff    968 Oct 12 04:27 software-pass-crypto-validation.txt
+-rw-------@  1 user  staff    271 Oct 12 04:28 software-pass-dns.json
+drwx------@  7 user  staff    224 Oct 12 04:16 software-pass-http-services
+-rw-------@  1 user  staff     48 Oct 12 04:18 software-pass-ipv6-default.private.json
+-rw-r--r--@  1 user  staff    433 Oct 12 04:27 software-pass-related-csrf.txt
+-rw-------@  1 user  staff     59 Oct 12 04:15 software-pass-router-ipv6.private.json
+-rw-r--r--@  1 user  staff    937 Oct 12 04:15 software-pass-router-tcp.txt
+drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
+-rw-r--r--@  1 user  staff    125 Oct 11 09:02 verify-squashfs-19x-reference.txt
 ```
 
 ## RBI checksums
