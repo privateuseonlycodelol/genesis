@@ -1,6 +1,6 @@
 # HAR review — `wanetc.har` (WAN Services UI) — 2026-10-12
 
-**Scope:** offline read of `/Users/[redacted]/Downloads/wanetc.har` (copy at `artifacts/hars/wanetc.har`, gitignored). No requests were replayed. Passwords, CSRF tokens, cookies, LAN/WAN addresses, rule names, and port-forward targets are **not** recorded here.
+**Scope:** offline read of the owner-supplied `wanetc.har` (private copy at `artifacts/hars/wanetc.har`, gitignored). No requests were replayed. Personal file paths, passwords, CSRF tokens, cookies, LAN/WAN addresses, rule names, and port-forward targets are **not** recorded here.
 
 **SHA-256:** `deaecf9c837035a9b1a2c5c5a62c37181a242aa757169d6ec2e77673b9e6f677`  
 **Entries:** 64 (50 GET, 14 POST), all `http://192.168.2.1`, HTTP **200** throughout.  
