@@ -29,4 +29,6 @@ POST /modals/system-config-modal.lp action=upgradefwstatus — 403 — nginx for
 GET /gateway.lp?action=scheduleReboot — 200 — JSON schedule/time fields, no firmware URL
 GET /gateway.lp?auto_update=true&getSessionStatus=true — 200 — JSON current_role admin
 GET /modals/parental-modal.lp?action=smartwifi — 200 — JSON smartwifi state only
-GET /modals/system-config-modal.lp?action=upgradefwstatus — 200 — configuration HTML modal, not JSON status
+GET /modals/system-config-modal.lp?action=upgradefwstatus — 200 — authenticated configuration HTML modal; no upgrade-status JSON (no success/errorcode fields)
+GET /modals/system-config-modal.lp?action=getbanksize — 200 — JSON success true, banksize 134217728 bytes (128 MiB)
+Offline summary of five uploaded browser HARs: `docs/f1-uploaded-hars.md`

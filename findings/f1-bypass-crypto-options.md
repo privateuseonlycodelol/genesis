@@ -1,5 +1,7 @@
 # F1 bypass and crypto options — 23.1.b (owner box)
 
+**Later-pass update (2026-10-12):** normal admin login plus the authenticated-page CSRF token successfully exercised hidden `getbanksize` and configuration export. The exported binary is preserved privately; no decryption or root is claimed. The earlier pass below is historical, and its negative UI conclusions are superseded by `software-pass-live-access.md` and `software-pass-config-export.md`.
+
 **When:** 2026-10-12  
 **Gateway:** `http://192.168.2.1`  
 **Config changed:** none. No reboot, reset, upload, or exploit payloads were sent.
@@ -16,15 +18,17 @@ This note separates what was tried from what is only a guess.
 | `GET /modals/system-config-modal.lp?action=upgradefwstatus` | 200 | **HTML configuration modal**, not JSON upgrade status |
 | `POST …/system-config-modal.lp` `action=upgradefwstatus` | 403 | nginx forbidden (plain POST, browser-like headers, and CSRF in body) |
 
-**Conclusion:** Homeware nginx allows authenticated **GET** on many `action=` query strings. **POST** to the same modal path without going through the in-page form flow is blocked. That is not a crypto bypass; it is access control on POST.
+**CORRECTION (2026-10-12):** These observations establish the listed response bodies and statuses only. They do not identify why the POSTs were rejected or establish a general restriction on requests outside the in-page flow. The saved frontend uses **GET** for `upgradefwstatus`; a valid ordinary browser-request control is needed before attributing 403 to feature permissions rather than session/CSRF/request differences. Related public framework code has a CSRF rejection path, but equivalence to this device is unverified. See `software-pass-request-review.md` and `software-pass-source-comparison.md`.
 
 Saved under `artifacts/ui/` (`gateway-scheduleReboot.json`, `gateway-session.json`, `parental-smartwifi.json`, etc.).
 
-## Web UI — already exhausted earlier
+## Web UI — pages inventoried earlier; backend coverage incomplete
 
 - Full Advanced dashboard and essentially all card modals (see `findings/tried.md`).
 - Log viewer: no `.rbi` or update host in 283 rows.
 - `system-config-min.js` upgrade/import/export/reboot actions exist in script but controls are not on the 23.1.b configuration page.
+
+**CORRECTION (2026-10-12):** Fetching these pages does not exhaust the backend surface. Hidden read/export handlers and a successful ordinary browser-request replay were not established by this inventory. No absence of a software-only path follows from this list.
 
 ## Classic Homeware “exploits” (reported, not re-run on 23.1.b)
 
@@ -43,7 +47,7 @@ From issue #321 and `docs/gcnt-x-public-hardware.md` on Telia **23.1.b**:
 | Derive OSCK from RBI header / LCM JSON alone | **Failed** — same logs |
 | `Decrypt_RBI_Firmware_Utility` board keys | **No GCNT-X** entry |
 | Guess OSCK or brute-force AES wrap | Impractical; not attempted |
-| **Device-backed `GCNT-X.osck`** via eripv2 + ECK (UART/root) | **Open** — only path to offline decrypt |
+| **Device-backed `GCNT-X.osck`** via eripv2 + ECK (UART/root) | **Open** — one acquisition route; not established as the only possible source |
 | On-device `bli_unseal` after root | **Open** — needs shell first |
 | WAN mirror during reboot / FOTA | **Open** — capture `.rbi` URL or TLS SNI without decrypting sealed file |
 

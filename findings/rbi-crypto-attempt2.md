@@ -36,7 +36,7 @@
 
 Both our script and Ansuel/Kbios `blidec_enhanced.py` use **inline IVs in the B7 blob** (IV₁ → 48 B wrapped key → IV₂ → ciphertext). **No** extra nonce in BLI2 TLVs for B7.
 
-**Footgun:** `blidec_enhanced.py` reads payload start as `struct.unpack_from(">H", globalheader, 0x2A)` (16-bit at `0x2A`). Correct Homeware offset is **32-bit big-endian at `0x28`** (see `header_parser.java` / `scripts/rbi_header.py`). On a full RBI file, `blidec` would seek to the wrong offset unless the stream is pre-stripped — use `rbi_header.py` offset or `attempt_rbi_decrypt.py`.
+**CORRECTION (2026-10-12, VERIFIED for the reference fixture):** `blidec_enhanced.py` reads payload start as `struct.unpack_from(">H", globalheader, 0x2A)` (16-bit at `0x2A`), while the format field is **32-bit big-endian at `0x28`**. Both reads return **363** on this reference RBI (`00 00 01 6b`). The earlier claim that this causes an incorrect seek on this full reference RBI was false. The 16-bit read remains a width limitation for offsets above `0xffff`; it does not explain this fixture's failed decryption. See `findings/software-pass-crypto-validation.md` and `scripts/test_rbi_validation.py`.
 
 ---
 

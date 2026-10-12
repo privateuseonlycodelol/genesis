@@ -14,28 +14,42 @@ TLV_NAMES = {
     0x20: "tagpparserversion",
     0x81: "flashaddress",
 }
+TLV_OFFSET = 48 + 0x104
 
 
 def parse_header(data: bytes) -> dict[str, str]:
     if len(data) < 48:
         raise ValueError("file too small for BLI header")
+    if data[:4] != b"BLI2":
+        raise ValueError("invalid BLI magic")
     magic, fim, fia = struct.unpack("4s2s2s", data[0:8])
     prodid, varid = struct.unpack("12s12s", data[8:32])
     ver = data[32:36]
     _unk = data[36:40]
     data_off = int.from_bytes(data[40:44], "big")
     data_size = int.from_bytes(data[44:48], "big")
+    if data_off < TLV_OFFSET:
+        raise ValueError(f"data_offset {data_off} before end of fixed header")
     if data_off > len(data):
         raise ValueError(f"data_offset {data_off} past EOF")
+    if data_size > len(data) - data_off:
+        raise ValueError(
+            f"data_size {data_size} extends past EOF from data_offset {data_off}"
+        )
 
     header = data[:data_off]
-    pos = 48 + 0x104
+    pos = TLV_OFFSET
     dynamic: dict[str, str] = {}
     while pos < data_off:
+        if data_off - pos < 2:
+            raise ValueError(f"incomplete TLV tag/length at offset {pos}")
         tag = header[pos]
-        pos += 1
-        length = header[pos]
-        pos += 1
+        length = header[pos + 1]
+        pos += 2
+        if length > data_off - pos:
+            raise ValueError(
+                f"TLV 0x{tag:02x} length {length} exceeds header at offset {pos - 2}"
+            )
         value = header[pos : pos + length]
         pos += length
         name = TLV_NAMES.get(tag, f"id_{tag:02x}")

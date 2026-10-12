@@ -1,13 +1,13 @@
 # Genesis report
 
-**Generated:** 2026-10-12T02:01:31Z
+**Generated:** 2026-10-12T02:21:42Z
 **Host:** (omitted)
 
 ## `artifacts/firmware`
 ```
 total 63984
 drwxr-xr-x  3 user  staff       96 Oct 11 05:48 .
-drwxr-xr-x  8 user  staff      256 Oct 11 20:21 ..
+drwxr-xr-x  9 user  staff      288 Oct 12 04:07 ..
 -rw-r--r--@ 1 user  staff 32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
 ```
 
@@ -15,7 +15,7 @@ drwxr-xr-x  8 user  staff      256 Oct 11 20:21 ..
 ```
 total 31104
 drwxr-xr-x  7 user  staff     224 Oct 11 17:46 .
-drwxr-xr-x  8 user  staff     256 Oct 11 20:21 ..
+drwxr-xr-x  9 user  staff     288 Oct 12 04:07 ..
 -rw-------  1 user  staff    1708 Oct 11 05:39 f1-reboot.pcapng
 -rw-r--r--  1 user  staff     335 Oct 11 08:01 wan.pcapng
 -rw-r--r--  1 user  staff  926664 Oct 11 17:46 wan2-real.pcapng
@@ -25,9 +25,9 @@ drwxr-xr-x  8 user  staff     256 Oct 11 20:21 ..
 
 ## `artifacts/logs`
 ```
-total 200
-drwxr-xr-x  15 user  staff   480 Oct 11 09:09 .
-drwxr-xr-x   8 user  staff   256 Oct 11 20:21 ..
+total 232
+drwxr-xr-x  21 user  staff   672 Oct 12 04:18 .
+drwxr-xr-x   9 user  staff   288 Oct 12 04:07 ..
 -rw-r--r--@  1 user  staff 49359 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.png
 drwxr-xr-x@  3 user  staff    96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.extracted
 -rw-r--r--@  1 user  staff   231 Oct 11 09:02 binwalk-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.txt
@@ -40,6 +40,12 @@ drwxr-xr-x@  3 user  staff    96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLAS
 -rw-r--r--@  1 user  staff  2525 Oct 11 05:48 rbi-download-attempts.txt
 -rw-r--r--@  1 user  staff  1880 Oct 11 09:02 rbi-inspect-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.txt
 -rw-r--r--@  1 user  staff  1514 Oct 11 05:48 rbi-inspect.txt
+-rw-r--r--@  1 user  staff   968 Oct 12 04:09 software-pass-crypto-validation.txt
+drwx------@  7 user  staff   224 Oct 12 04:16 software-pass-http-services
+-rw-------@  1 user  staff    48 Oct 12 04:18 software-pass-ipv6-default.private.json
+-rw-------@  1 user  staff    59 Oct 12 04:15 software-pass-router-ipv6.private.json
+-rw-r--r--@  1 user  staff   937 Oct 12 04:15 software-pass-router-tcp.txt
+drwx------@  7 user  staff   224 Oct 12 04:17 software-pass-ssdp
 -rw-r--r--@  1 user  staff   125 Oct 11 09:02 verify-squashfs-19x-reference.txt
 ```
 
@@ -71,6 +77,12 @@ drwxr-xr-x@  3 user  staff    96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLAS
 - [`mirror-test.md`](findings/mirror-test.md)
 - [`rbi-crypto-attempt2.md`](findings/rbi-crypto-attempt2.md)
 - [`rbi-crypto-debug.md`](findings/rbi-crypto-debug.md)
+- [`software-pass-capture-review.md`](findings/software-pass-capture-review.md)
+- [`software-pass-config-export.md`](findings/software-pass-config-export.md)
+- [`software-pass-crypto-validation.md`](findings/software-pass-crypto-validation.md)
+- [`software-pass-live-access.md`](findings/software-pass-live-access.md)
+- [`software-pass-request-review.md`](findings/software-pass-request-review.md)
+- [`software-pass-source-comparison.md`](findings/software-pass-source-comparison.md)
 - [`tried.md`](findings/tried.md)
 - [`wan-pcap.md`](findings/wan-pcap.md)
 - [`wan2-tagged-frames.md`](findings/wan2-tagged-frames.md)
