@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-11T20:10:59Z
+**Generated:** 2026-10-12T02:01:31Z
 **Host:** (omitted)
 
 ## `artifacts/firmware`
@@ -62,6 +62,7 @@ drwxr-xr-x@  3 user  staff    96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLAS
 - [`decomp-kickoff.md`](findings/decomp-kickoff.md)
 - [`f1-advanced-ui.md`](findings/f1-advanced-ui.md)
 - [`f1-api-map.md`](findings/f1-api-map.md)
+- [`f1-bypass-crypto-options.md`](findings/f1-bypass-crypto-options.md)
 - [`f1-logviewer.md`](findings/f1-logviewer.md)
 - [`f1-uart-23.1b.md`](findings/f1-uart-23.1b.md)
 - [`f1-ui-leads-23.1b.md`](findings/f1-ui-leads-23.1b.md)
