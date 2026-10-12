@@ -24,6 +24,21 @@ RIP_ID_OSCK = 0x0121
 
 LOGVIEWER_16 = bytes.fromhex("4d17f88a54003ce68362bbf7b1c70d1d")
 
+# GCNT-X 19.4.0856 public UART log (pastebin biRghtLr / hack-technicolor #321).
+_BOOT_BL_OID = bytes.fromhex("601cfafcb8ce8a06f90081d9")
+_BOOT_FW_GIT = b"5bde4b5646ee7061e320c605e10e3aaa98af4706"
+_BOOT_BL_GIT = b"c82c4f289bbd35e048aab42640d9d284a37e3ae9"
+_BOOT_BL_VER = (
+    b"21.05.1395-0000000-20210205075431-c82c4f289bbd35e048aab42640d9d284a37e3ae9"
+)
+_BOOT_SW_VER = (
+    b"19.4.0856-4581009-20221122120420-5bde4b5646ee7061e320c605e10e3aaa98af4706"
+)
+_BOOT_R2SECR_PHYS = 0x17fdf000
+_BOOT_PROZONE_PHYS = 0x17fe0000
+_BOOT_MARKET_ID = 0xFFA0
+_BOOT_NAND_ID = bytes.fromhex("98dc9026")
+
 
 def _env_serial() -> str:
     return os.environ.get("GENESIS_SERIAL", "").strip()
@@ -138,6 +153,40 @@ def _parse_board_java_osck_hex() -> list[tuple[str, bytes]]:
     return unique
 
 
+def boot_log_derived_candidates() -> list[tuple[str, bytes]]:
+    """Constants from the public GCNT-X 19.4.0856 UART boot log (not device-specific SN/MAC)."""
+    keys: list[tuple[str, bytes]] = []
+    keys.append(("boot_bl_oid_pad32", _BOOT_BL_OID.ljust(32, b"\0")[:32]))
+    keys.append(("sha256_boot_bl_oid", _sha256(_BOOT_BL_OID)))
+    for label, blob in [
+        ("boot_fw_git", _BOOT_FW_GIT),
+        ("boot_bl_git", _BOOT_BL_GIT),
+        ("boot_bl_ver", _BOOT_BL_VER),
+        ("boot_sw_ver", _BOOT_SW_VER),
+    ]:
+        keys.append((f"sha256_{label}", _sha256(blob)))
+        if len(blob) >= 32:
+            keys.append((f"{label}_first32", blob[:32]))
+    for label, addr in [
+        ("r2secr", _BOOT_R2SECR_PHYS),
+        ("prozone", _BOOT_PROZONE_PHYS),
+        ("flashbank", 0x117C0000),
+        ("market", _BOOT_MARKET_ID),
+    ]:
+        be4 = struct.pack(">I", addr)
+        keys.append((f"sha256_addr_{label}", _sha256(be4)))
+        keys.append((f"addr_{label}_pad32_be", be4.ljust(32, b"\0")))
+    keys.append(("sha256_nand_flashid", _sha256(_BOOT_NAND_ID)))
+    rip_salt = struct.pack(">H", RIP_ID_OSCK)
+    for label, msg in [
+        ("boot_bl_oid", _BOOT_BL_OID),
+        ("boot_fw_git8", _BOOT_FW_GIT[:8]),
+        ("boot_bl_git8", _BOOT_BL_GIT[:8]),
+    ]:
+        keys.append((f"hmac_rip0121_{label}", _hmac_sha256(rip_salt, msg)))
+    return keys
+
+
 def derived_key_candidates(
     serial: str | None = None,
     mac_hex: str | None = None,
@@ -218,6 +267,7 @@ def derived_key_candidates(
         keys.extend(_header_derived_candidates(header, serial, mac_hex))
 
     keys.extend(_parse_board_java_osck_hex())
+    keys.extend(boot_log_derived_candidates())
     return keys
 
 

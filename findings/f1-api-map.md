@@ -55,7 +55,7 @@ These show status or a settings form. They are not a shell. Posting the form wou
 | `/modals/tod-modal.lp` | Time-of-day rules |
 | `/modals/diagnostics-connection-modal.lp` | WAN check |
 | `/modals/diagnostics-network-modal.lp` | Port counters |
-| `/modals/diagnostics-ping-modal.lp` | Ping form |
+| `/modals/diagnostics-ping-modal.lp` | Ping and trace form (`action=PING` / `TRACE`; fields `ipAddress`, `ipAddressTrace`, …) |
 | `/modals/diagnostics-igmpproxy-modal.lp` | IGMP counters |
 | `/modals/wireless-radio-modal-newEM.lp` | 2.4 and 5 GHz radio form |
 | `/modals/wireless-wps-modal-newEM.lp` | WPS form |
@@ -76,6 +76,19 @@ Posting these would change the gateway. This pass only downloaded them.
 |------|-----------|
 | `/modals/wanservices-modal.lp` | Port forward and UPnP |
 | `/modals/dyndns-wanservices-modal.lp` | DynDNS account (currently disabled) |
+
+### WAN Services modal — verified POST behavior (`wanetc.har`, 2026-10-12)
+
+Offline browser capture on 23.1.b; not replayed. See [f1-har-wanetc-2026-10-12.md](f1-har-wanetc-2026-10-12.md).
+
+| POST `action` | Tables / fields (names only) | Observed result |
+| --- | --- | --- |
+| `TABLE-NEW` | `tableid` `portforwarding` or `fwrules_v6` | HTTP 200 HTML scaffold |
+| `TABLE-ADD` | IPv4: `destinationip`, `sourceip`, `wanport`, `lanport`, `protocol`, `enabled`; IPv6: `dest_ip_v6`, `src_ip_v6`, `wanport`, `enabled_v6` | HTTP 200; one attempt showed `Please enter valid IPv4` for bad destination |
+| `TABLE-DELETE` | `tableid`, `index` | HTTP 200 |
+| `SAVE` | `fromModal`, `upnp_status`, `upnp_natpmp`, `upnp_secure_mode`, `upnp_igd_version`, optional `enabled` | HTTP 200; “Changes saved successfully”; UPnP/NAT-PMP toggled in capture |
+
+Matches the shared `main-min.js` table handlers ([f1-js-deep-2026-10-12.md](f1-js-deep-2026-10-12.md)). Field validators and exploit assessment (no RCE; UPnP policy only): [f1-har-wanetc-2026-10-12.md](f1-har-wanetc-2026-10-12.md) § Exploit and injection assessment.
 | `/modals/l2tp-ipsec-server-modal.lp` | VPN server, including a pre-shared key field (value removed from the saved copy) |
 | `/modals/contentsharing-modal.lp` | Samba, DLNA, USB mode (USB 3.1 says it reboots) |
 | `/modals/system-config-modal.lp` | Restart, factory reset, semi-reset. The buttons on the page are only those three |
@@ -100,6 +113,22 @@ The upload accepts file extensions `rbi`, `fw`, and `pkgtb`. A failed upgrade st
 
 `main-min.js` also GETs `/gateway.lp?action=scheduleReboot` to read a scheduled time. That URL was not called again.
 
+### Diagnostics ping modal — verified POST behavior (2026-10-12)
+
+Authenticated session and CSRF required (same model as other modals). **VERIFIED** on this 23.1.b unit:
+
+| POST `action` | Observed behavior |
+| --- | --- |
+| `PING` + valid loopback `ipAddress` | HTTP 200; status `Ongoing` then completed success row; transformer logs `async run: /usr/bin/ipping_helper` with **no** trailing arguments ([f1-ipping-helper-2026-10-12.md](f1-ipping-helper-2026-10-12.md)). |
+| `PING` + newline/`logger` or backtick host | HTTP 200; `Please enter valid ipv4/domain address`; echoed raw host; **no** new `ipping_helper` line ([f1-ipping-host-2026-10-12.md](f1-ipping-host-2026-10-12.md)). |
+| `PING` + two `ipAddress` fields | HTTP **500** (170-byte nginx stub); Lua abort in `GetIPType` / `inet_pton` (`string expected, got table`); **no** helper ([f1-ipping-host-2026-10-12.md](f1-ipping-host-2026-10-12.md)). |
+| `TRACE` + loopback `ipAddressTrace`, hops 1 | HTTP 200; transformer logs **`igd_traceroute_helper`** (not `ipping_helper`) — [f1-trace-helper-2026-10-12.md](f1-trace-helper-2026-10-12.md) |
+| `TRACE` + `$(printf 127.0.0.1)` / newline / backtick host | HTTP 200; validation phrase; **no** new helper ([f1-trace-helper-2026-10-12.md](f1-trace-helper-2026-10-12.md), [f1-trace-path-2026-10-12.md](f1-trace-path-2026-10-12.md)) |
+
+**Connection modal** (`/modals/diagnostics-connection-modal.lp`): POST `action=SAVE` + `operation=RESTART` → HTTP 200; transformer logs `async run: /usr/bin/ipping_helper` in the same second ([f1-diagnostics-connection-restart-2026-10-12.md](f1-diagnostics-connection-restart-2026-10-12.md)). Driver: `scripts/f1_diagnostics_connection_control.py`.
+
+Drivers: `scripts/f1_ipping_control.py`, `scripts/f1_ipping_host_probe.py`. Pace requests; stop on nginx **503** after burst probes ([f1-ui-leads-23.1b.md](f1-ui-leads-23.1b.md)).
+
 ## Parallel surfaces (not the `:80` Homeware API)
 
 This file maps **session-gated** `*.lp` / `gateway.lp` / `authenticate` on **port 80**. Other listeners use different auth and protocols; they are **not** rows in the tables above.
@@ -118,7 +147,7 @@ CUPS :631 index: [docs/f1-cups-631.md](../docs/f1-cups-631.md). Drivers: `script
 
 ## Not fetched on purpose
 
-`/modals/wireless-qrcode-modal.lp` would show the Wi-Fi key. It was left alone.
+`/modals/wireless-qrcode-modal.lp` returns Wi-Fi QR markup (includes key material in the response). **VERIFIED 2026-10-12:** bare GET → HTTP **500**; GET with AP-modal query (`iface`, `broadcastiface`, `splitState`, `band6gOnly`, …) → HTTP **200** when authenticated. See [f1-wireless-qrcode-context-2026-10-12.md](f1-wireless-qrcode-context-2026-10-12.md). Do not archive bodies in git.
 
 ## Firmware and keys in the UI
 

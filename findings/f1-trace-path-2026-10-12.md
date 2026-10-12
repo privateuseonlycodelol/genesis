@@ -29,9 +29,13 @@ The substitution response also contained a `localhost.lan` route row, but a subs
 
 ## Assessment
 
-- **VERIFIED:** On this 23.1.b build, controlled TRACE requests did not add an `ipping_helper` event; a one-packet PING did. The evidence supports that TRACE does not invoke `/usr/bin/ipping_helper` through the logged transformer async path, while PING does. This is stronger than the earlier uncorrelated `05:08:06` helper line, which did not identify an action.
+- **VERIFIED (original oracle):** On this 23.1.b build, controlled TRACE requests did not add an **`ipping_helper`** event; a one-packet PING did. TRACE was never expected to use `ipping_helper` on published Homeware.
+
+**Superseded 2026-10-12 08:56 local:** the correct oracle is **`igd_traceroute_helper`**. One loopback TRACE added `async run: /usr/bin/igd_traceroute_helper` in the same second as the POST. See [f1-trace-helper-2026-10-12.md](f1-trace-helper-2026-10-12.md). The 05:46 table rows that say “no new helper” meant **no new ipping_helper**, not “TRACE did nothing.”
 - **VERIFIED, limited:** the direct form POST containing shell command substitution received the IPv4/domain validation message; the valid loopback control did not. This indicates server-side validation for that input. The validator's implementation and exact ordering relative to backend execution are not available in the saved artifacts.
 - **Not demonstrated:** command execution or command injection. The tested substitution string was rejected visibly, and no output was tied to it. This does **not** prove the entire TRACE path safe: only one metacharacter form and a small set of loopback inputs were tested; server source, process tracing, and the active backend binary were unavailable. Other encodings, fields, or parser paths remain untested.
+
+**Superseded for PING host on the same modal (2026-10-12 later):** newline/`logger`, backtick label, and duplicate `ipAddress` on `action=PING` were also rejected or aborted before `ipping_helper`; see [host validation](f1-ipping-host-2026-10-12.md).
 
 ## Reproduction identifiers and limits
 

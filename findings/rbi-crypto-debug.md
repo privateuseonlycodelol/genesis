@@ -118,3 +118,5 @@ Cross-check: `blidec_enhanced.py --osckey GCNT-R.osck` reaches `Layer type B7` t
 5. Optional: install **Temurin JRE** and run Ansuel GUI with a future OSCK hex to cross-check Python.
 
 **Do not flash** reference 19.x onto the live `23.1.b` Telia F1.
+
+Superseded for boot-log trials and aarch64 `r2secr` selection: [rbi-crypto-attempt3.md](rbi-crypto-attempt3.md).

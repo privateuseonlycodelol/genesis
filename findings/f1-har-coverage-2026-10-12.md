@@ -18,7 +18,9 @@
 
 **VERIFIED later (04:56:48Z UI grab, offline):** `GET /ajax/wirelesscard.lua?auto_update=true` with an admin session returns JSON (two radios: `listatus`, `ssid`, `radio`). Bare `GET` without the query is still 0 bytes. See [`f1-grab-045648-review.md`](f1-grab-045648-review.md). POST versus that GET was not compared in the grab.
 
-**Action names on the wire:** `scheduleReboot` (16 in `7.har`, 48 across 1–8) and `smartwifi` (3 / 11). No other `action=` name appears in these captures.
+**Action names on the wire (1–8 union):** `scheduleReboot` (16 in `7.har`, 48 across 1–8) and `smartwifi` (3 / 11). No `TABLE-*` or wanservices `SAVE` in that union.
+
+**Separate file `wanetc.har` (not in 1–8):** first repo capture of `POST /modals/wanservices-modal.lp` with `TABLE-NEW` / `TABLE-ADD` / `TABLE-DELETE` / `SAVE` on `portforwarding` and `fwrules_v6`. See [f1-har-wanetc-2026-10-12.md](f1-har-wanetc-2026-10-12.md). Still no broadband/ethernet/internet modals in that HAR.
 
 ## Gap pages
 

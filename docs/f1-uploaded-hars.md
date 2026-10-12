@@ -84,6 +84,21 @@ The parental HTML links `/modals/parental-modal.lp` and `/modals/tod-modal.lp`. 
 
 Sharing labels on the modal: Samba name **Vantiva**, workgroup **WORKGROUP**, description **Vantiva Gateway**, DLNA name **Telia F1**, profiler status **Idle**, USB 3.1 enabled (`usb3Enabled` `1`). The save sets `samba` and `sambaFilesharing` to `1`, `storageInterface` `0`, `diskProtection` `0`, `dlnaEnabled` `0`. The password field is omitted. The dashboard HTML captured before this save still said Samba filesharing disabled and DLNA disabled.
 
-## Still absent
+## Still absent (in files 1–5 above)
 
 No request for `upgradefwstatus` or `getbanksize`. No bank name, bank size, or firmware-upgrade endpoint. `logviewer` and `system-config` do not appear. The modal paths listed under file 1, other than dmz, L2TP, parental, and content sharing, were only linked, not loaded.
+
+## wanetc.har (standalone, 12 Oct 2026)
+
+**Not** nested with `1_a48a`–`5_fe07`. **64** entries, `06:41:51Z`–`06:43:34Z`. SHA-256 `deaecf9c837035a9b1a2c5c5a62c37181a242aa757169d6ec2e77673b9e6f677`. Full write-up: [f1-har-wanetc-2026-10-12.md](../findings/f1-har-wanetc-2026-10-12.md).
+
+Despite the filename, there is **no** `broadband-modal.lp`, `ethernet-modal.lp`, or `internet-modal.lp`. The new material is **WAN Services** interaction:
+
+| Method | URL | `action` | Notes |
+| --- | --- | --- | --- |
+| GET | `/modals/wanservices-modal.lp` | | 13,146 bytes (same hash as UI grab) |
+| GET | `/modals/dyndns-wanservices-modal.lp` | | Tab only; no DynDNS POST |
+| POST | `/modals/wanservices-modal.lp` | `TABLE-NEW`, `TABLE-ADD`, `TABLE-DELETE` | IPv4 `portforwarding` and IPv6 `fwrules_v6` tables |
+| POST | `/modals/wanservices-modal.lp` | `SAVE` | Two saves with “Changes saved successfully”; UPnP/NAT-PMP toggled on then off (field values omitted) |
+
+Also repeats `POST /gateway.lp` `action=URL`, `POST /ajax/wirelesscard.lua`, and session polls. All **200**. No secrets reproduced in the finding.

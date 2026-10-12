@@ -70,4 +70,4 @@ Reverse-engineering `r2secr.arm.*.ko` (ARM EABI relocatable, not stripped) expla
 
 ## Next discriminating experiment
 
-**UART boot log on the open case** (read-only, no flash): confirm **Linux version** → pick the correct `r2secr.arm.*.ko`, and print **`/proc/mtd`** names for **eripv2** on **23.1.b**. That does not yield the key by itself but selects the right acquisition commands the moment root exists.
+**UART boot log on the open case** (read-only, no flash): confirm **Linux version** → `scripts/select_r2secr_ko.py` (GCNT-X **19.4** public log is **aarch64 4.1.52**, not armv7 `p2v8`; closest stock module is `tools/secr/r2secr.arm64.4.1.45.ko`). Print **`/proc/mtd`** for **eripv2** on **23.1.b**. That does not yield the key by itself but selects the right acquisition commands the moment root exists. See [rbi-crypto-attempt3.md](rbi-crypto-attempt3.md).

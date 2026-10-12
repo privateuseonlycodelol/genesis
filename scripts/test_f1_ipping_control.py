@@ -83,6 +83,19 @@ class ParserTests(unittest.TestCase):
         parsed = probe.parse_ping_result(ping_page())
         self.assertEqual(parsed["trace"][0]["ip"], "127.0.0.1")
         self.assertEqual(parsed["spans"]["Success Count:"], "1")
+        self.assertEqual(parsed["ping_button"], "send")
+
+    def test_in_progress_page_uses_the_stop_button(self):
+        body = (
+            '<div id = "stop-config_PING" data-value = "PINGSTOP">Stop Ping Request</div>'
+            '<span id="Status:">Ongoing</span>'
+            '<table id="pingtrace"><tbody></tbody></table>'
+        )
+        parsed = probe.parse_ping_result(body)
+        self.assertTrue(parsed["diagnostics_modal"])
+        self.assertEqual(parsed["ping_button"], "stop")
+        self.assertEqual(parsed["spans"]["Status:"], "Ongoing")
+        self.assertEqual(parsed["trace"], [])
 
 
 class SequencingTests(unittest.TestCase):
@@ -150,6 +163,20 @@ class SequencingTests(unittest.TestCase):
         self.assertEqual(len(outcome["new_helper"]), 1)
         self.assertFalse(outcome["new_helper"][0]["arguments_logged"])
         self.assertIn("loopback result and a new ipping_helper", outcome["conclusion"])
+        self.assertNotIn("session-token", json.dumps(outcome))
+
+    def test_ongoing_post_records_the_helper_without_a_result_row(self):
+        body = (
+            b'<div id = "stop-config_PING" data-value="PINGSTOP">Stop Ping Request</div>'
+            b'<span id="Status:">Ongoing</span><span id="Success Count:">0</span>'
+            b'<input name="ipAddress" value="127.0.0.1">'
+            b'<table id="pingtrace"><tbody></tbody></table>'
+        )
+        quiet = log_page([OLD])
+        outcome, calls = self.run_case([quiet, quiet, log_page([NEW, OLD])], ping_body=body)
+        self.assertEqual(sum(call["method"] == "POST" for call in calls), 1)
+        self.assertIn("Ongoing", outcome["conclusion"])
+        self.assertEqual(outcome["ping"]["trace"], [])
         self.assertNotIn("session-token", json.dumps(outcome))
 
     def test_spontaneous_helper_skips_the_ping(self):

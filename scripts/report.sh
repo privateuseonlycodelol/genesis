@@ -77,10 +77,17 @@ shasum_rbi() {
   done
   echo
 
-  if [[ -f artifacts/logs/decrypt-attempt-19x.txt ]] || [[ -f artifacts/logs/decrypt-attempt2.txt ]]; then
+  if [[ -f artifacts/logs/decrypt-attempt-19x.txt ]] || [[ -f artifacts/logs/decrypt-attempt2.txt ]] || [[ -f artifacts/logs/decrypt-attempt3.txt ]]; then
     echo "## 19.x reference RBI (offline)"
+    if [[ -f artifacts/logs/decrypt-attempt3.txt ]]; then
+      echo "### attempt3 (boot-log derivations, latest)"
+      echo '```'
+      tail -n 12 artifacts/logs/decrypt-attempt3.txt
+      echo '```'
+      echo
+    fi
     if [[ -f artifacts/logs/decrypt-attempt2.txt ]]; then
-      echo "### attempt2 (latest)"
+      echo "### attempt2"
       echo '```'
       tail -n 12 artifacts/logs/decrypt-attempt2.txt
       echo '```'
@@ -93,7 +100,7 @@ shasum_rbi() {
       echo '```'
       echo
     fi
-    echo 'Deep dive: `findings/gcnt-x-19x-deep.md` · Crypto: `findings/rbi-crypto-attempt2.md` · Root path (lab): `findings/gcnt-x-root-path.md`'
+    echo 'Deep dive: `findings/gcnt-x-19x-deep.md` · Crypto: `findings/rbi-crypto-attempt3.md` · Root path (lab): `findings/gcnt-x-root-path.md`'
     echo
   fi
 

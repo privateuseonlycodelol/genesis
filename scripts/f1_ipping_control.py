@@ -206,7 +206,8 @@ def parse_ping_result(body):
             )
     return {
         "login_marker": login,
-        "diagnostics_modal": 'id="send-config_PING"' in body or "send-config_PING" in body,
+        "diagnostics_modal": "send-config_PING" in body or "stop-config_PING" in body,
+        "ping_button": "stop" if "stop-config_PING" in body else "send" if "send-config_PING" in body else None,
         "spans": {key: spans.get(key) for key in wanted},
         "ip_echo": _keep_status(_text(echoed.group(1))) if echoed else None,
         "trace": trace,
@@ -358,8 +359,11 @@ def run(client, password):
     outcome["new_helper"] = added
     ping = outcome["ping"]
     result_for_host = any(row.get("ip") == HOST for row in ping["trace"])
+    ongoing = ping["spans"].get("Status:") == "Ongoing"
     if added and result_for_host:
         outcome["conclusion"] = "PING response contained the loopback result and a new ipping_helper log line"
+    elif added and ongoing:
+        outcome["conclusion"] = "PING returned Ongoing and a new ipping_helper log line; the POST body had no result row yet"
     elif added and not result_for_host:
         outcome["conclusion"] = "new ipping_helper log line without a loopback result row in the POST body"
     elif result_for_host and not added:

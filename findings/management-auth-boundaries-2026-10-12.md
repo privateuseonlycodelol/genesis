@@ -4,6 +4,8 @@
 
 **Canonical CUPS follow-up (2026-10-12, same device):** [f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md) (policy model, ipptool, write discriminators) and [f1-cups-ipp-readonly-matrix-2026-10-12.md](f1-cups-ipp-readonly-matrix-2026-10-12.md) (19-probe matrix). This file records the **initial** boundary pass below; rows marked “mechanism not established” for HTTP **403** are **superseded** by the derived `<Location>` vs IPP split in the policy finding.
 
+**Diagnostics on port 80 (same day, separate pass):** authenticated `POST` to `/modals/diagnostics-ping-modal.lp` requires a valid admin session (not tested unauthenticated here). Host metacharacters and duplicate `ipAddress` were rejected or aborted before `transformer` launched `/usr/bin/ipping_helper`; see [f1-ipping-host-2026-10-12.md](f1-ipping-host-2026-10-12.md). TR-069/CWMP (**7547**) was **closed** on LAN in the software-pass inventory — no ACS bypass was attempted.
+
 **VERIFIED:** the owned F1 processes an unauthenticated read-only CUPS IPP operation, although ordinary browser GETs on the same service return 403. This is a protocol-access finding, not an administrative authentication bypass. No printer administration, settings change, firmware operation, WPS message, event subscription, or login attempt was performed.
 
 Target: only `192.168.2.1`. The current login page's static-asset build label is `23.1.b.0448-7241017-20260223134332-1bc56e11012dfec7d96d5c28eb498c16c196a568`, matching the recorded F1 build. Board identity remains supported by prior authenticated/export evidence, not a new hardware observation. This pass tested LAN access from this Mac; it establishes nothing about WAN, guest-network, other-client, or IPv6 exposure.

@@ -35,7 +35,27 @@ Source log: https://pastebin.com/raw/biRghtLr (PuTTY header `2024.02.22 18:25:13
 - Each bank span is `0x03c00000` (60 MiB). The log later prints `ubi0: attached mtd2 (name "ubi", size 278 MiB)`, which matches the `ubi` span rounded down to a whole mebibyte.
 - The live 23.1.b UI reported `banksize` `134217728` (128 MiB) in `findings/software-pass-live-access.md`. That number does not match these 60 MiB banks. This map is not a 23.1.b partition map.
 
-The log also prints `eRIPv2 secrets passed correctly to Linux` and `OSCK Loaded!`. Those are status strings. No key bytes are in this note.
+The log also prints `eRIPv2 secrets passed correctly to Linux`, `OSCK Loaded!`, and `Client Private Key Loaded!`. Those are status strings. No key bytes are in the paste.
+
+## What the same log adds for the sealed 19.4 RBI
+
+The local file `artifacts/firmware/REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi` is **19.4.0507-4581025**. This paste is **19.4.0856-4581009** (`SW Version : 19.4.0856-4581009-20221122120420-5bde4b5646ee7061e320c605e10e3aaa98af4706`). Same board and variant (`Board Mnemonic : GCNT-X`, `Variant ID : TL`, `Market ID : FFA0`). Not the same image, and not the live `23.1.b` unit.
+
+**REPORTED** from the paste, and checked against the local RBI header:
+
+- Kernel banner: `Linux version 4.1.52 (repowrt-builder@eb570e1caf5d) (gcc version 5.3.0 (Buildroot 2016.02) ) #0 SMP PREEMPT Fri Jan 28 10:29:17 2022`, then `CPU: AArch64 Processor [420f1000]`. This is a 64-bit 4.1.52 kernel. It is not the ARMv7 `4.1.52 … p2v8` string reported for other Technicolor boards.
+- Command line includes `root=/dev/mtdblock1 rootfstype=squashfs rootfs_offset=0x01400000 board=GCNT-X platform.prozone_addr=0x17fe0000 .r2secr=0x17fdf000`, plus bootloader `bl_version=21.05.1395-0000000-20210205075431-c82c4f289bbd35e048aab42640d9d284a37e3ae9` and `bl_oid=601cfafcb8ce8a06f90081d9`. Later: `Prozone base: 0000000017fe0000`.
+- Before Linux: `Boot Loader Version : 21.05.1395-…`, `Decompression LZ4 image OK!`, `Code Address: 0x00080000`. Early ROM banner ends `PASS`. `*** Press b to enter BOOT-P ***` is followed by `Booting : Bank 2`.
+- `parse_btab: num_banks (6)` is printed, then the two named banks in the table above. The log does not define six full firmware banks.
+- Root mounts `squashfs` readonly, then UBIFS volume `rootfs_data` as the overlay. Named early scripts: `/lib/mount_root/00_rtfd_all`, `10_remove_due_to_upgrade`, `18_ispconfig_save`, `20_rtfd_remove`, `30_parameter_conversion`, `80_rtfd_restore`, `82_ispconfig_restore`. Later: four `Hostapd starting` lines, `/bin/smd`, CMS `ssk` in Legacy98 mode. `Magic SysRq` is enabled on `ttyS0`. The capture never shows a shell prompt after `Please press Enter to activate this console.`
+
+**DERIVED** from those addresses plus the local RBI TLV `flashaddress: 0x117c0000` and payload length 32,759,002:
+
+- `0x117c0000` is the start of `bank_1` in this log. The sealed 19.4.0507 file is a bank image aimed at that offset, not a full NAND dump.
+- Each named bank is `0x03c00000` (60 MiB). The sealed payload is about 31.2 MiB, so it does not fill a bank. On the booted bank, squashfs `rootfs` begins `0x01400000` into the bank. A ~31 MiB image written at the bank start would cover that pre-rootfs region and about 11 MiB of the rootfs window.
+- `.r2secr=0x17fdf000` is the physical address where this bootloader parked the eRIP secret struct. `tools/secr`’s example dumps use addresses such as `0x1ffdf000` and only print key bytes after `insmod` of a matching `r2secr.*.ko`. This paste has the address and the stock `OSCK Loaded!` line. It does not have the `DumpHex` output. The published secr modules are MIPS or 32-bit ARM, including `r2secr.arm.4.1.38.ko`. None match an aarch64 4.1.52 kernel. No `.ko` is in this tree.
+
+**Still not in the paste:** OSCK or ECK bytes, a decrypted rootfs, PCI vendor/device IDs, and a public hit for git hashes `5bde4b5646ee7061e320c605e10e3aaa98af4706` or `c82c4f289bbd35e048aab42640d9d284a37e3ae9`. NAND `flashId=98dc9026` is only four bytes. That prefix is the one mainline’s unparsable-ID table uses for Toshiba `TC58NVG2S0F` (512 MB, 4K page); this driver printed `UNKNOWN NAND CHIP` and forced spare size from board config (`27B/512B`, `oobsize=216`). The catalog part is still not identified.
 
 ## Reported in issue 321, not in the paste
 

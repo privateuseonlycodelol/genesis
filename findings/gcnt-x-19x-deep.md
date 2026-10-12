@@ -73,9 +73,13 @@ Decrypted bank images should begin with four `0xFF` bytes before binwalk finds s
 
 Logs: `artifacts/logs/binwalk-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.txt`, entropy `artifacts/logs/REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.png`.
 
+## Sibling boot log (19.4.0856, not this file)
+
+A public serial log for **19.4.0856** on GCNT-X is already quoted in [gcnt-x-public-hardware.md](gcnt-x-public-hardware.md). It is not a decrypt of this 19.4.0507 RBI. It does fix the layout this header is aimed at: TLV `flashaddress 0x117c0000` is `bank_1` on that boot, banks are 60 MiB, and the kernel is **aarch64 4.1.52** with `.r2secr=0x17fdf000`. The paste records `OSCK Loaded!` and does not contain key bytes. Published `r2secr.arm.4.1.38.ko` does not match that kernel.
+
 ## Strings / Ghidra prep (from what we have)
 
-Until decrypt succeeds, RE targets are **header tooling** and **WAN-captured 23.1.b RBI**, not this blob’s userspace.
+Until decrypt succeeds, RE targets are **header tooling** and **WAN-captured 23.1.b RBI**, not this blob’s userspace. The 19.4.0856 log names the userspace to expect after unseal (`squashfs` + UBIFS `rootfs_data`, `/lib/mount_root/*`, `hostapd`, `/bin/smd`).
 
 | Target | In sealed 19.x RBI? | Notes for later extract |
 |--------|---------------------|-------------------------|

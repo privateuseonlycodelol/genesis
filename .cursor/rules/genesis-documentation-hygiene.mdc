@@ -1,0 +1,18 @@
+---
+description: After F1 research passes, update findings cross-links and tried.md without waiting for the user
+alwaysApply: true
+---
+
+# Genesis — documentation hygiene
+
+When this workspace work adds **verified** F1 behavior, tools, or refuted hypotheses:
+
+1. Write or update the **canonical** `findings/*.md` for that track (commands, evidence dir under `artifacts/`, exploit status, limitations).
+2. Append **`findings/tried.md`** (one line per live run).
+3. Search `findings/` for stale claims that your work supersedes (`rg -i 'not invoked|no soap|not tested|unknown.*49152'` etc.) and fix with dated supersession links.
+4. Touch applicable **hubs**: `software-pass-summary.md`, `management-auth-boundaries-2026-10-12.md`, `f1-api-map.md` (port-80 routes **or** Parallel surfaces table), `auth-session-and-wps-2026-10-12.md`, `wps-upnp-source-boundary.md`, `README.md`.
+5. Run **`./scripts/report.sh`** to refresh `findings/latest.md`.
+
+`f1-api-map.md` is **Homeware :80** only; WFA **49152**, CUPS **631**, and similar belong in Parallel surfaces + dedicated findings, not invented `.lp` paths.
+
+Do not commit secrets. Do not mark documentation done without the finding file and tried line when live device work ran.

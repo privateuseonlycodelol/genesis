@@ -32,8 +32,12 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
 fi
 
 # --- edit for your kernel / layout ---
-KO="/tmp/r2secr.arm.4.1.52_p2v8.ko"
+# GCNT-X 19.4 UART log: Linux 4.1.52 aarch64 — NOT armv7 p2v8. On router:
+#   uname -a | python3 /path/to/select_r2secr_ko.py
+# Copy the printed tools/secr/*.ko to /tmp on the gateway.
+KO="/tmp/r2secr.arm64.4.1.45.ko"
 MTD_DEV="/dev/mtd4"
+# eripv2 is 0x100000-0x140000 in 19.4 logs; confirm: grep eripv2 /proc/mtd
 # ------------------------------------
 
 mkdir -p "$OUT"

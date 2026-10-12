@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-12T06:16:32Z
+**Generated:** 2026-10-12T07:26:05Z
 **Host:** (omitted)
 
 ## UI grab reviews (newest first)
@@ -18,7 +18,7 @@
 ```
 total 63984
 drwxr-xr-x   3 user  staff        96 Oct 12 08:08 .
-drwxr-xr-x  13 user  staff       416 Oct 12 07:13 ..
+drwxr-xr-x  16 user  staff       512 Oct 12 09:24 ..
 -rw-r--r--@  1 user  staff  32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
 ```
 
@@ -26,7 +26,7 @@ drwxr-xr-x  13 user  staff       416 Oct 12 07:13 ..
 ```
 total 31104
 drwxr-xr-x   7 user  staff      224 Oct 11 17:46 .
-drwxr-xr-x  13 user  staff      416 Oct 12 07:13 ..
+drwxr-xr-x  16 user  staff      512 Oct 12 09:24 ..
 -rw-------   1 user  staff     1708 Oct 11 05:39 f1-reboot.pcapng
 -rw-r--r--   1 user  staff      335 Oct 11 08:01 wan.pcapng
 -rw-r--r--   1 user  staff   926664 Oct 11 17:46 wan2-real.pcapng
@@ -36,9 +36,9 @@ drwxr-xr-x  13 user  staff      416 Oct 12 07:13 ..
 
 ## `artifacts/logs`
 ```
-total 264
-drwxr-xr-x  24 user  staff    768 Oct 12 04:28 .
-drwxr-xr-x  13 user  staff    416 Oct 12 07:13 ..
+total 280
+drwxr-xr-x  25 user  staff    800 Oct 12 09:20 .
+drwxr-xr-x  16 user  staff    512 Oct 12 09:24 ..
 -rw-r--r--@  1 user  staff  49359 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.png
 drwxr-xr-x@  3 user  staff     96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.extracted
 -rw-r--r--@  1 user  staff    231 Oct 11 09:02 binwalk-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.txt
@@ -46,6 +46,7 @@ drwxr-xr-x@  3 user  staff     96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLA
 -rw-r--r--@  1 user  staff     82 Oct 11 05:48 binwalk-reference-rbi.txt
 -rw-r--r--@  1 user  staff    320 Oct 11 09:05 decrypt-attempt-19x.txt
 -rw-r--r--@  1 user  staff   4858 Oct 11 09:09 decrypt-attempt2.txt
+-rw-r--r--@  1 user  staff   4223 Oct 12 09:20 decrypt-attempt3.txt
 -rw-r--r--   1 user  staff     53 Oct 11 05:41 lcm-23.1.b.json
 -rw-r--r--   1 user  staff     51 Oct 11 05:41 lcm-23.1.json
 -rw-r--r--@  1 user  staff   2525 Oct 11 05:48 rbi-download-attempts.txt
@@ -88,6 +89,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-config-export-decrypt-2026-10-12.md`](findings/f1-config-export-decrypt-2026-10-12.md)
 - [`f1-cups-ipp-policy-2026-10-12.md`](findings/f1-cups-ipp-policy-2026-10-12.md)
 - [`f1-cups-ipp-readonly-matrix-2026-10-12.md`](findings/f1-cups-ipp-readonly-matrix-2026-10-12.md)
+- [`f1-diagnostics-connection-restart-2026-10-12.md`](findings/f1-diagnostics-connection-restart-2026-10-12.md)
 - [`f1-grab-033853-auth-crypto.md`](findings/f1-grab-033853-auth-crypto.md)
 - [`f1-grab-033853-integrity.md`](findings/f1-grab-033853-integrity.md)
 - [`f1-grab-033853-review.md`](findings/f1-grab-033853-review.md)
@@ -100,15 +102,21 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-grab-csrf-redaction-corruption.md`](findings/f1-grab-csrf-redaction-corruption.md)
 - [`f1-grab-notloggedin-2026-10-12.md`](findings/f1-grab-notloggedin-2026-10-12.md)
 - [`f1-har-coverage-2026-10-12.md`](findings/f1-har-coverage-2026-10-12.md)
+- [`f1-har-wanetc-2026-10-12.md`](findings/f1-har-wanetc-2026-10-12.md)
 - [`f1-hardware-key-blocker-2026-10-12.md`](findings/f1-hardware-key-blocker-2026-10-12.md)
 - [`f1-hidden-action-boundary-2026-10-12.md`](findings/f1-hidden-action-boundary-2026-10-12.md)
+- [`f1-ipping-helper-2026-10-12.md`](findings/f1-ipping-helper-2026-10-12.md)
+- [`f1-ipping-host-2026-10-12.md`](findings/f1-ipping-host-2026-10-12.md)
 - [`f1-js-deep-2026-10-12.md`](findings/f1-js-deep-2026-10-12.md)
 - [`f1-logviewer.md`](findings/f1-logviewer.md)
+- [`f1-trace-helper-2026-10-12.md`](findings/f1-trace-helper-2026-10-12.md)
 - [`f1-trace-path-2026-10-12.md`](findings/f1-trace-path-2026-10-12.md)
 - [`f1-uart-23.1b.md`](findings/f1-uart-23.1b.md)
 - [`f1-ui-grab-2026-10-12.md`](findings/f1-ui-grab-2026-10-12.md)
 - [`f1-ui-leads-23.1b.md`](findings/f1-ui-leads-23.1b.md)
+- [`f1-usp-ipping-2026-10-12.md`](findings/f1-usp-ipping-2026-10-12.md)
 - [`f1-wfa-wlanconfig-49152-2026-10-12.md`](findings/f1-wfa-wlanconfig-49152-2026-10-12.md)
+- [`f1-wireless-qrcode-context-2026-10-12.md`](findings/f1-wireless-qrcode-context-2026-10-12.md)
 - [`gcnt-x-19x-deep.md`](findings/gcnt-x-19x-deep.md)
 - [`gcnt-x-public-hardware.md`](findings/gcnt-x-public-hardware.md)
 - [`gcnt-x-root-path.md`](findings/gcnt-x-root-path.md)
@@ -116,6 +124,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`management-offline-service-evidence.md`](findings/management-offline-service-evidence.md)
 - [`mirror-test.md`](findings/mirror-test.md)
 - [`rbi-crypto-attempt2.md`](findings/rbi-crypto-attempt2.md)
+- [`rbi-crypto-attempt3.md`](findings/rbi-crypto-attempt3.md)
 - [`rbi-crypto-debug.md`](findings/rbi-crypto-debug.md)
 - [`session-source-availability-boundary.md`](findings/session-source-availability-boundary.md)
 - [`software-pass-capture-review.md`](findings/software-pass-capture-review.md)
@@ -134,7 +143,23 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`wps-upnp-source-boundary.md`](findings/wps-upnp-source-boundary.md)
 
 ## 19.x reference RBI (offline)
-### attempt2 (latest)
+### attempt3 (boot-log derivations, latest)
+```
+decrypt_success: False
+structural_scan:
+  file_len: 32759365
+  data_off + data_size: 32759365
+  trailing_after_payload: 0
+  BLI2_magic_offsets_first_1MiB: []
+  zip_local_in_header_region: offset none
+  gzip_in_header_region: offset none
+  bli2_in_hdr_in_header_region: offset 0
+  payload_prefix_hex: b74d5554450a01f3dcd09d50b329960e9b36866678955644375473aecc3addb038ac44ed75d194166aa5e2683868e079aa386f5cf5c294cf2f7d211858ed5e94
+  header_gap_0x104: no obvious cleartext PEM/ssh
+note: no trial passed B7 OSCK unwrap (bad_osck); GCNT-X.osck not published
+```
+
+### attempt2
 ```
 decrypt_success: False
 structural_scan:
@@ -160,5 +185,5 @@ decrypt_success: False
 note: no trial passed B7 OSCK unwrap (bad_osck); GCNT-X.osck not published
 ```
 
-Deep dive: `findings/gcnt-x-19x-deep.md` · Crypto: `findings/rbi-crypto-attempt2.md` · Root path (lab): `findings/gcnt-x-root-path.md`
+Deep dive: `findings/gcnt-x-19x-deep.md` · Crypto: `findings/rbi-crypto-attempt3.md` · Root path (lab): `findings/gcnt-x-root-path.md`
 
