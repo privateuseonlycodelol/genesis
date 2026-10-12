@@ -8,7 +8,7 @@ Target: the owner's F1 at `192.168.2.1`; no other network host was probed. Norma
 
 **VERIFIED:** the Codex in-app browser could not open the same URL; its error was `net::ERR_ADDRESS_UNREACHABLE`.
 
-**REPORTED by the user:** their browser can reach the F1. This differs from the tool observations and has not been explained. It is not evidence of an F1 authentication failure or HTTP 503 cooldown. An app/process-specific network access issue is a HYPOTHESIS, not a diagnosed cause.
+**REPORTED by the user:** their browser can reach the F1. At this stage, the discrepancy with tool observations was unexplained. It was not evidence of an F1 authentication failure or HTTP 503 cooldown. The later permission change and recovery below support an app/process-specific network access explanation, without an OS-level causal trace.
 
 **VERIFIED tool output, limited interpretation:** one paced TCP connect inventory against eight ports returned `filtered` for all: 22, 23, 53, 80, 443, 445, 8080, 8443. Command:
 
@@ -30,7 +30,9 @@ Nmap 7.991 exited 0. Its `Host is up` text is not independent reachability evide
 
 **DERIVED:** this controlled sequence supports CSRF-token state as the explanation for the failed export attempt. It disproves the claim that this hidden export operation is unavailable to the ordinary admin session merely because its button is absent. It does not diagnose every prior 403 or establish any privilege escalation.
 
-Private responses and cookie jar: ignored `artifacts/ui/readonly-control-20261012T021317Z/`; directory mode 0700, response files mode 0600. `summary.json` preserves request order, methods, static paths/actions, response sizes, hashes and safe classification. Requests 1–7 are the initial run; 8–10 are the corrected replay. The control script now refreshes CSRF from the authenticated page. Two mocked sequencing tests in `scripts/test_f1_readonly_control.py` check token rotation and stopping before hidden actions when the base authentication control fails. These tests are not live router evidence. See `software-pass-config-export.md` for offline format checks; no successful decryption is claimed.
+**VERIFIED outer-header identity check:** both downloaded exports declare board `GCNT-X`, a build beginning `23.1.b`, and the public analogue's `THENC` preamble. Board, build, and serial fields match across the two files; serial values are not published. These are outer metadata labels from the live-export responses, not independently authenticated inner contents.
+
+Private responses and cookie jar: ignored `artifacts/ui/readonly-control-20261012T021317Z/`; directory mode 0700, response files mode 0600. `summary.json` preserves request order, methods, static paths/actions, response sizes, hashes and safe classification. Requests 1–7 are the initial run; 8–10 are the corrected replay. Requests 11–13 repeat the base/admin controls and take one second ordinary export specifically for an envelope comparison: 181,089 bytes, SHA-256 `90d9833b519ddad18b183321196b8f0584ece549154ccb17081417a6434fe390`. Across these 13 requests, 12 returned 200 and the one stale-token export returned 403; no 503 occurred. The control script now refreshes CSRF from the authenticated page, requires valid bank-size JSON, and reports failure for a rejected or unrecognized export response. Five mocked sequencing tests in `scripts/test_f1_readonly_control.py` cover token rotation, failed base/bank controls, export 403, and HTTP 200 HTML pretending to be a download. These tests are not live router evidence. See `software-pass-config-export.md` for offline format checks; no successful decryption is claimed.
 
 ## Working-connection service inventory
 
@@ -41,6 +43,8 @@ Private responses and cookie jar: ignored `artifacts/ui/readonly-control-2026101
 ```
 
 Ordinary unauthenticated HTTP GET `/` on 631 returned 403 / 343 bytes with a CUPS family marker in its Server header; this is a header-reported identity only. Port 8080 returned 404 / 146 bytes with an nginx marker. Bodies/headers remain private under `artifacts/logs/software-pass-http-services/`. Neither root response excludes additional handlers. No service actions were invoked.
+
+**VERIFIED:** one standard `localhost A` DNS lookup over UDP and one over TCP to the router both completed with `NOERROR` and one answer. Thus a DNS-speaking service was observed on both transports, rather than inferred solely from port 53. Only status/counts are recorded in `artifacts/logs/software-pass-dns.json`; no answer values are published.
 
 **VERIFIED:** one unicast SSDP discovery request to the owned router's UDP 1900 received HTTP-like status 200. Its advertised description and service-description URLs pointed back to the same IPv4 router, on **TCP 49152**. Both descriptions were retrieved with ordinary GETs. The XML advertised `urn:schemas-wifialliance-org:device:WFADevice:1` and `urn:schemas-wifialliance-org:service:WFAWLANConfig:1`; action names: `GetDeviceInfo`, `PutMessage`, `PutWLANResponse`, `SetSelectedRegistrar`. **None was invoked.** Advertisement describes a Wi-Fi provisioning interface, not proof of an authentication flaw or shell access. Raw XML contains private identifiers and remains ignored under `artifacts/logs/software-pass-ssdp/`.
 

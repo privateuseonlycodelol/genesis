@@ -56,7 +56,7 @@ Source: https://pastebin.com/raw/biRghtLr
 
 The datasheet prints only “Flash 512 MB”. Source: https://fiber.rone.se/Manualer/Router_datasheet%20Wifi%206.pdf
 
-This log is firmware 19.4.0856. A 23.1.b partition map is not stated.
+This log is firmware 19.4.0856. Each bank span is `0x03c00000` (60 MiB). A 23.1.b partition map is not stated. The live unit’s UI later reported `banksize` 134217728 (128 MiB); that number is not this map.
 
 ## 3. Wi-Fi or radio part
 
@@ -98,7 +98,9 @@ Vantiva’s regulatory hits for this family are the 19.4 open-source report and 
 
 Flash chip name: the capture prints “UNKNOWN NAND CHIP”, quoted in section 2. A catalog name is not stated.
 
-Console prompt, from the same GCNT-X log: “*** Press b to enter BOOT-P ***” and “Please press Enter to activate this console.” Source: https://pastebin.com/raw/biRghtLr
+Console prompt, from the same GCNT-X log: “*** Press b to enter BOOT-P ***” and “Please press Enter to activate this console.” The fetched paste does not show a shell prompt after that line. Source: https://pastebin.com/raw/biRghtLr
+
+A later issue 321 comment quotes a power-on menu, not a second full log: “CFE-ROM WAS ABORTED” and “Please choose one of the following options:” with “c - continue” and “s - DDR safe mode”. The same comment says the CFE shell is cut out. Source: https://github.com/hack-technicolor/hack-technicolor/issues/321
 
 The log header is “=~=~=~=~=~=~=~=~=~=~=~= PuTTY log 2024.02.22 18:25:13 =~=~=~=~=~=~=~=~=~=~=~=” and the banner includes “Technicolor Gateway” and “Board Mnemonic : GCNT-X”. Source: https://pastebin.com/raw/biRghtLr
 

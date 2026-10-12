@@ -2,8 +2,9 @@
 """Print a sanitized, metadata-only summary of a browser HAR file.
 
 The output intentionally excludes hosts, arbitrary query parameters, headers,
-cookies, request bodies, response text, and JSON values. Only allowlisted
-``action`` query values are retained in paths.
+cookies, request-body values, response text, and JSON values. It reports only
+exact allowlisted paths/actions, a coarse request-body class, CSRF-field/header
+presence, response markers, sizes, and allowlisted JSON key names.
 """
 
 from __future__ import annotations
@@ -22,6 +23,19 @@ ALLOWED_ACTIONS = {
     "smartwifi",
     "upgradefwstatus",
     "getbanksize",
+    "lastaccess",
+    "redirect",
+}
+ALLOWED_BODY_ACTIONS = {
+    "export_config",
+    "import_config",
+    "schedulerebootset",
+    "system_bootp",
+    "system_reboot",
+    "upgradefw",
+    "languageChanged",
+    "lastaccess",
+    "redirect",
 }
 SAFE_MIME = re.compile(r"^[A-Za-z0-9.+-]+/[A-Za-z0-9.+-]+$")
 KNOWN_PATHS = {
@@ -37,9 +51,50 @@ KNOWN_PATHS = {
     "/favicon.ico",
     "/gateway.lp",
     "/login.lp",
+    "/password.lp",
+    "/home.lp",
     "/authenticate",
+    "/modals/basicview-accesscode-modal.lp",
+    "/modals/broadband-modal.lp",
+    "/modals/contentsharing-modal.lp",
+    "/modals/device-modal.lp",
+    "/modals/diagnostics-connection-modal.lp",
+    "/modals/diagnostics-igmpproxy-modal.lp",
+    "/modals/diagnostics-network-modal.lp",
+    "/modals/diagnostics-ping-modal.lp",
+    "/modals/dmz-modal.lp",
+    "/modals/dyndns-wanservices-modal.lp",
+    "/modals/ethernet-modal.lp",
+    "/modals/firewall-modal.lp",
+    "/modals/internet-modal.lp",
+    "/modals/l2tp-ipsec-server-modal.lp",
+    "/modals/logviewer-modal.lp",
     "/modals/parental-modal.lp",
     "/modals/system-config-modal.lp",
+    "/modals/system-info-modal.lp",
+    "/modals/time-management-modal.lp",
+    "/modals/tod-modal.lp",
+    "/modals/wanservices-modal.lp",
+    "/modals/wireless-ap-modal-newEM.lp",
+    "/modals/wireless-radio-modal-newEM.lp",
+    "/modals/wireless-wps-modal-newEM.lp",
+    "/js/004_wireless.js",
+    "/js/asmcrypto-min.js",
+    "/js/chart-min.js",
+    "/js/device-min.js",
+    "/js/dmz-modal-min.js",
+    "/js/ethernet-min.js",
+    "/js/firewall-min.js",
+    "/js/gateway.js",
+    "/js/internet-dns-min.js",
+    "/js/internet-routed-settings-min.js",
+    "/js/logviewer-min.js",
+    "/js/media-min.js",
+    "/js/password.js",
+    "/js/system-config-min.js",
+    "/js/tod-modal-min.js",
+    "/js/wanservices-min.js",
+    "/js/wireless-ap-modal-newEM.js",
 }
 KNOWN_JSON_KEYS = {
     "B",
@@ -125,6 +180,76 @@ def response_size(content: object, body: bytes) -> int | None:
     return len(body) if body else None
 
 
+def header_presence(headers: object, accepted_names: set[str]) -> bool:
+    """Check only header names; never return or inspect their values."""
+    if not isinstance(headers, list):
+        return False
+    return any(
+        isinstance(header, dict)
+        and isinstance(header.get("name"), str)
+        and header["name"].lower() in accepted_names
+        for header in headers
+    )
+
+
+def request_body_metadata(request: object) -> tuple[str, str, bool]:
+    """Return body class, allowlisted action marker, and CSRF-field presence."""
+    if not isinstance(request, dict):
+        return "none", "", False
+    post_data = request.get("postData")
+    if not isinstance(post_data, dict):
+        return "none", "", False
+
+    raw_mime = post_data.get("mimeType")
+    mime = raw_mime.split(";", 1)[0].strip().lower() if isinstance(raw_mime, str) else ""
+    if mime == "application/x-www-form-urlencoded":
+        body_class = "form"
+    elif mime == "multipart/form-data":
+        body_class = "multipart"
+    elif mime == "application/json":
+        body_class = "json"
+    else:
+        body_class = "other"
+
+    pairs: list[tuple[object, object]] = []
+    params = post_data.get("params")
+    if isinstance(params, list):
+        for item in params:
+            if isinstance(item, dict):
+                pairs.append((item.get("name"), item.get("value")))
+    text = post_data.get("text")
+    if isinstance(text, str) and mime == "application/x-www-form-urlencoded":
+        from urllib.parse import parse_qsl
+        pairs.extend(parse_qsl(text, keep_blank_values=True))
+    elif isinstance(text, str) and mime == "application/json":
+        try:
+            obj = json.loads(text)
+        except json.JSONDecodeError:
+            obj = None
+        if isinstance(obj, dict):
+            pairs.extend(obj.items())
+
+    csrf_present = any(
+        isinstance(name, str) and name.lower() in {"csrftoken", "csrf_token"}
+        for name, _ in pairs
+    )
+    actions = {
+        value
+        for name, value in pairs
+        if isinstance(name, str)
+        and name.lower() == "action"
+        and isinstance(value, str)
+    }
+    if not actions:
+        action = ""
+    elif len(actions) == 1:
+        value = next(iter(actions))
+        action = value if value in ALLOWED_BODY_ACTIONS else "<redacted>"
+    else:
+        action = "<multiple>"
+    return body_class, action, csrf_present
+
+
 def login_markers(body: bytes) -> list[str]:
     text = body.decode("utf-8", errors="ignore").lower()
     markers = []
@@ -174,6 +299,10 @@ def summarize_entry(entry: object) -> dict[str, object]:
     if not isinstance(status, int):
         status = None
 
+    body_class, post_action, body_csrf_present = request_body_metadata(request)
+    request_headers = request.get("headers")
+    response_headers = response.get("headers")
+
     return {
         "path": safe_path(request.get("url")),
         "method": method,
@@ -182,6 +311,14 @@ def summarize_entry(entry: object) -> dict[str, object]:
         "response_size": response_size(content, body),
         "login_markers": sorted(login_markers(body)),
         "json_top_level_keys": top_level_json_keys(body),
+        "request_body_class": body_class,
+        "request_action": post_action,
+        "request_body_csrf_present": body_csrf_present,
+        "request_csrf_header_present": header_presence(
+            request_headers, {"csrf", "csrftoken", "x-csrf-token", "x-csrftoken"}
+        ),
+        "request_cookie_header_present": header_presence(request_headers, {"cookie"}),
+        "response_set_cookie_header_present": header_presence(response_headers, {"set-cookie"}),
     }
 
 
@@ -198,8 +335,10 @@ def main() -> int:
         print("Could not read a valid HAR entry list.", file=sys.stderr)
         return 2
 
-    for entry in entries:
-        print(json.dumps(summarize_entry(entry), sort_keys=True, separators=(",", ":")))
+    for index, entry in enumerate(entries, start=1):
+        summary = summarize_entry(entry)
+        summary["index"] = index
+        print(json.dumps(summary, sort_keys=True, separators=(",", ":")))
     return 0
 
 

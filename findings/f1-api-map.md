@@ -98,9 +98,9 @@ hack-technicolor’s firmware table does not list a GCNT-X bank dump. Issue 321 
 
 ## Compared with issue 321
 
-The public note `docs/gcnt-x-public-hardware.md` already says: no SoC part, no flash part, no Wi-Fi chip, NAND in a TSOP48 package as a guess, CFE shell removed, 23.1.b not downgradable, serial input often dead.
+A later public 19.4.0856 GCNT-X boot log, linked from issue 321, does print `CPU : BCM68360_B1`, 4096-byte NAND pages, and an MTD map. That log is not this 23.1.b unit. NAND catalog part and Wi-Fi chip remain unstated. See `findings/gcnt-x-public-hardware.md`.
 
-This UI pass adds nothing on Linux hardware, boot, or OpenWrt. It confirms the running software string `23.1.b` and the hardware version string `GCNT-X`, and it shows the admin UI is ordinary forms plus a log table. Syslog lines mentioning `restricted_shell` do **not** establish UART behavior on this unit — **no boot log has been captured** yet.
+This UI pass adds nothing on Linux hardware, boot, or OpenWrt. It confirms the running software string `23.1.b` and the hardware version string `GCNT-X`, and it shows the admin UI is ordinary forms plus a log table. Syslog lines mentioning `restricted_shell` do **not** establish UART behavior on this unit — **no boot log has been captured from this unit** yet.
 
 ## Next
 

@@ -11,3 +11,5 @@ Notes on the Telia F1 I have open. Vantiva board GCNT-X, firmware 23.1.b.0448-72
 Write the sha256 next to an image if you keep one. Don't commit the image.
 
 Public thread for this board: https://github.com/hack-technicolor/hack-technicolor/issues/321
+
+Latest software-only research pass: [verified controls, configuration export, service inventory, and tooling corrections](findings/software-pass-summary.md).

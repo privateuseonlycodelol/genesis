@@ -1,5 +1,11 @@
 artifacts/
 tools/venv/
+# Local reference checkouts; these may contain firmware keys and are not project source.
+tools/Decrypt_RBI_Firmware_Utility/
+tools/hack-technicolor/
+tools/secr/
+# Empty nested checkout retained from local setup.
+/genesis/
 tools/**/.git/
 *.rbi
 *.bin

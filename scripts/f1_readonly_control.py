@@ -103,10 +103,27 @@ def main():
             role = None
         if code != 200 or role != "admin":
             raise StopProbe("Authenticated admin-session control failed")
-        client._open(client.base + "/modals/system-config-modal.lp?action=getbanksize")
+        code, body = client._open(client.base + "/modals/system-config-modal.lp?action=getbanksize")
+        try:
+            metadata = json.loads(body)
+            bank_size = int(metadata.get("banksize", 0))
+            bank_ok = metadata.get("success") in (True, "true") and bank_size > 0
+        except (ValueError, TypeError, AttributeError):
+            bank_ok = False
+        if code != 200 or not bank_ok:
+            raise StopProbe("Bank-size metadata was not verified; stopped before export")
         if args.export:
             data = urllib.parse.urlencode({"action": "export_config", "CSRFtoken": client.csrf}).encode()
-            client._open(client.base + "/modals/system-config-modal.lp", data, "POST")
+            code, body = client._open(client.base + "/modals/system-config-modal.lp", data, "POST")
+            boundary = body.find(b"\n\n", 0, 4096)
+            header = body[:boundary].splitlines() if boundary >= 0 else []
+            # Recognize only the observed outer envelope. This is not a
+            # cryptographic authenticity or decrypted-content check.
+            envelope_ok = (len(header) >= 2 and all(b"=" in line for line in header)
+                           and boundary >= 0 and len(body) - boundary - 2 >= 52
+                           and (len(body) - boundary - 2 - 36) % 16 == 0)
+            if code != 200 or client.rows[-1]["login_marker"] or not envelope_ok:
+                raise StopProbe("Export did not return the observed binary envelope; response preserved privately")
         print("Completed normal read controls; private artifacts: " + str(directory), flush=True)
         return 0
     except (StopProbe, urllib.error.URLError, TimeoutError) as error:
