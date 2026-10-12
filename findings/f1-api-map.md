@@ -21,6 +21,24 @@ A poll, `GET /gateway.lp?auto_update=true&getSessionStatus=true`, returns the cu
 
 The saved admin surface is mostly **forms** and **`.lp` GETs**, including a **session-status poll** on `gateway.lp`. A `.lp` URL can still return **structured data** (JSON) for some `action=` query parameters; that is not a separate REST API beside the Homeware page model. Each modal is also a form whose `method` is `post` and whose `action` is its own path, plus `CSRFtoken`.
 
+### GET JSON verified later (04:56:48Z UI grab, offline)
+
+These were not exercised in the 2026-10-11 live map pass; they are **VERIFIED** in [`f1-grab-045648-review.md`](f1-grab-045648-review.md) from a finished Tampermonkey archive (admin session cookie, GET only). Values that identify the LAN or Wi-Fi are omitted here.
+
+**Session scope:** Tampermonkey `GM_xmlhttpRequest` GETs use the **browser cookie jar**. Archives exported while still signed in (including `notloggedin.zip`, which matches the ~05:57:18Z admin grab) therefore show JSON for these probes. They do **not** prove unauthenticated access; see [`f1-hidden-action-boundary-2026-10-12.md`](f1-hidden-action-boundary-2026-10-12.md) and [`f1-grab-notloggedin-2026-10-12.md`](f1-grab-notloggedin-2026-10-12.md).
+
+| Request | Shape (keys / notes) |
+| --- | --- |
+| `GET /gateway.lp?auto_update=true&getSessionStatus=true` | `current_role` (observed `admin`) |
+| `GET /gateway.lp?action=scheduleReboot` | `systemTime`, `rebootTime`, `alertMsg`, `popupHeader` |
+| `GET /modals/parental-modal.lp?action=smartwifi` | `current_state`, `current_phase` |
+| `GET /modals/system-config-modal.lp?action=getbanksize` | `success`, `banksize` (128 MiB string) |
+| `GET /ajax/wirelesscard.lua?auto_update=true` | JSON **array** of objects: `listatus`, `ssid`, `radio` (bare `/ajax/wirelesscard.lua` still 0 B) |
+| `GET /modals/time-management-modal.lp?getNTP=true&auto_update=true` | JSON string body listing Telia NTP hostnames |
+| `GET /modals/ethernet-modal.lp?intf=guest` | HTML guest-LAN modal (distinct from bare LAN modal) |
+
+`GET …?action=upgradefwstatus` on the configuration modal returned the same normalized HTML as `action=gf1nosuchaction`, not a JSON status object. That does not disprove POST upgrade polling from `system-config-min.js`.
+
 ## Ordinary pages (verified GET 200)
 
 These show status or a settings form. They are not a shell. Posting the form would change settings; that was not done.
@@ -76,9 +94,27 @@ The upload accepts file extensions `rbi`, `fw`, and `pkgtb`. A failed upgrade st
 
 **Verified:** `system-config-min.js` still defines an **upgrade handler** (`upgradefw`, `upgradefwstatus`, `getbanksize`, import/export, BOOTP confirm).
 
-**Not tested:** whether the backend would accept those actions without the on-page controls. A hand-built `POST` with `action=upgradefwstatus` returned **403** from nginx in a later pass (see `findings/tried.md`).
+**Not tested:** reboot, factory reset, import, BOOTP, and firmware upload. Those names were not sent in the [2026-10-12 boundary pass](f1-hidden-action-boundary-2026-10-12.md). A hand-built `POST` with `action=upgradefwstatus` returned **403** from nginx in an earlier pass (see `findings/tried.md`). Authenticated `POST export_config` does return a config envelope; the same POST without an admin session returns the login page.
+
+**Key-surface sweep (2026-10-12):** `scripts/f1_config_key_probe.py` sent **119** authenticated GETs (rip/backup/debug `action=` names, fake `/proc/rip` paths, traversal). **No** new JSON or binary key material; only the known JSON pair above plus HTML shells. Details: [`f1-hardware-key-blocker-2026-10-12.md`](f1-hardware-key-blocker-2026-10-12.md). Followed by nginx **503** on new logins until cooldown.
 
 `main-min.js` also GETs `/gateway.lp?action=scheduleReboot` to read a scheduled time. That URL was not called again.
+
+## Parallel surfaces (not the `:80` Homeware API)
+
+This file maps **session-gated** `*.lp` / `gateway.lp` / `authenticate` on **port 80**. Other listeners use different auth and protocols; they are **not** rows in the tables above.
+
+| Surface | Port / transport | Auth vs web UI | Canonical finding |
+| --- | --- | --- | --- |
+| WFA WLANConfig (WPS over UPnP) | TCP **49152**; SSDP UDP 1900 | **No** HTTP session on tested LAN SOAP/SUBSCRIBE | [f1-wfa-wlanconfig-49152-2026-10-12.md](f1-wfa-wlanconfig-49152-2026-10-12.md), [auth-session-and-wps-2026-10-12.md](auth-session-and-wps-2026-10-12.md) |
+| CUPS / IPP | TCP **631** | Browser GET/HEAD **403** (`CUPS v2.2.10` in body); **`application/ipp` POST** allows anonymous reads (e.g. **Get-Jobs** `successful-ok`); helpers `cups-deviced`/`cups-driverd` fail internally; remote queue create blocked; **not** Homeware session | [f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md), [f1-cups-ipp-readonly-matrix-2026-10-12.md](f1-cups-ipp-readonly-matrix-2026-10-12.md), [management-auth-boundaries-2026-10-12.md](management-auth-boundaries-2026-10-12.md) |
+| Alternate HTTP | TCP **8080** (observed **404** on UI paths) | Unknown handler; not the main UI | [management-auth-boundaries-2026-10-12.md](management-auth-boundaries-2026-10-12.md) |
+
+The admin **WPS form** (`/modals/wireless-wps-modal-newEM.lp`) is still Homeware UI state; **49152** is the separate Wi‑Fi Alliance UPnP registrar/enrollee control plane documented in the WFA finding. No demonstrated chain from UI session to unauthenticated 49152 bypass was shown.
+
+Drivers for 49152: `scripts/wfa_wlanconfig_*.py`, `scripts/wps_device_info.py`.
+
+CUPS :631 index: [docs/f1-cups-631.md](../docs/f1-cups-631.md). Drivers: `scripts/cups_ipp_readonly_matrix.py`, `scripts/cups_ipp_followup.py`, `scripts/cups_ipp_policy_probe.py` (`scripts/test_cups_ipp_readonly_matrix.py` for encoder fixture).
 
 ## Not fetched on purpose
 

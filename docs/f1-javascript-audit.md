@@ -104,6 +104,8 @@ $(document).on("click",".Restart",function(){ a.call(this)}); ... });
 
 **Saved HTML:** no `.export-config` control.
 
+**Server (2026-10-12):** authenticated `POST` returns a **Technicolor `THENC`** binary (`CIPHERKEY=GW` labels only). Decrypt tooling: `scripts/decrypt_f1_config_export.py`; key acquisition: `findings/f1-config-export-decrypt-2026-10-12.md`, `findings/f1-hardware-key-blocker-2026-10-12.md`.
+
 ### 2.7 Import configuration (`import_config` via upload)
 
 | Trigger | `.import-config` click (L11–12) |
@@ -221,7 +223,7 @@ Password change (`password.lp`, guided modal):
 
 ## 5. What cannot be known from JavaScript alone
 
-1. **Server enforcement** — whether nginx/Lua accepts `system_bootp`, `export_config`, `upgradefw`, etc. when UI elements are stripped from HTML (403 on some hand-built POSTs is live data, not JS).
+1. **Server enforcement** — `export_config` **works** for a normal admin session when CSRF is current (hidden handler); see `findings/f1-hidden-action-boundary-2026-10-12.md`. Other actions (`system_bootp`, `upgradefw`, etc.) remain uneven (403 on some hand-built POSTs is live data, not JS).
 2. **Cookie name, path, HttpOnly, rotation** — no `document.cookie` writes in reviewed scripts.
 3. **Multipart field names for firmware/import** — `$.fileUpload` only injects `params` as hidden inputs; file input name and any `action=` hidden field come from server HTML (`#form-upgradefw` not in saved config modal).
 4. **Whether GET `upgradefwstatus` returns JSON during a real upgrade** — script expects JSON; idle GET capture returned HTML modal.

@@ -29,7 +29,7 @@ Distinct requests:
 
 Login copy says the standard username is `User` and names the box a MediaAccess Gateway. Simplified shell copyright line is Technicolor 2026. Login and advanced pages say Vantiva 2026. Simplified shell links `modals/basicview-accesscode-modal.lp` and `/password.lp`. Those two are not fetched.
 
-**New versus the known set:** `POST /ajax/wirelesscard.lua`, and `POST /gateway.lp` with `action=URL`. Logged-out `action=scheduleReboot` returns the login HTML, not the 184-byte JSON. SRP and the authenticated `scheduleReboot` JSON are the known admin UI.
+**New versus the known set:** `POST /ajax/wirelesscard.lua`, and `POST /gateway.lp` with `action=URL`. Logged-out `action=scheduleReboot` returns the login HTML, not the 184-byte JSON. SRP and the authenticated `scheduleReboot` JSON are the known admin UI. The [04:56:48Z UI grab](../findings/f1-grab-045648-review.md) also recorded the same wireless-card payload on authenticated `GET …?auto_update=true` (127 bytes); this HAR shows POST only.
 
 Advanced `gateway.lp` HTML links these modal paths. They are not requested in this file: `system-info-modal.lp`, `broadband-modal.lp`, `internet-modal.lp`, `wireless-ap-modal-newEM.lp`, `ethernet-modal.lp`, `device-modal.lp`, `firewall-modal.lp`, `wanservices-modal.lp`, `diagnostics-connection-modal.lp`, `diagnostics-network-modal.lp`, `dmz-modal.lp`, `l2tp-ipsec-server-modal.lp`, `parental-modal.lp`, `tod-modal.lp`, `contentsharing-modal.lp`.
 

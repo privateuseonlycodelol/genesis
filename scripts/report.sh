@@ -26,6 +26,17 @@ shasum_rbi() {
   echo "**Generated:** $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "**Host:** $(hostname -s 2>/dev/null || hostname)"
   echo
+  echo "## UI grab reviews (newest first)"
+  echo "- [\`f1-grab-notloggedin-2026-10-12.md\`](findings/f1-grab-notloggedin-2026-10-12.md) — \`notloggedin.zip\` is admin duplicate of ~05:57 grab, not logged-out"
+  echo "- [\`f1-grab-045648-review.md\`](findings/f1-grab-045648-review.md) — finished 04:56:48Z zip; verbatim bodies; GET JSON"
+  echo "- [\`f1-grab-040001-review.md\`](findings/f1-grab-040001-review.md) — script repair vs 03:38"
+  echo "- [\`f1-grab-033853-review.md\`](findings/f1-grab-033853-review.md) — integrity, crypto, runtime map"
+  echo
+  echo "## LAN surfaces (non–port-80)"
+  echo "- **CUPS :631** — [\`docs/f1-cups-631.md\`](docs/f1-cups-631.md) · [\`f1-cups-ipp-policy-2026-10-12.md\`](findings/f1-cups-ipp-policy-2026-10-12.md) · [\`f1-cups-ipp-readonly-matrix-2026-10-12.md\`](findings/f1-cups-ipp-readonly-matrix-2026-10-12.md)"
+  echo "- **WFA WLANConfig :49152** — [\`f1-wfa-wlanconfig-49152-2026-10-12.md\`](findings/f1-wfa-wlanconfig-49152-2026-10-12.md)"
+  echo "- **Listener inventory** — [\`management-auth-boundaries-2026-10-12.md\`](findings/management-auth-boundaries-2026-10-12.md)"
+  echo
 
   for dir in artifacts/firmware artifacts/captures artifacts/logs; do
     echo "## \`$dir\`"

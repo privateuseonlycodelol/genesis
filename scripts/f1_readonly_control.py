@@ -70,6 +70,7 @@ class ControlClient(SRPClient):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--export", action="store_true", help="try normal configuration export after valid session control")
+    parser.add_argument("--password-file", type=Path, help="read the admin password from this file; never pass it on the command line")
     args = parser.parse_args()
     os.umask(0o077)
     directory = ROOT / "artifacts" / "ui" / ("readonly-control-" + time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()))
@@ -83,7 +84,10 @@ def main():
         if not match:
             raise StopProbe("CSRF meta not found")
         client.csrf = match.group(1).decode()
-        password = getpass.getpass("Router password (not echoed): ")
+        if args.password_file:
+            password = args.password_file.read_text().strip("\n")
+        else:
+            password = getpass.getpass("Router password (not echoed): ")
         code, result = client.login("User", password)
         del password
         if code != 200 or result != "ok":

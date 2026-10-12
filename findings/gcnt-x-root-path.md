@@ -70,6 +70,7 @@ On Mac/PC: **Decrypt_RBI_Firmware_Utility** or OSCK + same crypto chain, then `b
 |------|-------------------|------------------|
 | Decrypt reference RBI offline | Needs **GCNT-X OSCK** | Same |
 | Extract squashfs | After decrypt | Need 23.1.b RBI capture first |
+| Read shipped **`/etc/cups/cupsd.conf`** | From extracted rootfs or rooted `cat` | **Not obtained**; LAN IPP behavior mapped without it ([f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md)) |
 | Root | VLAN/SSH/`tchroot` reports + unknown exploit surface | **Not actionable** from public docs alone |
 | Bank switch 14 s | Reported for local upgrade UI | **Do not rely on** for 23.1.b |
 

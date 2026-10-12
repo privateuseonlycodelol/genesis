@@ -95,8 +95,12 @@ Start with `README.md`, then consult only the relevant findings. These are docum
 - `findings/decomp-kickoff.md`: the current 23.1.b image has not been confirmed acquired in the recorded work.
 - `findings/wan2-tagged-frames.md` and `findings/mirror-test.md`: previous WAN capture evidence was contaminated or misinterpreted; establish correct capture placement and encapsulation before drawing conclusions about firmware traffic.
 - `findings/f1-uart-23.1b.md`: UART evidence is a separate lead; recorded notes do not establish an interactive root shell.
-- `findings/f1-ui-leads-23.1b.md`: authenticated UI and session mechanics are not fully resolved. A prior burst of requests produced an HTTP 503 lockout, so use deliberate, evidence-driven tests instead of noisy repetitions.
+- `findings/f1-ui-leads-23.1b.md`: authenticated UI and session mechanics are not fully resolved. Bursts of requests (2026-10-11 unauthenticated paths; **2026-10-12** `f1_config_key_probe.py`, 119 GETs) produced nginx **503** on new logins — wait for **200** on `/login.lp` before more automation; use deliberate, paced tests only.
+- `findings/f1-config-export-decrypt-2026-10-12.md` / `findings/f1-hardware-key-blocker-2026-10-12.md`: saved `export_config` uses Technicolor `THENC` + `GW`; decrypt needs per-device **`RIP_ID_RANDOM_KEY_B`** (`scripts/decrypt_f1_config_export.py`) — not derivable from export/UI/OSCK trials recorded there.
 - `findings/latest.md` is a generated report, not independent evidence of what actually happened.
+- `findings/f1-api-map.md` is the **port-80 Homeware** route map; non-UI surfaces (49152 WFA, 631 CUPS, etc.) live in dedicated findings linked from its **Parallel surfaces** section; CUPS entry index: `docs/f1-cups-631.md`.
+- `findings/f1-wfa-wlanconfig-49152-2026-10-12.md`: paced LAN probes on WPS/UPnP **49152**; attack surface documented, **no demonstrated exploit**.
+- `findings/f1-cups-ipp-policy-2026-10-12.md` / `f1-cups-ipp-readonly-matrix-2026-10-12.md`: **631** CUPS — HTTP page **403**, unauthenticated IPP **reads** (incl. empty **Get-Jobs**); shipped `cupsd.conf` **not** obtained; **no demonstrated exploit**.
 
 Do not waste time repeating the same failed OSCK derivations, downloading the same unavailable RBI, or reanalyzing the same bad capture unless a **specific new hypothesis, corrected instrumentation, or new input** justifies doing so.
 
@@ -107,6 +111,26 @@ Research boldly within owned hardware, offline firmware, locally collected captu
 This boundary does **not** make the agent defensive or passive: seek weaknesses, test whether controls fail, and pursue realistic attack-chain hypotheses in the authorized environment.
 
 Keep raw firmware, captures, keys, credentials, session cookies, personal/device identifiers, and other sensitive artifacts out of Git. Respect `.gitignore`; sanitize generated Markdown, command output, and commit contents. Preserve relevant originals locally for reproducibility.
+
+## Documentation hygiene (mandatory before ending a research pass)
+
+Do **not** wait for the user to ask. When you add or materially change verified device behavior, tools, or conclusions, update the repo in the same session so progress is not stranded in chat or private artifacts only.
+
+1. **Canonical finding** — Add or extend a dated `findings/<topic>-<date>.md` (or the existing canonical file for that track) with VERIFIED/DERIVED tags, reproduction commands, private evidence paths, exploit status if applicable, and explicit **what was not shown**.
+2. **`findings/tried.md`** — One line per live experiment or tool run (path, method, outcome code, pointer to finding).
+3. **Stale cross-references** — `rg` for contradictions (`none was invoked`, `not tested`, `no SOAP`, `UNKNOWN` auth on a surface you just exercised). Update the **source** doc with “at time of pass” vs superseded pointer, not silent contradiction.
+4. **Hub docs** (update every file that applies; skip only if truly unrelated):
+   - [ ] `findings/software-pass-summary.md` / `software-pass-live-access.md` — inventory or pass-level narrative
+   - [ ] `findings/management-auth-boundaries-2026-10-12.md` — listener/auth boundaries
+   - [ ] `findings/f1-api-map.md` — new **:80** routes/JSON; otherwise **Parallel surfaces** row + link
+   - [ ] `findings/auth-session-and-wps-2026-10-12.md` — session vs 49152 / **631**
+   - [ ] `findings/f1-cups-ipp-policy-2026-10-12.md` + `docs/f1-cups-631.md` — CUPS follow-up
+   - [ ] `findings/wps-upnp-source-boundary.md` — upstream vs live F1
+   - [ ] `README.md` — new scripts or primary entry finding
+5. **`./scripts/report.sh`** — Regenerates `findings/latest.md` (index only, not evidence); includes **LAN surfaces** links when `report.sh` is updated.
+6. **Tools** — New probe under `scripts/` with a small test where parsing/classification matters; mention scripts in the finding and README when user-facing.
+
+If a pass is exploratory with no new verified behavior, say so in the session summary only; do not create empty finding files.
 
 ## What counts as done
 

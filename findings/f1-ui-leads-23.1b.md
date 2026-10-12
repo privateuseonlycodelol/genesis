@@ -13,17 +13,26 @@ Related: [admin-url-hunt.md](admin-url-hunt.md) (earlier unauthenticated pass), 
 
 ## HTTP 503 lockout
 
+### 2026-10-11 (unauthenticated path burst)
+
 After a **burst of unauthenticated `curl` path probes** (~15+ GETs in a few seconds, plus retries while already failing), **every** path on `192.168.2.1` began returning nginx **503** (190-byte stub), including `/` and `/login.lp`. The user confirmed the same from a browser (“temporarily unavailable”).
 
-**Likely cause:** Homeware/Vantiva **nginx rate-limit or anti-abuse**, not a config change from this work (no POST, no login attempts, no UCI).
+### 2026-10-12 (authenticated key-surface probe)
+
+After **`scripts/f1_config_key_probe.py`** completed **119** spaced authenticated GETs (rip/debug/action names, traversal guesses), **new** HTTP clients again saw nginx **503** on `/` and `/login.lp` (190-byte generic page, not the Homeware “wait 20 seconds” sessionmgr text). **VERIFIED:** user terminal `curl` to `/login.lp` returned **503** in the same window.
+
+Same day: paced **CUPS :631** IPP matrix completed without 503; a later **`logviewer?process=cupsd`** attempt (saved session cookie) hit **503** on session poll — cupsd log harvest deferred ([f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md)).
+
+**Likely cause:** Homeware/Vantiva **nginx rate-limit, session exhaustion, or anti-abuse** — not a configuration change from this work (no reboot/reset/import/upload sent in the key hunt).
 
 **Recovery (user):**
 
-1. **Stop** automated or rapid requests to the gateway for **15–30 minutes**.
-2. If 503 persists: **power-cycle** the F1 (short off/on; wait for Wi‑Fi and `http://192.168.2.1/login.lp` → **200** and login form).
-3. **Do not** script-scan paths again; use **one** browser session after login (see [Post-login console harvest](#post-login-console-harvest-one-line-each)).
+1. **Stop** automated or rapid requests to the gateway for **15–30 minutes** (longer if needed).
+2. Recheck: `curl --noproxy '*' -sS -o /dev/null -w '%{http_code}\n' http://192.168.2.1/login.lp` → wait for **200**.
+3. If 503 persists overnight: **power-cycle** the F1 once; recheck `/login.lp`.
+4. After recovery: **do not** rerun bulk action probes; use `f1_readonly_control.py` (2 s pacing) or manual browser only.
 
-**Agent note:** Further probes were halted once 503 was observed. User supplied LAN admin credentials for a follow-up authenticated pass; that pass **must wait** until HTTP 200 returns on `/login.lp`.
+**Agent note:** Do not stack CUPS/WFA/SSRF experiments while `/login.lp` is **503**. CUPS IPP tools use **3 s** pacing ([docs/f1-cups-631.md](../docs/f1-cups-631.md)). See [f1-hardware-key-blocker-2026-10-12.md](f1-hardware-key-blocker-2026-10-12.md) for the key-probe summary.
 
 ---
 

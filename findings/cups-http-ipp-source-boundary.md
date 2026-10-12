@@ -8,7 +8,7 @@ The additional annotated tag `v2.2.10` resolves from tag object `db56c2fc3ad5d48
 
 Pinned upstream links: [v2.2.12 client.c](https://github.com/OpenPrinting/cups/blob/c8cb6400e317633f66cdc87884915d54710b53a0/scheduler/client.c), [ipp.c](https://github.com/OpenPrinting/cups/blob/c8cb6400e317633f66cdc87884915d54710b53a0/scheduler/ipp.c), and [cupsd.conf.in](https://github.com/OpenPrinting/cups/blob/c8cb6400e317633f66cdc87884915d54710b53a0/conf/cupsd.conf.in); [v2.2.10 client.c](https://github.com/OpenPrinting/cups/blob/25b2338346ef3abbb93ea88476887cba7b2b86f8/scheduler/client.c), [ipp.c](https://github.com/OpenPrinting/cups/blob/25b2338346ef3abbb93ea88476887cba7b2b86f8/scheduler/ipp.c), and [cupsd.conf.in](https://github.com/OpenPrinting/cups/blob/25b2338346ef3abbb93ea88476887cba7b2b86f8/conf/cupsd.conf.in).
 
-No attempt was made to identify the live router's exact CUPS patch level or read its effective configuration.
+No on-device file read was performed in the **source-only** pass below. Live LAN behavior and vendor opcode drift are documented separately in [f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md).
 
 ## Source branches
 
@@ -39,3 +39,11 @@ The companion live-boundary finding records unauthenticated `CUPS-Get-Printers` 
 The source contains a matching IPP status/message branch and a separate HTTP 200 IPP response writer. That correspondence is consistent with, but does not prove, source/runtime equivalence. The parent reports that the saved 403 body parsed as `Forbidden - CUPS v2.2.10` followed by `Forbidden`; this is a **body-reported version string**, not binary identification. It is a more specific version lead than the `CUPS/2.2` response header, which reports only the family. The installed binary, `WebInterface` value, effective location rules, selected IPP policy, and live destination-array state have not been established from this source retrieval. In particular, neither source version explains the live GET `/` response by the explicit disabled-web-interface GET predicate: `/` is outside it, and location authorization/configuration remains an independent condition.
 
 No exploit, administrative operation, or additional live-device request was performed.
+
+## Live follow-up on the owned 23.1.b F1 (2026-10-12)
+
+Independent LAN probes (not repeated in this source file) are canonical in [f1-cups-ipp-readonly-matrix-2026-10-12.md](f1-cups-ipp-readonly-matrix-2026-10-12.md) and [f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md). **VERIFIED on device:** HTTP location-style **403** on GET/HEAD (body cites **CUPS v2.2.10**); **`application/ipp` POST** reaches handlers without `WWW-Authenticate` on tested reads; **Get-Jobs** returns IPP `successful-ok` with an empty queue; `cups-deviced` / `cups-driverd` run far enough to return **server-error-internal** (not HTTP 401). **DERIVED:** stock upstream `cupsd.conf.in` **`<Limit CUPS-Get-Devices … Require user @SYSTEM>`** does not match observed behavior (policy passed, helper failed).
+
+**VERIFIED mismatch with this upstream tree:** `CUPS-Set-Default` (`0x4005`) and some admin-style opcodes on the live unit do **not** follow the `set_default()` / `add_printer()` paths documented above (e.g. `0x4005` echoed `CUPS-Get-Printers` empty-destination text). Treat **body-reported 2.2.10** as a weak version signal; runtime may be a vendor-patched or configured fork.
+
+**UNKNOWN:** effective `Listen`, `<Location>`, and `<Policy>` until **23.1.b rootfs** or on-device `cat /etc/cups/cupsd.conf` (see policy finding § config ground truth).

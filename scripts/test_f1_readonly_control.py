@@ -79,6 +79,43 @@ class SequencingTests(unittest.TestCase):
         self.assertEqual(result, 1)
         self.assertEqual(calls[-1][2], "POST")
 
+    def test_password_file_is_used_without_prompt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            secret = Path(directory) / "password"
+            secret.write_text("dummy-password\n")
+            calls = []
+
+            class FakeClient:
+                base = "http://192.168.2.1"
+
+                def __init__(self, out):
+                    self.csrf = ""
+                    self.rows = []
+
+                def login(self, username, password):
+                    calls.append(password)
+                    return 200, "ok"
+
+                def _open(self, url, data=None, method="GET"):
+                    if url.endswith("/login.lp"):
+                        return 200, b'<meta name="CSRFtoken" content="login-token">'
+                    if url.endswith("/gateway.lp"):
+                        self.rows.append({"login_marker": False})
+                        return 200, b'<meta name="CSRFtoken" content="authenticated-token">'
+                    if "getSessionStatus" in url:
+                        return 200, b'{"current_role":"admin"}'
+                    if "getbanksize" in url:
+                        return 200, b'{"success":"true","banksize":"134217728"}'
+                    raise AssertionError("export should not run")
+
+            with patch.object(control, "ROOT", Path(directory)), patch.object(control, "ControlClient", FakeClient):
+                with patch.object(control.getpass, "getpass", side_effect=AssertionError("prompt")):
+                    with patch("sys.argv", ["f1_readonly_control.py", "--password-file", str(secret)]):
+                        with contextlib.redirect_stdout(io.StringIO()):
+                            result = control.main()
+        self.assertEqual(result, 0)
+        self.assertEqual(calls, ["dummy-password"])
+
     def test_http200_html_is_not_a_successful_export(self):
         result, calls = self.run_control(export_html=True)
         self.assertEqual(result, 1)

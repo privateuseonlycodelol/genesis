@@ -30,6 +30,10 @@ The script scans through a bare LF separator, treats the first 16 body bytes as 
 
 That is structural compatibility only. No key was supplied, no HMAC was checked, and no plaintext structure was verified. Also, the script only prints a warning when HMAC comparison fails and still writes the plaintext file (`:82-89`); it dumps supplied key material to stdout (`:53-61`). I did not run it on the private export.
 
-## Next offline discriminating test
+## Tier 1 follow-up (2026-10-12)
 
-**Next offline discriminating test:** locate a producer/parser or independent fixture for this exact header schema in matching 23.1.b / EWA1330 firmware or source, then verify the field and trailer semantics against it. A third export would add little to the already observed prefix variation. No matching producer/schema or independent fixture was found locally; the related Ansuel source only specifies export dispatch and download behavior. The public README and issue are cross-version analogues only. Until exact-version implementation evidence or an authenticated inner structure is available, the container format and trailer semantics remain unverified. No keys were copied or tried, no code was executed, and no additional router request was made.
+**VERIFIED:** three exports share the Technicolor `THENC` header schema; `CIPHERKEY`/`SIGNATUREKEY` are two-letter labels (`GW`), not embedded key material. **VERIFIED:** envelope layout and HMAC signed region match the public technicolor-config-decrypt model (see [f1-config-export-decrypt-2026-10-12.md](f1-config-export-decrypt-2026-10-12.md)). Tooling: `scripts/decrypt_f1_config_export.py` + tests.
+
+**BLOCKED:** decryption without per-device `RIP_ID_RANDOM_KEY_B` (`/proc/rip/0108`, 64 bytes). Offline HMAC trials (header metadata, 37 community OSCK files) and a **119-request** authenticated UI sweep found no key material — [`f1-hardware-key-blocker-2026-10-12.md`](f1-hardware-key-blocker-2026-10-12.md).
+
+**Next offline discriminating test:** obtain `0x0108` via authorized `secr`/`eripv2` or `/proc/rip` read, then run the new script with `--randb`. Separately, find 23.1.b backup encrypt code in decrypted firmware to rule out a GCNT-X-specific derivation change.

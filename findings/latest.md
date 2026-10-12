@@ -1,33 +1,44 @@
 # Genesis report
 
-**Generated:** 2026-10-12T02:21:42Z
+**Generated:** 2026-10-12T06:13:42Z
 **Host:** (omitted)
+
+## UI grab reviews (newest first)
+- [`f1-grab-notloggedin-2026-10-12.md`](findings/f1-grab-notloggedin-2026-10-12.md) — `notloggedin.zip` is admin duplicate of ~05:57 grab, not logged-out
+- [`f1-grab-045648-review.md`](findings/f1-grab-045648-review.md) — finished 04:56:48Z zip; verbatim bodies; GET JSON
+- [`f1-grab-040001-review.md`](findings/f1-grab-040001-review.md) — script repair vs 03:38
+- [`f1-grab-033853-review.md`](findings/f1-grab-033853-review.md) — integrity, crypto, runtime map
+
+## LAN surfaces (non–port-80)
+- **CUPS :631** — [`docs/f1-cups-631.md`](docs/f1-cups-631.md) · [`f1-cups-ipp-policy-2026-10-12.md`](findings/f1-cups-ipp-policy-2026-10-12.md) · [`f1-cups-ipp-readonly-matrix-2026-10-12.md`](findings/f1-cups-ipp-readonly-matrix-2026-10-12.md)
+- **WFA WLANConfig :49152** — [`f1-wfa-wlanconfig-49152-2026-10-12.md`](findings/f1-wfa-wlanconfig-49152-2026-10-12.md)
+- **Listener inventory** — [`management-auth-boundaries-2026-10-12.md`](findings/management-auth-boundaries-2026-10-12.md)
 
 ## `artifacts/firmware`
 ```
 total 63984
-drwxr-xr-x  3 user  staff       96 Oct 11 05:48 .
-drwxr-xr-x  9 user  staff      288 Oct 12 04:07 ..
--rw-r--r--@ 1 user  staff 32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
+drwxr-xr-x   3 user  staff       96 Oct 12 08:08 .
+drwxr-xr-x  13 user  staff      416 Oct 12 07:13 ..
+-rw-r--r--@  1 user  staff 32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
 ```
 
 ## `artifacts/captures`
 ```
 total 31104
-drwxr-xr-x  7 user  staff     224 Oct 11 17:46 .
-drwxr-xr-x  9 user  staff     288 Oct 12 04:07 ..
--rw-------  1 user  staff    1708 Oct 11 05:39 f1-reboot.pcapng
--rw-r--r--  1 user  staff     335 Oct 11 08:01 wan.pcapng
--rw-r--r--  1 user  staff  926664 Oct 11 17:46 wan2-real.pcapng
--rw-r--r--  1 user  staff 9635526 Oct 11 17:41 wan2.pcapng
--rw-r--r--  1 user  staff 5347036 Oct 11 07:02 want.pcapng
+drwxr-xr-x   7 user  staff     224 Oct 11 17:46 .
+drwxr-xr-x  13 user  staff     416 Oct 12 07:13 ..
+-rw-------   1 user  staff    1708 Oct 11 05:39 f1-reboot.pcapng
+-rw-r--r--   1 user  staff     335 Oct 11 08:01 wan.pcapng
+-rw-r--r--   1 user  staff  926664 Oct 11 17:46 wan2-real.pcapng
+-rw-r--r--   1 user  staff 9635526 Oct 11 17:41 wan2.pcapng
+-rw-r--r--   1 user  staff 5347036 Oct 11 07:02 want.pcapng
 ```
 
 ## `artifacts/logs`
 ```
-total 232
-drwxr-xr-x  21 user  staff   672 Oct 12 04:18 .
-drwxr-xr-x   9 user  staff   288 Oct 12 04:07 ..
+total 264
+drwxr-xr-x  24 user  staff   768 Oct 12 04:28 .
+drwxr-xr-x  13 user  staff   416 Oct 12 07:13 ..
 -rw-r--r--@  1 user  staff 49359 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.png
 drwxr-xr-x@  3 user  staff    96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.extracted
 -rw-r--r--@  1 user  staff   231 Oct 11 09:02 binwalk-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.txt
@@ -40,9 +51,12 @@ drwxr-xr-x@  3 user  staff    96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLAS
 -rw-r--r--@  1 user  staff  2525 Oct 11 05:48 rbi-download-attempts.txt
 -rw-r--r--@  1 user  staff  1880 Oct 11 09:02 rbi-inspect-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.txt
 -rw-r--r--@  1 user  staff  1514 Oct 11 05:48 rbi-inspect.txt
--rw-r--r--@  1 user  staff   968 Oct 12 04:09 software-pass-crypto-validation.txt
+-rw-r--r--@  1 user  staff  4339 Oct 12 04:22 software-pass-capture-selftest.txt
+-rw-r--r--@  1 user  staff   968 Oct 12 04:27 software-pass-crypto-validation.txt
+-rw-------@  1 user  staff   271 Oct 12 04:28 software-pass-dns.json
 drwx------@  7 user  staff   224 Oct 12 04:16 software-pass-http-services
 -rw-------@  1 user  staff    48 Oct 12 04:18 software-pass-ipv6-default.private.json
+-rw-r--r--@  1 user  staff   433 Oct 12 04:27 software-pass-related-csrf.txt
 -rw-------@  1 user  staff    59 Oct 12 04:15 software-pass-router-ipv6.private.json
 -rw-r--r--@  1 user  staff   937 Oct 12 04:15 software-pass-router-tcp.txt
 drwx------@  7 user  staff   224 Oct 12 04:17 software-pass-ssdp
@@ -65,28 +79,59 @@ drwx------@  7 user  staff   224 Oct 12 04:17 software-pass-ssdp
 
 ## Findings
 - [`admin-url-hunt.md`](findings/admin-url-hunt.md)
+- [`auth-session-and-wps-2026-10-12.md`](findings/auth-session-and-wps-2026-10-12.md)
+- [`cups-http-ipp-source-boundary.md`](findings/cups-http-ipp-source-boundary.md)
 - [`decomp-kickoff.md`](findings/decomp-kickoff.md)
 - [`f1-advanced-ui.md`](findings/f1-advanced-ui.md)
 - [`f1-api-map.md`](findings/f1-api-map.md)
 - [`f1-bypass-crypto-options.md`](findings/f1-bypass-crypto-options.md)
+- [`f1-config-export-decrypt-2026-10-12.md`](findings/f1-config-export-decrypt-2026-10-12.md)
+- [`f1-cups-ipp-policy-2026-10-12.md`](findings/f1-cups-ipp-policy-2026-10-12.md)
+- [`f1-cups-ipp-readonly-matrix-2026-10-12.md`](findings/f1-cups-ipp-readonly-matrix-2026-10-12.md)
+- [`f1-grab-033853-auth-crypto.md`](findings/f1-grab-033853-auth-crypto.md)
+- [`f1-grab-033853-integrity.md`](findings/f1-grab-033853-integrity.md)
+- [`f1-grab-033853-review.md`](findings/f1-grab-033853-review.md)
+- [`f1-grab-033853-runtime.md`](findings/f1-grab-033853-runtime.md)
+- [`f1-grab-033853-ui-surfaces.md`](findings/f1-grab-033853-ui-surfaces.md)
+- [`f1-grab-040001-coverage.md`](findings/f1-grab-040001-coverage.md)
+- [`f1-grab-040001-fidelity.md`](findings/f1-grab-040001-fidelity.md)
+- [`f1-grab-040001-review.md`](findings/f1-grab-040001-review.md)
+- [`f1-grab-045648-review.md`](findings/f1-grab-045648-review.md)
+- [`f1-grab-csrf-redaction-corruption.md`](findings/f1-grab-csrf-redaction-corruption.md)
+- [`f1-grab-notloggedin-2026-10-12.md`](findings/f1-grab-notloggedin-2026-10-12.md)
+- [`f1-har-coverage-2026-10-12.md`](findings/f1-har-coverage-2026-10-12.md)
+- [`f1-hardware-key-blocker-2026-10-12.md`](findings/f1-hardware-key-blocker-2026-10-12.md)
+- [`f1-hidden-action-boundary-2026-10-12.md`](findings/f1-hidden-action-boundary-2026-10-12.md)
+- [`f1-js-deep-2026-10-12.md`](findings/f1-js-deep-2026-10-12.md)
 - [`f1-logviewer.md`](findings/f1-logviewer.md)
+- [`f1-trace-path-2026-10-12.md`](findings/f1-trace-path-2026-10-12.md)
 - [`f1-uart-23.1b.md`](findings/f1-uart-23.1b.md)
+- [`f1-ui-grab-2026-10-12.md`](findings/f1-ui-grab-2026-10-12.md)
 - [`f1-ui-leads-23.1b.md`](findings/f1-ui-leads-23.1b.md)
+- [`f1-wfa-wlanconfig-49152-2026-10-12.md`](findings/f1-wfa-wlanconfig-49152-2026-10-12.md)
 - [`gcnt-x-19x-deep.md`](findings/gcnt-x-19x-deep.md)
+- [`gcnt-x-public-hardware.md`](findings/gcnt-x-public-hardware.md)
 - [`gcnt-x-root-path.md`](findings/gcnt-x-root-path.md)
+- [`management-auth-boundaries-2026-10-12.md`](findings/management-auth-boundaries-2026-10-12.md)
+- [`management-offline-service-evidence.md`](findings/management-offline-service-evidence.md)
 - [`mirror-test.md`](findings/mirror-test.md)
 - [`rbi-crypto-attempt2.md`](findings/rbi-crypto-attempt2.md)
 - [`rbi-crypto-debug.md`](findings/rbi-crypto-debug.md)
+- [`session-source-availability-boundary.md`](findings/session-source-availability-boundary.md)
 - [`software-pass-capture-review.md`](findings/software-pass-capture-review.md)
 - [`software-pass-config-export.md`](findings/software-pass-config-export.md)
 - [`software-pass-crypto-validation.md`](findings/software-pass-crypto-validation.md)
+- [`software-pass-har7-js.md`](findings/software-pass-har7-js.md)
+- [`software-pass-har7-review.md`](findings/software-pass-har7-review.md)
 - [`software-pass-live-access.md`](findings/software-pass-live-access.md)
 - [`software-pass-request-review.md`](findings/software-pass-request-review.md)
 - [`software-pass-source-comparison.md`](findings/software-pass-source-comparison.md)
+- [`software-pass-summary.md`](findings/software-pass-summary.md)
 - [`tried.md`](findings/tried.md)
 - [`wan-pcap.md`](findings/wan-pcap.md)
 - [`wan2-tagged-frames.md`](findings/wan2-tagged-frames.md)
 - [`want-pcap.md`](findings/want-pcap.md)
+- [`wps-upnp-source-boundary.md`](findings/wps-upnp-source-boundary.md)
 
 ## 19.x reference RBI (offline)
 ### attempt2 (latest)

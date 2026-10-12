@@ -112,12 +112,12 @@ class SRPClient:
         self.y_hex = ""
         self.v_hex = ""
 
-    def _open(self, url: str, data=None, method="GET"):
+    def _open(self, url: str, data=None, method="GET", timeout=30):
         req = urllib.request.Request(url, data=data, method=method)
         if data is not None:
             req.add_header("Content-Type", "application/x-www-form-urlencoded")
         opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.jar))
-        with opener.open(req, timeout=30) as resp:
+        with opener.open(req, timeout=timeout) as resp:
             return resp.getcode(), resp.read()
 
     def save_jar(self):

@@ -4,6 +4,8 @@
 
 **Live device:** Telia F1, board **GCNT-X**, firmware **23.1.b.0448-7241017-20260223134332**.
 
+**Config backup (separate from RBI):** authenticated `export_config` saves are **Technicolor `THENC`** envelopes; decrypt needs per-device **`RIP_ID_RANDOM_KEY_B`** — see `findings/f1-config-export-decrypt-2026-10-12.md`. Producer source for 23.1.b is still inside sealed firmware, not in the reference 19.x RBI.
+
 ## Reference blob obtained
 
 | Field | Value |
@@ -73,6 +75,8 @@ Use 19.4.0507 reference to:
 1. Learn BLI layout and where metadata (`boardname`, `flashaddress`, timestamps) lives.
 2. Practice unseal/extract workflow once you have Linux ARM tools or a rooted 19.x bank (optional; **not** required on the 23.1 live unit).
 3. Build a mental map of partition names, `core-lcm`, CWMP, and transformer paths documented in #321 for diffing against a future **23.1** extract.
+
+**Related live lead (2026-10-12):** CUPS on :631 behavior is mapped without rootfs ([f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md)). A decrypted **23.1.b** image would also supply `/etc/cups/cupsd.conf` (`Listen`, `<Location>`, `<Policy>`) to reconcile IPP vs HTTP **403**.
 
 ## Next steps — Ghidra / AI (when you have 23.1)
 

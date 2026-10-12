@@ -3,6 +3,9 @@
 
 No path discovery, redirects, login attempts, settings, or provisioning actions.
 Raw responses and cookie jars stay in ignored artifacts with private permissions.
+
+CUPS :631 IPP follow-up (read matrix, ipptool, policy probes): see docs/f1-cups-631.md
+and scripts/cups_ipp_*.py (not invoked from this probe).
 """
 import hashlib
 import json

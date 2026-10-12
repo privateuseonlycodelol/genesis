@@ -2,6 +2,8 @@
 
 ## Result and scope
 
+**Canonical CUPS follow-up (2026-10-12, same device):** [f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md) (policy model, ipptool, write discriminators) and [f1-cups-ipp-readonly-matrix-2026-10-12.md](f1-cups-ipp-readonly-matrix-2026-10-12.md) (19-probe matrix). This file records the **initial** boundary pass below; rows marked “mechanism not established” for HTTP **403** are **superseded** by the derived `<Location>` vs IPP split in the policy finding.
+
 **VERIFIED:** the owned F1 processes an unauthenticated read-only CUPS IPP operation, although ordinary browser GETs on the same service return 403. This is a protocol-access finding, not an administrative authentication bypass. No printer administration, settings change, firmware operation, WPS message, event subscription, or login attempt was performed.
 
 Target: only `192.168.2.1`. The current login page's static-asset build label is `23.1.b.0448-7241017-20260223134332-1bc56e11012dfec7d96d5c28eb498c16c196a568`, matching the recorded F1 build. Board identity remains supported by prior authenticated/export evidence, not a new hardware observation. This pass tested LAN access from this Mac; it establishes nothing about WAN, guest-network, other-client, or IPv6 exposure.
@@ -20,11 +22,12 @@ Target: only `192.168.2.1`. The current login page's static-asset build label is
 | Listener / request | Client authentication state | Actual response | What it establishes |
 |---|---|---|---|
 | 80: session-status poll | No cookie; fresh anonymous cookie | 200, 5,784-byte login HTML, no JSON | No session-role disclosure in these controls |
+| 80: session-status poll | Tampermonkey UI grab (`notloggedin.zip`, 2026-10-12) | 200, 24-byte `current_role` JSON | **Not** an unauthenticated control — browser still held admin cookie; see [`f1-grab-notloggedin-2026-10-12.md`](f1-grab-notloggedin-2026-10-12.md) |
 | 80: `system-config-modal.lp?action=getbanksize` | No cookie; fresh anonymous cookie; fixed invalid cookie | 200, 5,784-byte login HTML, no JSON | No bank-size handler bypass in these controls |
 | 80: session-status poll | Previously saved session cookie jar | 200, login HTML | Saved jar is not a current authenticated positive control; reason unknown |
 | 8080: `/`, `/login.lp`, known bank-size route | No cookie | 404, identical 146-byte bodies | These requests did not expose the UI/backend on 8080 |
 | 80 and 8080: GET `/api` | No cookie | 404, same 146-byte nginx body | Related-source exact route is not exposed by these GET requests |
-| 631: GET `/`, `/admin/`, `/printers/` | No credentials or cookies | 403, identical 343-byte bodies; no `WWW-Authenticate` | Browser requests are refused; mechanism is not established |
+| 631: GET `/`, `/admin/`, `/printers/` | No credentials or cookies | 403, identical 343-byte bodies; no `WWW-Authenticate` | Browser requests refused (at pass time: mechanism **UNKNOWN**; later **DERIVED** as location ACL — see policy finding) |
 | 631: POST `/`, IPP `CUPS-Get-Printers` | No credentials or cookies | HTTP 200, `application/ipp`, 113 bytes; IPP `client-error-not-found` | The read operation reaches the IPP handler without web login |
 | 631: POST `/admin/`, identical IPP read | No credentials or cookies | Same HTTP status and byte-identical IPP body as `/` | The URL string `/admin/` alone does not impose a different result for this operation |
 | 49152: advertised device and service description GETs | No credentials or cookies | 200, 777 and 2,469 bytes; no auth challenge | Description metadata is readable without the UI session |
@@ -46,7 +49,7 @@ The [OpenPrinting operation specification](https://openprinting.github.io/cups/d
 Independent curl request SHA-256: `980dcfaa2c71f2a54176caf494c2a85dda6fc3bbb13df7931a48527113dc39e6`.
 Root and `/admin/` response SHA-256: `373ba70cd030ed50f43607276996b03c719a1ac7e9a9109593d94f9f58cb3c99`.
 
-**DERIVED:** browser-page denial cannot be used to conclude that LAN access to CUPS is fully denied. **UNKNOWN:** whether the difference results from disabled web pages, method/operation rules, location rules, or another implementation detail. The response reports no destinations; it does not demonstrate printer enumeration impact, configuration access, authorization for write operations, or a vulnerability. [CUPS configuration documentation](https://openprinting.github.io/cups/doc/man-cupsd.conf.html) describes separate location and operation authorization facilities; the F1's effective configuration has not been obtained.
+**DERIVED:** browser-page denial cannot be used to conclude that LAN access to CUPS is fully denied. At this pass only one IPP read was tested; later work mapped many read ops, **Get-Jobs** success, and helper failures ([f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md)). **DERIVED (later):** HTTP **403** vs IPP **200** split matches separate location ACL and IPP policy; shipped `cupsd.conf` still **not** obtained. The response reports no destinations; it does not demonstrate printer enumeration impact, configuration access, authorization for write operations, or a vulnerability. [CUPS configuration documentation](https://openprinting.github.io/cups/doc/man-cupsd.conf.html) describes separate location and operation authorization facilities.
 
 ## WPS and related-source boundaries
 
@@ -55,7 +58,9 @@ The re-fetched descriptions exactly match the prior artifacts by SHA-256:
 - Device description: `16c380ac7ffe8e5699b0bb1de6b9a9ee1b492fa58eaa98fedc91c116330508e2`.
 - Service description: `093f458cc0f7bfa8998d7b052e133cbdf7bc3fdabeed9a2644723842afc54ed4`.
 
-The extracted relative routes are `wps_control`, `wps_event`, and `wps_scpd.xml`. The service advertises `GetDeviceInfo`, `PutMessage`, `PutWLANResponse`, and `SetSelectedRegistrar`. Opaque base64 message fields make the description insufficient to determine message-level authentication. Public descriptions do not prove that control or event endpoints accept unauthenticated actions. No SOAP message or event subscription was sent.
+The extracted relative routes are `wps_control`, `wps_event`, and `wps_scpd.xml`. The service advertises `GetDeviceInfo`, `PutMessage`, `PutWLANResponse`, and `SetSelectedRegistrar`. **At the time of this pass**, only description GETs were sent; opaque base64 fields left message-level authentication **UNKNOWN**.
+
+**Superseded for control-plane behavior:** later paced work on the same listener documents unauthenticated SOAP, `SUBSCRIBE`, and peer-state handling on 49152 — see [auth-session-and-wps-2026-10-12.md](auth-session-and-wps-2026-10-12.md) and [f1-wfa-wlanconfig-49152-2026-10-12.md](f1-wfa-wlanconfig-49152-2026-10-12.md). That does not change the description-hash boundary recorded above; it refutes “actions might require the web session” for the tested LAN client.
 
 [Offline executor evidence](management-offline-service-evidence.md) records exact fields and related-source line references. The Luna xhigh subagent only parsed the specified local files and inspected source; the parent selected experiments, executed live checks, and interpreted results. Parent review removed an incorrect path-mismatch sentence from the executor draft.
 
@@ -96,8 +101,13 @@ Versions: Python 3.14.7, curl 8.7.1, native ipptool CUPS v2.3.4, macOS 27.0 arm6
 
 ## What changed and next discriminating experiment
 
-The broad claim “CUPS is inaccessible because `/` is 403” is now refuted for the tested read operation. Unauthenticated IPP processing is established, including at the `/admin/` resource. The tested UI metadata boundary held, and the WPS description boundary is distinct from the web session. No administrative bypass, exploit, root access, or secret extraction was demonstrated.
+The broad claim “CUPS is inaccessible because `/` is 403” is now refuted for the tested read operation. Unauthenticated IPP processing is established, including at the `/admin/` resource. The tested UI metadata boundary held, and the WPS **description** boundary is distinct from the web session. Later work mapped the full 49152 control plane without HTTP credentials ([f1-wfa-wlanconfig-49152-2026-10-12.md](f1-wfa-wlanconfig-49152-2026-10-12.md)); that is provisioning exposure, not a demonstrated exploit. No administrative bypass, root access, or secret extraction was demonstrated in this pass.
 
 The highest-value web follow-up is a fresh normal login with pre/post-login cookie and CSRF capture, followed by a small paired session test: confirm admin-role JSON, check whether the pre-login cookie alone remains unauthenticated, and test CSRF binding only with an already-authorized read/export action. This would distinguish identity rotation and session binding from merely accepting a supplied token. A working authenticated session is missing in this pass; do not infer the old jar's rejection mechanism or repeat guessed logins.
 
-For provisioning, first inspect the precise WPS-over-UPnP message handling and its state transitions in primary source, then design a single information-read control. The current XML alone cannot resolve its authentication boundary. For CUPS, obtain or identify the effective authorization configuration before treating read access as evidence about write/administrative access; speculative administrative requests were not used as probes.
+WPS-over-UPnP on 49152 was subsequently exercised in [f1-wfa-wlanconfig-49152-2026-10-12.md](f1-wfa-wlanconfig-49152-2026-10-12.md) (drivers under `scripts/wfa_wlanconfig_*.py`). Open items: WAN/guest exposure, `WLANEvent` sensitivity, and whether a valid registrar message could complete enrollment — not demonstrated here. For CUPS, effective authorization is still **derived**, not extracted from `cupsd.conf` (no 23.1.b rootfs; HTTP config path **403**). Follow-up work:
+
+- [f1-cups-ipp-readonly-matrix-2026-10-12.md](f1-cups-ipp-readonly-matrix-2026-10-12.md) — 19 paced probes; anonymous **Get-Jobs** `successful-ok`; `CUPS-Get-Devices` reached `cups-deviced` (internal error).
+- [f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md) — ipptool PASS on job lists; `cups-driverd`/`cups-deviced` failures; **CUPS-Create-Local-Printer** forbidden from LAN; vendor opcode drift (`CUPS-Set-Default` / `0x4004` do not match upstream 2.2.10 create paths); **503** stopped authenticated `logviewer?process=cupsd` harvest.
+
+Tools: `scripts/cups_ipp_readonly_matrix.py`, `scripts/cups_ipp_followup.py`, `scripts/cups_ipp_policy_probe.py`.
