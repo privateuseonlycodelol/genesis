@@ -51,7 +51,7 @@ Cleartext `strings` in the file are limited to the header/metadata region (`GCNT
 | OSCK AES unwrap (`0xB7`) | **Blocked** | No **GCNT-X** / EWA1330 key in community DB |
 | `bli_unseal` on router | Not run | Requires rooted gateway + on-device tools |
 | Ansuel `Decrypt_RBI_Firmware_Utility` | Not run | `board.java` lists **GCNT-N** only, not **GCNT-X** |
-| Brute OSCK | **57 keys tried** | Community `osck/` + serial/MAC/logviewer derivations + Ansuel `board.java` keys — all `bad_osck` at first AES layer (see `findings/rbi-crypto-debug.md`) |
+| Brute OSCK | **71 unique keys** (attempt3) | Community `osck/` + header/HMAC + **19.4.0856 boot-log** derivations — all `bad_osck` — [rbi-crypto-attempt3.md](rbi-crypto-attempt3.md); attempt1 baseline in [rbi-crypto-debug.md](rbi-crypto-debug.md) |
 | Logviewer “key” from #321 | **Not OSCK** | 16-byte value; does not decrypt RBI |
 
 **Conclusion:** Offline decrypt on this Mac is **not possible** without extracting **GCNT-X OSCK** from hardware (root shell / NAND / `secr`-style dump) or a community-published `GCNT-X.osck`.
@@ -75,7 +75,7 @@ Logs: `artifacts/logs/binwalk-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.txt`, entro
 
 ## Sibling boot log (19.4.0856, not this file)
 
-A public serial log for **19.4.0856** on GCNT-X is already quoted in [gcnt-x-public-hardware.md](gcnt-x-public-hardware.md). It is not a decrypt of this 19.4.0507 RBI. It does fix the layout this header is aimed at: TLV `flashaddress 0x117c0000` is `bank_1` on that boot, banks are 60 MiB, and the kernel is **aarch64 4.1.52** with `.r2secr=0x17fdf000`. The paste records `OSCK Loaded!` and does not contain key bytes. Published `r2secr.arm.4.1.38.ko` does not match that kernel.
+A public serial log for **19.4.0856** on GCNT-X is already quoted in [gcnt-x-public-hardware.md](gcnt-x-public-hardware.md). It is not a decrypt of this 19.4.0507 RBI. It does fix the layout this header is aimed at: TLV `flashaddress 0x117c0000` is `bank_1` on that boot, banks are 60 MiB, and the kernel is **aarch64 4.1.52** with `.r2secr=0x17fdf000`. The paste records `OSCK Loaded!` and does not contain key bytes. Use **`r2secr.arm64.4.1.52.ko`** ([r2secr-build-2026-10-12.md](r2secr-build-2026-10-12.md)) + `scripts/select_r2secr_ko.py`; 32-bit `r2secr.arm.4.1.38.ko` does not match.
 
 ## Strings / Ghidra prep (from what we have)
 
@@ -101,6 +101,6 @@ Until decrypt succeeds, RE targets are **header tooling** and **WAN-captured 23.
 
 ## Next offline steps (no hardware flash)
 
-1. Obtain **GCNT-X OSCK** from a rooted 19.x bank (or share via hack-technicolor `osck/`) → rerun `scripts/attempt_rbi_decrypt.py` / Ansuel tool.
+1. Obtain **GCNT-X OSCK** from a rooted 19.x bank (`insmod tools/secr/r2secr.arm64.4.1.52.ko`, `dmesg` for `id : 121`) or community `GCNT-X.osck` → rerun `scripts/attempt_rbi_decrypt.py`.
 2. Capture **23.1.b** RBI on mirrored WAN (`scripts/wan-capture.sh`) — same decrypt path once OSCK confirmed for board.
 3. After decrypt: `binwalk -e` → `unsquashfs` into `artifacts/extracted/19x-reference/` → Ghidra AArch64 on `/usr/bin`, `cwmpd`, LCM helpers.

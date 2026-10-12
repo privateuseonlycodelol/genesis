@@ -12,7 +12,7 @@ SECR = ROOT / "tools" / "secr"
 
 # vermagic substring -> module basename (newest / best match first within arch).
 _AARCH64 = [
-    ("4.1.52", "r2secr.arm64.4.1.45.ko"),  # closest in tree; rebuild for exact 4.1.52
+    ("4.1.52", "r2secr.arm64.4.1.52.ko"),
     ("4.1.45", "r2secr.arm64.4.1.45.ko"),
 ]
 _ARM32 = [
@@ -45,15 +45,7 @@ def pick_ko(uname_or_banner: str) -> tuple[Path | None, str]:
         if ver in uname_or_banner:
             path = SECR / name
             if path.is_file():
-                note = (
-                    f"arch={arch} matched={ver} module={name}"
-                    + (
-                        " WARN: GCNT-X 19.4 UART log is aarch64 4.1.52; "
-                        "4.1.45.ko vermagic may reject — build from tools/secr/src/r2secrets.arm"
-                        if arch == "aarch64" and ver == "4.1.52" and name.endswith("4.1.45.ko")
-                        else ""
-                    )
-                )
+                note = f"arch={arch} matched={ver} module={name}"
                 return path, note
     return None, f"arch={arch} no_module_match"
 

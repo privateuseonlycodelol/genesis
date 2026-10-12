@@ -14,9 +14,11 @@
 
 **VERIFIED:** Telia `rgw` fetch of `19.5.1062` unified RBI returned **HTTP 403 Forbidden** (18-byte body), not a firmware blob.
 
-**BLOCKED / inconclusive:** CUPS `printer-uri` tricks (`file:///proc/rip/0108`, path traversal) via Python client **timed out** (8 s); not proof of read, may be drop/hang. Separately, [f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md) shows normal IPP reads reach the scheduler on :631; `file://` abuse was not re-tested in that matrix.
+**VERIFIED (2026-10-12 follow-up):** CUPS `file:///proc/rip/0108` as `printer-uri` → HTTP **400** / 347 bytes in under 0.2 s — **no** file read. See [f1-gateway-url-action-2026-10-12.md](f1-gateway-url-action-2026-10-12.md).
 
-**VERIFIED:** After the key-probe burst, **new** logins via `curl` returned nginx **503** (190-byte stub) on `/` and `/login.lp` — confirmed on the owner Mac terminal as well as automation. Wait for **200** before more live work (see `findings/f1-ui-leads-23.1b.md`). A planned `POST gateway.lp` `action=URL` SSRF check was **not** completed because of the same **503** gate.
+**VERIFIED:** `POST gateway.lp` `action=URL` with twelve SSRF-style `urlVal` strings → identical 17,267-byte dashboard HTML; **no** SSRF demonstrated. Same finding.
+
+**VERIFIED:** After the key-probe burst, **new** logins via `curl` returned nginx **503** (190-byte stub) on `/` and `/login.lp` — confirmed on the owner Mac terminal as well as automation. Wait for **200** before more live work (see `findings/f1-ui-leads-23.1b.md`). Heavy parallel curls re-trigger **503** even when a lone `login.lp` check returns **200**.
 
 Private artifacts: `artifacts/ui/key-probe-20261012T060025Z/summary.json`.
 
@@ -70,4 +72,4 @@ Reverse-engineering `r2secr.arm.*.ko` (ARM EABI relocatable, not stripped) expla
 
 ## Next discriminating experiment
 
-**UART boot log on the open case** (read-only, no flash): confirm **Linux version** → `scripts/select_r2secr_ko.py` (GCNT-X **19.4** public log is **aarch64 4.1.52**, not armv7 `p2v8`; closest stock module is `tools/secr/r2secr.arm64.4.1.45.ko`). Print **`/proc/mtd`** for **eripv2** on **23.1.b**. That does not yield the key by itself but selects the right acquisition commands the moment root exists. See [rbi-crypto-attempt3.md](rbi-crypto-attempt3.md).
+**UART boot log on the open case** (read-only, no flash): confirm **Linux version** → `scripts/select_r2secr_ko.py` (public **19.4.0856** log is **aarch64 4.1.52**, not armv7 `p2v8`; local module **`tools/secr/r2secr.arm64.4.1.52.ko`** — [r2secr-build-2026-10-12.md](r2secr-build-2026-10-12.md)). Print **`/proc/mtd`** for **eripv2** on **23.1.b**. That does not yield the key by itself but selects the right acquisition commands the moment root exists. See [rbi-crypto-attempt3.md](rbi-crypto-attempt3.md).

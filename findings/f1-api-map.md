@@ -31,6 +31,7 @@ These were not exercised in the 2026-10-11 live map pass; they are **VERIFIED** 
 | --- | --- |
 | `GET /gateway.lp?auto_update=true&getSessionStatus=true` | `current_role` (observed `admin`) |
 | `GET /gateway.lp?action=scheduleReboot` | `systemTime`, `rebootTime`, `alertMsg`, `popupHeader` |
+| `POST /gateway.lp` `action=URL` + `urlVal` | HTTP 200 Advanced dashboard HTML (17,267 B); **no** change in body for loopback/CUPS/WPS/`file://` test values — [f1-gateway-url-action-2026-10-12.md](f1-gateway-url-action-2026-10-12.md) |
 | `GET /modals/parental-modal.lp?action=smartwifi` | `current_state`, `current_phase` |
 | `GET /modals/system-config-modal.lp?action=getbanksize` | `success`, `banksize` (128 MiB string) |
 | `GET /ajax/wirelesscard.lua?auto_update=true` | JSON **array** of objects: `listatus`, `ssid`, `radio` (bare `/ajax/wirelesscard.lua` still 0 B) |
@@ -169,4 +170,4 @@ This UI pass adds nothing on Linux hardware, boot, or OpenWrt. It confirms the r
 
 ## Next
 
-Read the serial boot log on Tuesday. Read only. Do not flash.
+Read the serial boot log on this **23.1.b** unit when the case is open (read-only). Public **19.4.0856** log already on file — [gcnt-x-public-hardware.md](gcnt-x-public-hardware.md). Do not flash.

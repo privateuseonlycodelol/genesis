@@ -17,8 +17,8 @@ Boot-log derivations included `bl_oid`, firmware/bootloader git hashes, full `bl
 | `scripts/attempt_rbi_decrypt.py` | `boot_log_derived_candidates()` |
 | `scripts/test_boot_log_osck_trials.py` | regression on candidate shape/count |
 | `scripts/select_r2secr_ko.py` | map `uname -a` / kernel banner → `tools/secr/r2secr*.ko` |
-| `scripts/build_r2secr_module.sh` | out-of-tree build when `KDIR` + `CROSS_COMPILE` exist (Linux host) |
-| `scripts/acquire_f1_config_key.sh` | default KO corrected from **armv7 `4.1.52_p2v8`** to **`r2secr.arm64.4.1.45.ko`** for GCNT-X aarch64 |
+| `scripts/build_r2secr_module.sh` | macOS cross-compile `r2secr.o` + package `r2secr.arm64.4.1.52.ko` — [r2secr-build-2026-10-12.md](r2secr-build-2026-10-12.md) |
+| `scripts/acquire_f1_config_key.sh` | default KO corrected from **armv7 `4.1.52_p2v8`** to **`r2secr.arm64.4.1.52.ko`** for GCNT-X aarch64 |
 
 ## RBI download sweep (this pass)
 
@@ -33,7 +33,7 @@ No second sealed image for header diff.
 ## Honest unblock chain
 
 1. **RBI plaintext** still needs **`RIP_ID_OSCK` (`0x0121`)** for GCNT-X. Boot log proves the kernel loads it (`OSCK Loaded!`) but does not print bytes.
-2. **On-router dump** (root + USB): `insmod` matching **`r2secr` aarch64** module → `dmesg` hex for `0x0121` / ECK `0x011f` → `eripv2.py` on `dd` of **eripv2** MTD. Closest stock module: `tools/secr/r2secr.arm64.4.1.45.ko` (**vermagic 4.1.45**, not 4.1.52 — may need `build_r2secr_module.sh` against a 4.1.52 tree).
+2. **On-router dump** (root + USB): copy **`tools/secr/r2secr.arm64.4.1.52.ko`** → `insmod` → `dmesg` hex for **`0x0121` (OSCK)** / **`0x011f` (ECK)** → `eripv2.py` on `dd` of **eripv2** MTD. Built on Mac 2026-10-12 ([r2secr-build-2026-10-12.md](r2secr-build-2026-10-12.md)); if **23.1.b** `uname -r` differs, rerun `scripts/build_r2secr_module.sh` on Linux with device `KDIR`.
 3. **UART on your 23.1.b unit** (read-only): capture `Linux version …` and `/proc/mtd` to confirm whether 23.1.b still uses aarch64 4.1.5x and the same **eripv2** name before any root attempt.
 
 ## Best next experiment

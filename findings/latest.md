@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-12T07:26:05Z
+**Generated:** 2026-10-12T10:45:10Z
 **Host:** (omitted)
 
 ## UI grab reviews (newest first)
@@ -36,8 +36,8 @@ drwxr-xr-x  16 user  staff      512 Oct 12 09:24 ..
 
 ## `artifacts/logs`
 ```
-total 280
-drwxr-xr-x  25 user  staff    800 Oct 12 09:20 .
+total 288
+drwxr-xr-x  26 user  staff    832 Oct 12 09:26 .
 drwxr-xr-x  16 user  staff    512 Oct 12 09:24 ..
 -rw-r--r--@  1 user  staff  49359 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.png
 drwxr-xr-x@  3 user  staff     96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.extracted
@@ -49,6 +49,7 @@ drwxr-xr-x@  3 user  staff     96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLA
 -rw-r--r--@  1 user  staff   4223 Oct 12 09:20 decrypt-attempt3.txt
 -rw-r--r--   1 user  staff     53 Oct 11 05:41 lcm-23.1.b.json
 -rw-r--r--   1 user  staff     51 Oct 11 05:41 lcm-23.1.json
+-rw-r--r--@  1 user  staff   3266 Oct 12 09:26 r2secr-build-20261012T072638Z.txt
 -rw-r--r--@  1 user  staff   2525 Oct 11 05:48 rbi-download-attempts.txt
 -rw-r--r--@  1 user  staff   1880 Oct 11 09:02 rbi-inspect-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.txt
 -rw-r--r--@  1 user  staff   1514 Oct 11 05:48 rbi-inspect.txt
@@ -90,6 +91,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-cups-ipp-policy-2026-10-12.md`](findings/f1-cups-ipp-policy-2026-10-12.md)
 - [`f1-cups-ipp-readonly-matrix-2026-10-12.md`](findings/f1-cups-ipp-readonly-matrix-2026-10-12.md)
 - [`f1-diagnostics-connection-restart-2026-10-12.md`](findings/f1-diagnostics-connection-restart-2026-10-12.md)
+- [`f1-gateway-url-action-2026-10-12.md`](findings/f1-gateway-url-action-2026-10-12.md)
 - [`f1-grab-033853-auth-crypto.md`](findings/f1-grab-033853-auth-crypto.md)
 - [`f1-grab-033853-integrity.md`](findings/f1-grab-033853-integrity.md)
 - [`f1-grab-033853-review.md`](findings/f1-grab-033853-review.md)
@@ -98,6 +100,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-grab-040001-coverage.md`](findings/f1-grab-040001-coverage.md)
 - [`f1-grab-040001-fidelity.md`](findings/f1-grab-040001-fidelity.md)
 - [`f1-grab-040001-review.md`](findings/f1-grab-040001-review.md)
+- [`f1-grab-040001-runtime-delta.md`](findings/f1-grab-040001-runtime-delta.md)
 - [`f1-grab-045648-review.md`](findings/f1-grab-045648-review.md)
 - [`f1-grab-csrf-redaction-corruption.md`](findings/f1-grab-csrf-redaction-corruption.md)
 - [`f1-grab-notloggedin-2026-10-12.md`](findings/f1-grab-notloggedin-2026-10-12.md)
@@ -123,6 +126,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`management-auth-boundaries-2026-10-12.md`](findings/management-auth-boundaries-2026-10-12.md)
 - [`management-offline-service-evidence.md`](findings/management-offline-service-evidence.md)
 - [`mirror-test.md`](findings/mirror-test.md)
+- [`r2secr-build-2026-10-12.md`](findings/r2secr-build-2026-10-12.md)
 - [`rbi-crypto-attempt2.md`](findings/rbi-crypto-attempt2.md)
 - [`rbi-crypto-attempt3.md`](findings/rbi-crypto-attempt3.md)
 - [`rbi-crypto-debug.md`](findings/rbi-crypto-debug.md)
@@ -185,5 +189,5 @@ decrypt_success: False
 note: no trial passed B7 OSCK unwrap (bad_osck); GCNT-X.osck not published
 ```
 
-Deep dive: `findings/gcnt-x-19x-deep.md` · Crypto: `findings/rbi-crypto-attempt3.md` · Root path (lab): `findings/gcnt-x-root-path.md`
+Deep dive: `findings/gcnt-x-19x-deep.md` · Crypto: `findings/rbi-crypto-attempt3.md` · r2secr: `findings/r2secr-build-2026-10-12.md` · Root path (lab): `findings/gcnt-x-root-path.md`
 

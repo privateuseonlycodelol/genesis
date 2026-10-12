@@ -12,7 +12,7 @@ Write the sha256 next to an image if you keep one. Don't commit the image.
 
 Public thread for this board: https://github.com/hack-technicolor/hack-technicolor/issues/321
 
-Sealed **19.4.0507** reference RBI (offline decrypt blocked on GCNT-X OSCK): [gcnt-x-19x-deep.md](findings/gcnt-x-19x-deep.md), [rbi-crypto-attempt3.md](findings/rbi-crypto-attempt3.md). Tools: `scripts/attempt_rbi_decrypt.py`, `scripts/select_r2secr_ko.py`, `scripts/build_r2secr_module.sh`.
+Sealed **19.4.0507** reference RBI (offline decrypt blocked on GCNT-X OSCK): [gcnt-x-19x-deep.md](findings/gcnt-x-19x-deep.md), [rbi-crypto-attempt3.md](findings/rbi-crypto-attempt3.md). Tools: `scripts/attempt_rbi_decrypt.py`, `scripts/select_r2secr_ko.py`, `scripts/build_r2secr_module.sh` → [r2secr-build-2026-10-12.md](findings/r2secr-build-2026-10-12.md) (`tools/secr/r2secr.arm64.4.1.52.ko`).
 
 Latest software-only research pass: [verified controls, configuration export, service inventory, and tooling corrections](findings/software-pass-summary.md).
 
@@ -21,6 +21,8 @@ Configuration export (`export_config`): format and decrypt tooling are documente
 WFA WLANConfig on LAN TCP **49152** (WPS over UPnP, paced probes, no demonstrated exploit): [findings/f1-wfa-wlanconfig-49152-2026-10-12.md](findings/f1-wfa-wlanconfig-49152-2026-10-12.md). Drivers: `scripts/wfa_wlanconfig_probe.py`, `wfa_wlanconfig_peer_probe.py`, `wfa_wlanconfig_event_probe.py`, `wfa_wlanconfig_deep_probe.py`, `wfa_wlanconfig_registrar_probe.py` (plus `scripts/wps_device_info.py` for `GetDeviceInfo`).
 
 CUPS on LAN TCP **631** (HTTP **403**, unauthenticated IPP reads on empty queue; no demonstrated admin/write): [docs/f1-cups-631.md](docs/f1-cups-631.md) → [findings/f1-cups-ipp-policy-2026-10-12.md](findings/f1-cups-ipp-policy-2026-10-12.md), [f1-cups-ipp-readonly-matrix-2026-10-12.md](findings/f1-cups-ipp-readonly-matrix-2026-10-12.md). Drivers: `scripts/cups_ipp_readonly_matrix.py`, `cups_ipp_followup.py`, `cups_ipp_policy_probe.py`.
+
+`POST gateway.lp` `action=URL` SSRF matrix and TCP **8080** path sweep (no SSRF; 8080 all **404**): [findings/f1-gateway-url-action-2026-10-12.md](findings/f1-gateway-url-action-2026-10-12.md). Drivers: `scripts/f1_gateway_url_probe.py`, `scripts/f1_port8080_probe.py`, `scripts/f1_surface_quick_probe.py`.
 
 Diagnostics PING / TRACE on **:80** (PING → `ipping_helper`; TRACE → `igd_traceroute_helper`; web-form host injection failed closed): [f1-ipping-helper-2026-10-12.md](findings/f1-ipping-helper-2026-10-12.md), [f1-ipping-host-2026-10-12.md](findings/f1-ipping-host-2026-10-12.md), [f1-trace-helper-2026-10-12.md](findings/f1-trace-helper-2026-10-12.md). Drivers: `scripts/f1_ipping_control.py`, `f1_ipping_host_probe.py`, `f1_trace_control.py`, `f1_trace_host_probe.py`, `f1_usp_ipping_probe.py` (plus `test_f1_*`). USP/CWMP LAN attempt: [findings/f1-usp-ipping-2026-10-12.md](findings/f1-usp-ipping-2026-10-12.md).
 
@@ -32,4 +34,4 @@ Config export scripts: `scripts/decrypt_f1_config_export.py`, `scripts/test_decr
 
 Browser HARs (offline, sanitized): [docs/f1-uploaded-hars.md](docs/f1-uploaded-hars.md) (`1`–`5` nested set); standalone [WAN Services capture `wanetc.har`](findings/f1-har-wanetc-2026-10-12.md) (`analyze_f1_har.py` / `inspect_ui_har.py`).
 
-Latest supplied UI archive review: [04:56:48Z grab — Wi-Fi card JSON, guest LAN, NTP, and finished modal coverage](findings/f1-grab-045648-review.md). The file `notloggedin.zip` (2026-10-12) is **not** an unauthenticated capture — it duplicates the ~05:57 admin session; see [notloggedin review](findings/f1-grab-notloggedin-2026-10-12.md). Earlier: [04:00:01 versus 03:38:53](findings/f1-grab-040001-review.md) and the [03:38:53 evidence map](findings/f1-grab-033853-review.md). Grabber behavior and known tooling gaps: [`docs/f1-artifact-grabber.md`](docs/f1-artifact-grabber.md).
+Latest supplied UI archive review: [04:56:48Z grab — Wi-Fi card JSON, guest LAN, NTP, and finished modal coverage](findings/f1-grab-045648-review.md). The file `notloggedin.zip` (2026-10-12) is **not** an unauthenticated capture — it duplicates the ~05:57 admin session; see [notloggedin review](findings/f1-grab-notloggedin-2026-10-12.md). Earlier: [04:00:01 versus 03:38:53](findings/f1-grab-040001-review.md) and the [03:38:53 evidence map](findings/f1-grab-033853-review.md). Grabber behavior and known tooling gaps: [`docs/f1-artifact-grabber.md`](docs/f1-artifact-grabber.md). Offline ZIP comparison: [`scripts/compare_f1_grabs.py`](scripts/compare_f1_grabs.py), with body hashes, ledger transitions, and queued-route reconciliation; [04:00 runtime delta](findings/f1-grab-040001-runtime-delta.md).

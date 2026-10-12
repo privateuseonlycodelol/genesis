@@ -100,7 +100,7 @@ shasum_rbi() {
       echo '```'
       echo
     fi
-    echo 'Deep dive: `findings/gcnt-x-19x-deep.md` · Crypto: `findings/rbi-crypto-attempt3.md` · Root path (lab): `findings/gcnt-x-root-path.md`'
+    echo 'Deep dive: `findings/gcnt-x-19x-deep.md` · Crypto: `findings/rbi-crypto-attempt3.md` · r2secr: `findings/r2secr-build-2026-10-12.md` · Root path (lab): `findings/gcnt-x-root-path.md`'
     echo
   fi
 

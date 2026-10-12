@@ -96,7 +96,7 @@ Categories:
 
 Every candidate stops at the **first `0xB7` layer** with **`bad_osck`** (AES unwrap of the 48-byte inner key fails PKCS#7). No candidate reached `plain_b0`, `inflate`, or a secondary magic (`0xB8`/`0xB4`).
 
-**Decrypt success: false.** Last run: **57** unique 32-byte keys (`bad_osck`: 57) — see `artifacts/logs/decrypt-attempt-19x.txt`.
+**Decrypt success: false.** Attempt1: **57** keys — `artifacts/logs/decrypt-attempt-19x.txt`. **Superseded:** attempt3 **71** keys incl. boot-log derivations — [rbi-crypto-attempt3.md](rbi-crypto-attempt3.md), `artifacts/logs/decrypt-attempt3.txt`.
 
 Cross-check: `blidec_enhanced.py --osckey GCNT-R.osck` reaches `Layer type B7` then **`ValueError: Invalid key size (0) for AES`** (bad unwrap → empty inner key). Python trial maps the same root cause to **`bad_osck`** at PKCS#7 check.
 

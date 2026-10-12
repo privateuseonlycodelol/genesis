@@ -76,6 +76,8 @@ Use 19.4.0507 reference to:
 2. Practice unseal/extract workflow once you have Linux ARM tools or a rooted 19.x bank (optional; **not** required on the 23.1 live unit).
 3. Build a mental map of partition names, `core-lcm`, CWMP, and transformer paths documented in #321 for diffing against a future **23.1** extract.
 
+**2026-10-12:** Public **19.4.0856** UART log maps `flashaddress 0x117c0000` to **`bank_1`**, 60 MiB banks, **eripv2** MTD — [gcnt-x-public-hardware.md](gcnt-x-public-hardware.md). RBI decrypt still needs **GCNT-X OSCK** ([rbi-crypto-attempt3.md](rbi-crypto-attempt3.md)); `r2secr` module [r2secr-build-2026-10-12.md](r2secr-build-2026-10-12.md).
+
 **Related live lead (2026-10-12):** CUPS on :631 behavior is mapped without rootfs ([f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md)). A decrypted **23.1.b** image would also supply `/etc/cups/cupsd.conf` (`Listen`, `<Location>`, `<Policy>`) to reconcile IPP vs HTTP **403**.
 
 ## Next steps — Ghidra / AI (when you have 23.1)

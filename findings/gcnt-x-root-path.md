@@ -68,10 +68,10 @@ On Mac/PC: **Decrypt_RBI_Firmware_Utility** or OSCK + same crypto chain, then `b
 
 | Goal | 19.x lab hardware | User’s 23.1.b F1 |
 |------|-------------------|------------------|
-| Decrypt reference RBI offline | Needs **GCNT-X OSCK** | Same |
+| Decrypt reference RBI offline | Needs **GCNT-X OSCK** (`r2secr.arm64.4.1.52.ko` on 19.4-class aarch64 log — [r2secr-build-2026-10-12.md](r2secr-build-2026-10-12.md)) | Same |
 | Extract squashfs | After decrypt | Need 23.1.b RBI capture first |
 | Read shipped **`/etc/cups/cupsd.conf`** | From extracted rootfs or rooted `cat` | **Not obtained**; LAN IPP behavior mapped without it ([f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md)) |
 | Root | VLAN/SSH/`tchroot` reports + unknown exploit surface | **Not actionable** from public docs alone |
 | Bank switch 14 s | Reported for local upgrade UI | **Do not rely on** for 23.1.b |
 
-Further offline work: `findings/gcnt-x-19x-deep.md`, WAN capture `findings/wan-pcap.md`.
+Further offline work: `findings/gcnt-x-19x-deep.md`, [gcnt-x-public-hardware.md](gcnt-x-public-hardware.md) (19.4.0856 boot log), [rbi-crypto-attempt3.md](rbi-crypto-attempt3.md), WAN capture `findings/wan-pcap.md`.
