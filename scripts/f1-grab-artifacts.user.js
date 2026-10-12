@@ -284,7 +284,7 @@
     const push = (path, method) => {
       if (path && isWanted(path)) out.push({ path, method, from: fromPath || "" });
     };
-    if (!text) return out;
+    if (!text) return { refs: out, actions: [] };
     for (const p of text.match(/\/js\/[A-Za-z0-9_.-]+\.js/g) || []) push(p, "chase-regex-js");
     for (const p of text.match(/\/modals\/[A-Za-z0-9_.-]+\.lp/g) || []) push(p, "chase-regex-modal");
     for (const p of text.match(/\/ajax\/[A-Za-z0-9._/-]+\.lua/g) || []) push(p, "chase-regex-ajax");
@@ -387,9 +387,10 @@
   }
 
   function mergeQueue(queue, items) {
+    const list = Array.isArray(items) ? items : items && Array.isArray(items.refs) ? items.refs : [];
     const seen = new Set(queue.map((x) => x.path));
     let added = 0;
-    for (const item of items) {
+    for (const item of list) {
       if (!item?.path || seen.has(item.path) || BLOCK.has(item.path)) continue;
       if (!isWanted(item.path)) continue;
       queue.push({ path: item.path, method: item.method || "unknown", from: item.from || "" });
@@ -493,19 +494,24 @@
         missExcerpt: res.status === 200 ? "" : body.slice(0, 240),
         actions: [],
       };
+      await putRecord(rec);
       if (res.status === 200) {
-        if (chase) {
-          const found = extractRefs(body, item.path);
-          rec.actions = found.actions;
-          const n = mergeQueue(queue, found.refs);
-          if (n) log(logEl, `  linked paths +${n}`);
-        }
-        if (opts.guess) {
-          const n = mergeQueue(queue, guessFrom(item.path));
-          if (n) log(logEl, `  similar names +${n}`);
+        try {
+          if (chase) {
+            const found = extractRefs(body, item.path);
+            rec.actions = found.actions || [];
+            const n = mergeQueue(queue, found.refs);
+            if (n) log(logEl, `  linked paths +${n}`);
+          }
+          if (opts.guess) {
+            const n = mergeQueue(queue, guessFrom(item.path));
+            if (n) log(logEl, `  similar names +${n}`);
+          }
+          if (rec.actions?.length) await putRecord(rec);
+        } catch (e) {
+          log(logEl, `  saved ${item.path}, skipped link scan: ${e.message}`);
         }
       }
-      await putRecord(rec);
       cache.set(rec.path, rec);
       queue.shift();
       session.push(rec);
