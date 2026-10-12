@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Acquire RIP_ID_RANDOM_KEY_B (config.bin AES/HMAC key) on a *rooted* GCNT-X / Homeware gateway.
 # Does not run from the Mac against an unrooted Telia 23.1.b box — copy secr/*.ko to USB first.
+# Historical 19.x checklist: owned-unit capture now reports 4.19.235 and UBI.
+# The KO/MTD defaults below do NOT match verified current acquisition sources.
+# See findings/f1-boot-log-2026-10-12.md; no current matching module is available.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -23,6 +26,8 @@ Set MTD_DEV to the eripv2 partition (often mtd5 on older maps; confirm with cat 
 On GCNT-X 19.x public logs the partition is named "eripv2" (256 KiB).
 
 This script is a checklist wrapper; edit MTD_DEV and KO path before use.
+The supplied owned-unit boot log reports Linux 4.19.235 and UBI storage.
+The legacy 4.1.52 module/raw-MTD defaults below are NOT validated for that unit.
 EOF
 }
 

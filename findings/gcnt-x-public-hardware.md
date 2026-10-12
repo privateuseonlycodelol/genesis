@@ -2,6 +2,8 @@
 
 Read 12 October 2026 from public pages. No router was contacted. This is a **19.4.0856** serial log linked from [hack-technicolor #321](https://github.com/hack-technicolor/hack-technicolor/issues/321), not a capture from the live Telia F1 on `23.1.b.0448-7241017`.
 
+**Later owned-unit comparison:** [the supplied 2026-10-12 capture](f1-boot-log-2026-10-12.md) now reports **4.19.235**, U-Boot 2019.07, UBI/verity/AES-XTS root, Toshiba `TC58NVG2S0H` driver identification and a `43684b0` radio-firmware path. It supersedes hardware/kernel unknowns for that new evidence source; the 4.1.52/60 MiB-bank map and unknown chip identification below remain scoped to this older public log. Neither driver text nor firmware pathname independently verifies physical chip markings.
+
 Source log: https://pastebin.com/raw/biRghtLr (PuTTY header `2024.02.22 18:25:13`). Issue 321’s opening post lists that URL under firmware `19.4.0856`.
 
 ## Verified in that log

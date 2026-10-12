@@ -139,6 +139,7 @@ This file maps **session-gated** `*.lp` / `gateway.lp` / `authenticate` on **por
 | WFA WLANConfig (WPS over UPnP) | TCP **49152**; SSDP UDP 1900 | **No** HTTP session on tested LAN SOAP/SUBSCRIBE | [f1-wfa-wlanconfig-49152-2026-10-12.md](f1-wfa-wlanconfig-49152-2026-10-12.md), [auth-session-and-wps-2026-10-12.md](auth-session-and-wps-2026-10-12.md) |
 | CUPS / IPP | TCP **631** | Browser GET/HEAD **403** (`CUPS v2.2.10` in body); **`application/ipp` POST** allows anonymous reads (e.g. **Get-Jobs** `successful-ok`); helpers `cups-deviced`/`cups-driverd` fail internally; remote queue create blocked; **not** Homeware session | [f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md), [f1-cups-ipp-readonly-matrix-2026-10-12.md](f1-cups-ipp-readonly-matrix-2026-10-12.md), [management-auth-boundaries-2026-10-12.md](management-auth-boundaries-2026-10-12.md) |
 | Alternate HTTP | TCP **8080** (observed **404** on UI paths) | Unknown handler; not the main UI | [management-auth-boundaries-2026-10-12.md](management-auth-boundaries-2026-10-12.md) |
+| Physical UART / boot recovery | `serial0` / `ttyS0`, **115200n8**; BOOT-P invitation | Input/auth outcome unknown; Enter invitation and JTAG warning do not establish a shell/root | [f1-boot-log-2026-10-12.md](f1-boot-log-2026-10-12.md), [f1-uart-23.1b.md](f1-uart-23.1b.md) |
 
 The admin **WPS form** (`/modals/wireless-wps-modal-newEM.lp`) is still Homeware UI state; **49152** is the separate Wi‑Fi Alliance UPnP registrar/enrollee control plane documented in the WFA finding. No demonstrated chain from UI session to unauthenticated 49152 bypass was shown.
 
@@ -166,8 +167,8 @@ hack-technicolor’s firmware table does not list a GCNT-X bank dump. Issue 321 
 
 A later public 19.4.0856 GCNT-X boot log, linked from issue 321, does print `CPU : BCM68360_B1`, 4096-byte NAND pages, and an MTD map. That log is not this 23.1.b unit. NAND catalog part and Wi-Fi chip remain unstated. See `findings/gcnt-x-public-hardware.md`.
 
-This UI pass adds nothing on Linux hardware, boot, or OpenWrt. It confirms the running software string `23.1.b` and the hardware version string `GCNT-X`, and it shows the admin UI is ordinary forms plus a log table. Syslog lines mentioning `restricted_shell` do **not** establish UART behavior on this unit — **no boot log has been captured from this unit** yet.
+This UI pass added nothing on Linux hardware, boot, or OpenWrt. It confirmed the software string `23.1.b` and hardware string `GCNT-X`. At that time no owned-unit boot log was available, and syslog `restricted_shell` references did not establish UART behavior. **Superseded for boot evidence:** [the later supplied capture](f1-boot-log-2026-10-12.md) establishes **4.19.235**, storage/crypto setup and serial invitations; no interactive shell is shown. Driver strings now identify Toshiba NAND and a `43684b0` radio-firmware path; physical part markings remain unchecked.
 
 ## Next
 
-Read the serial boot log on this **23.1.b** unit when the case is open (read-only). Public **19.4.0856** log already on file — [gcnt-x-public-hardware.md](gcnt-x-public-hardware.md). Do not flash.
+The owned-unit log has now been read. Next access discriminator: one captured Enter interaction with bidirectional wiring verified, as proposed in [the boot finding](f1-boot-log-2026-10-12.md). The public **19.4.0856** reference remains separate — [gcnt-x-public-hardware.md](gcnt-x-public-hardware.md).

@@ -4,6 +4,8 @@ Target: the owner's F1 at `192.168.2.1`; no other network host was probed. Norma
 
 ## Initial connection failure, subsequently resolved
 
+**Later offline hardware evidence:** the [owner-supplied UART capture](f1-boot-log-2026-10-12.md) now records GCNT-X / **4.19.235 AArch64**, Bank 2, five physical partition ranges, UBI rootfs2, verity + AES-XTS and UBIFS overlay. No new network check was made. The earlier 128 MiB `banksize` below remains a logical backend value; neither the 502 MiB UBI image region nor the ~52.824 MiB mapped root independently measures configured bank allocation. No shell/root is shown.
+
 **VERIFIED:** a normal HTTP GET of `/login.lp` failed from the command-line client, including after sandbox escalation. Curl returned exit 7, HTTP `000`, zero response bytes. A separate Python socket connection to TCP 80 returned errno 65, `No route to host`. No proxy environment variables were present. A route lookup nevertheless showed the destination associated with `en0`.
 
 **VERIFIED:** the Codex in-app browser could not open the same URL; its error was `net::ERR_ADDRESS_UNREACHABLE`.

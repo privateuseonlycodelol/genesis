@@ -68,7 +68,7 @@ Full curl transcript: `artifacts/logs/rbi-download-attempts.txt`.
 
 ## Why this reference still helps for 23.1.b RE
 
-Same **board** (`GCNT-X`) and same Homeware RBI pipeline (BLI2 → sealed image → flash layout). Differences on 23.1.b (Vantiva branding, modal/LCM changes, downgrade lock) sit mainly in **userspace and signing**, not in “unknown file format.”
+Same **board** (`GCNT-X`) makes the older RBI a useful container reference. **Correction from the later owned-unit UART capture:** differences are not confined mainly to userspace/signing. [The current boot evidence](f1-boot-log-2026-10-12.md) reports **4.19.235** versus the public reference's **4.1.52**, U-Boot FIT policy/key handoff, a different physical map and UBI → verity → AES-XTS root. The current RBI itself is still not acquired; its complete container pipeline cannot be proved by the older image. Do not reuse old fixed bank offsets or kernel-module assumptions.
 
 Use 19.4.0507 reference to:
 

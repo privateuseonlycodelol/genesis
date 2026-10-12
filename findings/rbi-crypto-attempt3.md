@@ -34,7 +34,7 @@ No second sealed image for header diff.
 
 1. **RBI plaintext** still needs **`RIP_ID_OSCK` (`0x0121`)** for GCNT-X. Boot log proves the kernel loads it (`OSCK Loaded!`) but does not print bytes.
 2. **On-router dump** (root + USB): copy **`tools/secr/r2secr.arm64.4.1.52.ko`** → `insmod` → `dmesg` hex for **`0x0121` (OSCK)** / **`0x011f` (ECK)** → `eripv2.py` on `dd` of **eripv2** MTD. Built on Mac 2026-10-12 ([r2secr-build-2026-10-12.md](r2secr-build-2026-10-12.md)); if **23.1.b** `uname -r` differs, rerun `scripts/build_r2secr_module.sh` on Linux with device `KDIR`.
-3. **UART on your 23.1.b unit** (read-only): capture `Linux version …` and `/proc/mtd` to confirm whether 23.1.b still uses aarch64 4.1.5x and the same **eripv2** name before any root attempt.
+3. **UART follow-up now supplied:** [owned F1 capture](f1-boot-log-2026-10-12.md) reports **AArch64 4.19.235**, refuting the same-4.1.5x assumption. The module selector finds no match. It reads `eripv2` as a UBI volume and prints raw eripv2 backup partitions; `/proc/mtd`, a full UBI volume table and matching kernel/module layout remain missing. The old module/MTD defaults above are historical 19.x guidance, not validated acquisition commands for this unit. No new OSCK trials or cryptographic success resulted from the capture review.
 
 ## Best next experiment
 

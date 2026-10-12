@@ -10,6 +10,10 @@ Notes on the Telia F1 I have open. Vantiva board GCNT-X, firmware 23.1.b.0448-72
 
 Write the sha256 next to an image if you keep one. Don't commit the image.
 
+Mac UART boot capture: `bash scripts/f1-boot-capture.command` (default `/dev/cu.usbserial-0001`, 115200 baud, timestamped Desktop log). Compatible with bundled Screen 4.00.03; [UART notes](findings/f1-uart-23.1b.md).
+
+Owned-unit boot evidence: [detailed 2026-10-12 UART review](findings/f1-boot-log-2026-10-12.md) and [redacted line-numbered evidence](findings/f1-boot-log-2026-10-12-evidence.md). **Linux 4.19.235**, Bank 2, UBI + dm-verity + AES-XTS root; BOOT-P/Enter invitations and JTAG warning are observed, **no shell/root/key recovery demonstrated**. The old **4.1.52** module is for the public 19.x reference and does not match this capture. Offline indexer: `python3 scripts/index_f1_boot_log.py <log>`; eight fixture tests: `python3 scripts/test_index_f1_boot_log.py`. Raw logs remain private.
+
 Public thread for this board: https://github.com/hack-technicolor/hack-technicolor/issues/321
 
 Sealed **19.4.0507** reference RBI (offline decrypt blocked on GCNT-X OSCK): [gcnt-x-19x-deep.md](findings/gcnt-x-19x-deep.md), [rbi-crypto-attempt3.md](findings/rbi-crypto-attempt3.md). Tools: `scripts/attempt_rbi_decrypt.py`, `scripts/select_r2secr_ko.py`, `scripts/build_r2secr_module.sh` → [r2secr-build-2026-10-12.md](findings/r2secr-build-2026-10-12.md) (`tools/secr/r2secr.arm64.4.1.52.ko`).

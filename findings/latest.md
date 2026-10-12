@@ -1,24 +1,28 @@
 # Genesis report
 
-**Generated:** 2026-10-12T10:45:10Z
+**Generated:** 2026-10-12T18:01:36Z
 **Host:** (omitted)
 
+## Owned-unit boot evidence
+- [Detailed UART review](f1-boot-log-2026-10-12.md) · [redacted line-indexed evidence](f1-boot-log-2026-10-12-evidence.md) — AArch64 4.19.235, UBI/verity/AES-XTS root; no shell/root/key recovery shown; old 4.1.52 module does not match
+- This report is a generated index, not independent evidence. Raw UART logs stay private under artifacts/uart/.
+
 ## UI grab reviews (newest first)
-- [`f1-grab-notloggedin-2026-10-12.md`](findings/f1-grab-notloggedin-2026-10-12.md) — `notloggedin.zip` is admin duplicate of ~05:57 grab, not logged-out
-- [`f1-grab-045648-review.md`](findings/f1-grab-045648-review.md) — finished 04:56:48Z zip; verbatim bodies; GET JSON
-- [`f1-grab-040001-review.md`](findings/f1-grab-040001-review.md) — script repair vs 03:38
-- [`f1-grab-033853-review.md`](findings/f1-grab-033853-review.md) — integrity, crypto, runtime map
+- [`f1-grab-notloggedin-2026-10-12.md`](f1-grab-notloggedin-2026-10-12.md) — `notloggedin.zip` is admin duplicate of ~05:57 grab, not logged-out
+- [`f1-grab-045648-review.md`](f1-grab-045648-review.md) — finished 04:56:48Z zip; verbatim bodies; GET JSON
+- [`f1-grab-040001-review.md`](f1-grab-040001-review.md) — script repair vs 03:38
+- [`f1-grab-033853-review.md`](f1-grab-033853-review.md) — integrity, crypto, runtime map
 
 ## LAN surfaces (non–port-80)
-- **CUPS :631** — [`docs/f1-cups-631.md`](docs/f1-cups-631.md) · [`f1-cups-ipp-policy-2026-10-12.md`](findings/f1-cups-ipp-policy-2026-10-12.md) · [`f1-cups-ipp-readonly-matrix-2026-10-12.md`](findings/f1-cups-ipp-readonly-matrix-2026-10-12.md)
-- **WFA WLANConfig :49152** — [`f1-wfa-wlanconfig-49152-2026-10-12.md`](findings/f1-wfa-wlanconfig-49152-2026-10-12.md)
-- **Listener inventory** — [`management-auth-boundaries-2026-10-12.md`](findings/management-auth-boundaries-2026-10-12.md)
+- **CUPS :631** — [`docs/f1-cups-631.md`](../docs/f1-cups-631.md) · [`f1-cups-ipp-policy-2026-10-12.md`](f1-cups-ipp-policy-2026-10-12.md) · [`f1-cups-ipp-readonly-matrix-2026-10-12.md`](f1-cups-ipp-readonly-matrix-2026-10-12.md)
+- **WFA WLANConfig :49152** — [`f1-wfa-wlanconfig-49152-2026-10-12.md`](f1-wfa-wlanconfig-49152-2026-10-12.md)
+- **Listener inventory** — [`management-auth-boundaries-2026-10-12.md`](management-auth-boundaries-2026-10-12.md)
 
 ## `artifacts/firmware`
 ```
 total 63984
 drwxr-xr-x   3 user  staff        96 Oct 12 08:08 .
-drwxr-xr-x  16 user  staff       512 Oct 12 09:24 ..
+drwxr-xr-x  17 user  staff       544 Oct 12 19:45 ..
 -rw-r--r--@  1 user  staff  32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
 ```
 
@@ -26,7 +30,7 @@ drwxr-xr-x  16 user  staff       512 Oct 12 09:24 ..
 ```
 total 31104
 drwxr-xr-x   7 user  staff      224 Oct 11 17:46 .
-drwxr-xr-x  16 user  staff      512 Oct 12 09:24 ..
+drwxr-xr-x  17 user  staff      544 Oct 12 19:45 ..
 -rw-------   1 user  staff     1708 Oct 11 05:39 f1-reboot.pcapng
 -rw-r--r--   1 user  staff      335 Oct 11 08:01 wan.pcapng
 -rw-r--r--   1 user  staff   926664 Oct 11 17:46 wan2-real.pcapng
@@ -38,7 +42,7 @@ drwxr-xr-x  16 user  staff      512 Oct 12 09:24 ..
 ```
 total 288
 drwxr-xr-x  26 user  staff    832 Oct 12 09:26 .
-drwxr-xr-x  16 user  staff    512 Oct 12 09:24 ..
+drwxr-xr-x  17 user  staff    544 Oct 12 19:45 ..
 -rw-r--r--@  1 user  staff  49359 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.png
 drwxr-xr-x@  3 user  staff     96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.extracted
 -rw-r--r--@  1 user  staff    231 Oct 11 09:02 binwalk-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.txt
@@ -80,71 +84,73 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 {"error":"Apps was not found GCNT-X 23.1 f1_1.0-1"}```
 
 ## Findings
-- [`admin-url-hunt.md`](findings/admin-url-hunt.md)
-- [`auth-session-and-wps-2026-10-12.md`](findings/auth-session-and-wps-2026-10-12.md)
-- [`cups-http-ipp-source-boundary.md`](findings/cups-http-ipp-source-boundary.md)
-- [`decomp-kickoff.md`](findings/decomp-kickoff.md)
-- [`f1-advanced-ui.md`](findings/f1-advanced-ui.md)
-- [`f1-api-map.md`](findings/f1-api-map.md)
-- [`f1-bypass-crypto-options.md`](findings/f1-bypass-crypto-options.md)
-- [`f1-config-export-decrypt-2026-10-12.md`](findings/f1-config-export-decrypt-2026-10-12.md)
-- [`f1-cups-ipp-policy-2026-10-12.md`](findings/f1-cups-ipp-policy-2026-10-12.md)
-- [`f1-cups-ipp-readonly-matrix-2026-10-12.md`](findings/f1-cups-ipp-readonly-matrix-2026-10-12.md)
-- [`f1-diagnostics-connection-restart-2026-10-12.md`](findings/f1-diagnostics-connection-restart-2026-10-12.md)
-- [`f1-gateway-url-action-2026-10-12.md`](findings/f1-gateway-url-action-2026-10-12.md)
-- [`f1-grab-033853-auth-crypto.md`](findings/f1-grab-033853-auth-crypto.md)
-- [`f1-grab-033853-integrity.md`](findings/f1-grab-033853-integrity.md)
-- [`f1-grab-033853-review.md`](findings/f1-grab-033853-review.md)
-- [`f1-grab-033853-runtime.md`](findings/f1-grab-033853-runtime.md)
-- [`f1-grab-033853-ui-surfaces.md`](findings/f1-grab-033853-ui-surfaces.md)
-- [`f1-grab-040001-coverage.md`](findings/f1-grab-040001-coverage.md)
-- [`f1-grab-040001-fidelity.md`](findings/f1-grab-040001-fidelity.md)
-- [`f1-grab-040001-review.md`](findings/f1-grab-040001-review.md)
-- [`f1-grab-040001-runtime-delta.md`](findings/f1-grab-040001-runtime-delta.md)
-- [`f1-grab-045648-review.md`](findings/f1-grab-045648-review.md)
-- [`f1-grab-csrf-redaction-corruption.md`](findings/f1-grab-csrf-redaction-corruption.md)
-- [`f1-grab-notloggedin-2026-10-12.md`](findings/f1-grab-notloggedin-2026-10-12.md)
-- [`f1-har-coverage-2026-10-12.md`](findings/f1-har-coverage-2026-10-12.md)
-- [`f1-har-wanetc-2026-10-12.md`](findings/f1-har-wanetc-2026-10-12.md)
-- [`f1-hardware-key-blocker-2026-10-12.md`](findings/f1-hardware-key-blocker-2026-10-12.md)
-- [`f1-hidden-action-boundary-2026-10-12.md`](findings/f1-hidden-action-boundary-2026-10-12.md)
-- [`f1-ipping-helper-2026-10-12.md`](findings/f1-ipping-helper-2026-10-12.md)
-- [`f1-ipping-host-2026-10-12.md`](findings/f1-ipping-host-2026-10-12.md)
-- [`f1-js-deep-2026-10-12.md`](findings/f1-js-deep-2026-10-12.md)
-- [`f1-logviewer.md`](findings/f1-logviewer.md)
-- [`f1-trace-helper-2026-10-12.md`](findings/f1-trace-helper-2026-10-12.md)
-- [`f1-trace-path-2026-10-12.md`](findings/f1-trace-path-2026-10-12.md)
-- [`f1-uart-23.1b.md`](findings/f1-uart-23.1b.md)
-- [`f1-ui-grab-2026-10-12.md`](findings/f1-ui-grab-2026-10-12.md)
-- [`f1-ui-leads-23.1b.md`](findings/f1-ui-leads-23.1b.md)
-- [`f1-usp-ipping-2026-10-12.md`](findings/f1-usp-ipping-2026-10-12.md)
-- [`f1-wfa-wlanconfig-49152-2026-10-12.md`](findings/f1-wfa-wlanconfig-49152-2026-10-12.md)
-- [`f1-wireless-qrcode-context-2026-10-12.md`](findings/f1-wireless-qrcode-context-2026-10-12.md)
-- [`gcnt-x-19x-deep.md`](findings/gcnt-x-19x-deep.md)
-- [`gcnt-x-public-hardware.md`](findings/gcnt-x-public-hardware.md)
-- [`gcnt-x-root-path.md`](findings/gcnt-x-root-path.md)
-- [`management-auth-boundaries-2026-10-12.md`](findings/management-auth-boundaries-2026-10-12.md)
-- [`management-offline-service-evidence.md`](findings/management-offline-service-evidence.md)
-- [`mirror-test.md`](findings/mirror-test.md)
-- [`r2secr-build-2026-10-12.md`](findings/r2secr-build-2026-10-12.md)
-- [`rbi-crypto-attempt2.md`](findings/rbi-crypto-attempt2.md)
-- [`rbi-crypto-attempt3.md`](findings/rbi-crypto-attempt3.md)
-- [`rbi-crypto-debug.md`](findings/rbi-crypto-debug.md)
-- [`session-source-availability-boundary.md`](findings/session-source-availability-boundary.md)
-- [`software-pass-capture-review.md`](findings/software-pass-capture-review.md)
-- [`software-pass-config-export.md`](findings/software-pass-config-export.md)
-- [`software-pass-crypto-validation.md`](findings/software-pass-crypto-validation.md)
-- [`software-pass-har7-js.md`](findings/software-pass-har7-js.md)
-- [`software-pass-har7-review.md`](findings/software-pass-har7-review.md)
-- [`software-pass-live-access.md`](findings/software-pass-live-access.md)
-- [`software-pass-request-review.md`](findings/software-pass-request-review.md)
-- [`software-pass-source-comparison.md`](findings/software-pass-source-comparison.md)
-- [`software-pass-summary.md`](findings/software-pass-summary.md)
-- [`tried.md`](findings/tried.md)
-- [`wan-pcap.md`](findings/wan-pcap.md)
-- [`wan2-tagged-frames.md`](findings/wan2-tagged-frames.md)
-- [`want-pcap.md`](findings/want-pcap.md)
-- [`wps-upnp-source-boundary.md`](findings/wps-upnp-source-boundary.md)
+- [`admin-url-hunt.md`](admin-url-hunt.md)
+- [`auth-session-and-wps-2026-10-12.md`](auth-session-and-wps-2026-10-12.md)
+- [`cups-http-ipp-source-boundary.md`](cups-http-ipp-source-boundary.md)
+- [`decomp-kickoff.md`](decomp-kickoff.md)
+- [`f1-advanced-ui.md`](f1-advanced-ui.md)
+- [`f1-api-map.md`](f1-api-map.md)
+- [`f1-boot-log-2026-10-12-evidence.md`](f1-boot-log-2026-10-12-evidence.md)
+- [`f1-boot-log-2026-10-12.md`](f1-boot-log-2026-10-12.md)
+- [`f1-bypass-crypto-options.md`](f1-bypass-crypto-options.md)
+- [`f1-config-export-decrypt-2026-10-12.md`](f1-config-export-decrypt-2026-10-12.md)
+- [`f1-cups-ipp-policy-2026-10-12.md`](f1-cups-ipp-policy-2026-10-12.md)
+- [`f1-cups-ipp-readonly-matrix-2026-10-12.md`](f1-cups-ipp-readonly-matrix-2026-10-12.md)
+- [`f1-diagnostics-connection-restart-2026-10-12.md`](f1-diagnostics-connection-restart-2026-10-12.md)
+- [`f1-gateway-url-action-2026-10-12.md`](f1-gateway-url-action-2026-10-12.md)
+- [`f1-grab-033853-auth-crypto.md`](f1-grab-033853-auth-crypto.md)
+- [`f1-grab-033853-integrity.md`](f1-grab-033853-integrity.md)
+- [`f1-grab-033853-review.md`](f1-grab-033853-review.md)
+- [`f1-grab-033853-runtime.md`](f1-grab-033853-runtime.md)
+- [`f1-grab-033853-ui-surfaces.md`](f1-grab-033853-ui-surfaces.md)
+- [`f1-grab-040001-coverage.md`](f1-grab-040001-coverage.md)
+- [`f1-grab-040001-fidelity.md`](f1-grab-040001-fidelity.md)
+- [`f1-grab-040001-review.md`](f1-grab-040001-review.md)
+- [`f1-grab-040001-runtime-delta.md`](f1-grab-040001-runtime-delta.md)
+- [`f1-grab-045648-review.md`](f1-grab-045648-review.md)
+- [`f1-grab-csrf-redaction-corruption.md`](f1-grab-csrf-redaction-corruption.md)
+- [`f1-grab-notloggedin-2026-10-12.md`](f1-grab-notloggedin-2026-10-12.md)
+- [`f1-har-coverage-2026-10-12.md`](f1-har-coverage-2026-10-12.md)
+- [`f1-har-wanetc-2026-10-12.md`](f1-har-wanetc-2026-10-12.md)
+- [`f1-hardware-key-blocker-2026-10-12.md`](f1-hardware-key-blocker-2026-10-12.md)
+- [`f1-hidden-action-boundary-2026-10-12.md`](f1-hidden-action-boundary-2026-10-12.md)
+- [`f1-ipping-helper-2026-10-12.md`](f1-ipping-helper-2026-10-12.md)
+- [`f1-ipping-host-2026-10-12.md`](f1-ipping-host-2026-10-12.md)
+- [`f1-js-deep-2026-10-12.md`](f1-js-deep-2026-10-12.md)
+- [`f1-logviewer.md`](f1-logviewer.md)
+- [`f1-trace-helper-2026-10-12.md`](f1-trace-helper-2026-10-12.md)
+- [`f1-trace-path-2026-10-12.md`](f1-trace-path-2026-10-12.md)
+- [`f1-uart-23.1b.md`](f1-uart-23.1b.md)
+- [`f1-ui-grab-2026-10-12.md`](f1-ui-grab-2026-10-12.md)
+- [`f1-ui-leads-23.1b.md`](f1-ui-leads-23.1b.md)
+- [`f1-usp-ipping-2026-10-12.md`](f1-usp-ipping-2026-10-12.md)
+- [`f1-wfa-wlanconfig-49152-2026-10-12.md`](f1-wfa-wlanconfig-49152-2026-10-12.md)
+- [`f1-wireless-qrcode-context-2026-10-12.md`](f1-wireless-qrcode-context-2026-10-12.md)
+- [`gcnt-x-19x-deep.md`](gcnt-x-19x-deep.md)
+- [`gcnt-x-public-hardware.md`](gcnt-x-public-hardware.md)
+- [`gcnt-x-root-path.md`](gcnt-x-root-path.md)
+- [`management-auth-boundaries-2026-10-12.md`](management-auth-boundaries-2026-10-12.md)
+- [`management-offline-service-evidence.md`](management-offline-service-evidence.md)
+- [`mirror-test.md`](mirror-test.md)
+- [`r2secr-build-2026-10-12.md`](r2secr-build-2026-10-12.md)
+- [`rbi-crypto-attempt2.md`](rbi-crypto-attempt2.md)
+- [`rbi-crypto-attempt3.md`](rbi-crypto-attempt3.md)
+- [`rbi-crypto-debug.md`](rbi-crypto-debug.md)
+- [`session-source-availability-boundary.md`](session-source-availability-boundary.md)
+- [`software-pass-capture-review.md`](software-pass-capture-review.md)
+- [`software-pass-config-export.md`](software-pass-config-export.md)
+- [`software-pass-crypto-validation.md`](software-pass-crypto-validation.md)
+- [`software-pass-har7-js.md`](software-pass-har7-js.md)
+- [`software-pass-har7-review.md`](software-pass-har7-review.md)
+- [`software-pass-live-access.md`](software-pass-live-access.md)
+- [`software-pass-request-review.md`](software-pass-request-review.md)
+- [`software-pass-source-comparison.md`](software-pass-source-comparison.md)
+- [`software-pass-summary.md`](software-pass-summary.md)
+- [`tried.md`](tried.md)
+- [`wan-pcap.md`](wan-pcap.md)
+- [`wan2-tagged-frames.md`](wan2-tagged-frames.md)
+- [`want-pcap.md`](want-pcap.md)
+- [`wps-upnp-source-boundary.md`](wps-upnp-source-boundary.md)
 
 ## 19.x reference RBI (offline)
 ### attempt3 (boot-log derivations, latest)

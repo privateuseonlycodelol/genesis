@@ -2,6 +2,8 @@
 
 Target: GCNT-X **19.4.0856** UART log (`Linux 4.1.52` **aarch64**, `SMP PREEMPT`). Module dumps `r2secr` / eRIP items after `insmod` (see `tools/secr/README.md`).
 
+**Superseding owned-unit observation, 2026-10-12:** the supplied F1 boot capture reports **Linux 4.19.235 AArch64**, not 4.1.52. [Detailed evidence](f1-boot-log-2026-10-12.md). The selector returns **exit 1**, `arch=aarch64 no_module_match`. The module below was not loaded on either target in this review and is **not validated for the owned unit**. Changing vermagic alone cannot establish kernel ABI/configuration, symbol export, or secret-structure compatibility. The current map also uses UBI volumes and eripv2 backups; the old raw-eripv2 MTD default is unvalidated.
+
 ## Deliverable
 
 | Artifact | Path | vermagic (strings) |
@@ -43,4 +45,4 @@ macOS cannot link a loadable `.ko` with in-tree `modpost` (host tool chain confl
 ## What this does **not** do
 
 - Does not decrypt the sealed RBI or export OSCK to the Mac without `insmod` on rooted hardware.
-- Does not prove **23.1.b** uses the same kernel vermagic (UART capture still required).
+- At build time, the owned-unit kernel was unknown. The later capture **refutes the same-kernel assumption**: **4.19.235**. A matching vendor tree/configuration and verified `r2secr` symbol/layout are still missing; this 4.1.52 module is a historical reference deliverable.

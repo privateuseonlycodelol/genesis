@@ -66,6 +66,8 @@ On Mac/PC: **Decrypt_RBI_Firmware_Utility** or OSCK + same crypto chain, then `b
 
 ## Mapping to this repo
 
+**Current-unit correction, 2026-10-12:** [new owned F1 boot evidence](f1-boot-log-2026-10-12.md) reports **4.19.235 AArch64**, Bank 2, UBI/verity/AES-XTS root and eripv2 volume/backup names. The 4.1.52 module and physical-bank map in this historical guide do not match that capture. BOOT-P/Enter invitations are observed, but no serial interaction or shell is established. Old recovery/downgrade reports are still hypotheses for the current unit.
+
 | Goal | 19.x lab hardware | User’s 23.1.b F1 |
 |------|-------------------|------------------|
 | Decrypt reference RBI offline | Needs **GCNT-X OSCK** (`r2secr.arm64.4.1.52.ko` on 19.4-class aarch64 log — [r2secr-build-2026-10-12.md](r2secr-build-2026-10-12.md)) | Same |
