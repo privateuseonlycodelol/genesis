@@ -4,7 +4,7 @@ Scope: owned Telia F1 GCNT-X on the recorded 23.1.b build, ordinary authenticate
 
 ## Evidence found
 
-**Later owner-supplied UART review (offline, same date):** [extensive boot analysis](f1-boot-log-2026-10-12.md) and [line-indexed evidence](f1-boot-log-2026-10-12-evidence.md) establish the recorded **4.19.235 AArch64** kernel, Bank 2 and UBI → verity → AES-XTS root stack. They supersede the earlier no-owned-log/kernel-unknown state. BOOT-P/Enter prompts, key handoff and JTAG warning are leads; no access or exploit is established. The **4.1.52** module applies to the older public reference, not this kernel.
+**Later owner-supplied UART review (same date):** [extensive boot analysis](f1-boot-log-2026-10-12.md) and [line-indexed evidence](f1-boot-log-2026-10-12-evidence.md) establish the recorded **4.19.235 AArch64** kernel, Bank 2 and UBI → verity → AES-XTS root stack. The subsequent [live interaction follow-up](f1-uart-interaction-2026-10-12.md) verifies `b` enters BOOT-P; early attempts had **no Ethernet** (`no active_port set`); a later capture had link up but still **BOOTP Reply timeout** without a PC server. **2026-10-13:** Windows PC on LAN recorded full BOOTREQUESTs with boot file **`GCNT-X`**, no Offer ([BOOT-P LAN](f1-bootp-lan-2026-10-13.md)). Linux Return/`id`/Ctrl+J produced no shell; logviewer verified serial denied for root. A later re-read of that same log found cooked-tty echo of Up-arrow (`^[[A`) and another invitation, still with no command output. A follow-up `/login.lp` check from this Mac timed out; its default route was not the F1 LAN. A later logviewer export on this unit **verified** tty `restricted_shell` plus Clash `User root has no serial access` / `No suitable login found for root on serial` ([UART interaction](f1-uart-interaction-2026-10-12.md)). The **4.1.52** module applies to the older public reference, not this kernel.
 
 | Track | Actual result | Evidence |
 | --- | --- | --- |
@@ -26,6 +26,9 @@ Scope: owned Telia F1 GCNT-X on the recorded 23.1.b build, ordinary authenticate
 | WAN Services HAR (`wanetc.har`) | Admin `TABLE-*` / UPnP saves; validators block injection class; no RCE path vs diagnostics `io.popen` | [f1-har-wanetc-2026-10-12.md](f1-har-wanetc-2026-10-12.md) |
 | **19.x RBI + boot log (offline, same day)** | Sealed **19.4.0507** RBI unchanged; **71** OSCK trials incl. **19.4.0856** UART constants — all `bad_osck`; `:7577` sibling **403**; **`r2secr.arm64.4.1.52.ko`** built for aarch64 **4.1.52** | [rbi-crypto-attempt3.md](rbi-crypto-attempt3.md), [gcnt-x-public-hardware.md](gcnt-x-public-hardware.md), [r2secr-build-2026-10-12.md](r2secr-build-2026-10-12.md) |
 | **`POST gateway.lp` `action=URL` + port 8080** | Twelve SSRF-style `urlVal` values → identical dashboard HTML; TCP **8080** fixed paths all nginx **404**; CUPS `file://` printer-uri → **400** | [f1-gateway-url-action-2026-10-12.md](f1-gateway-url-action-2026-10-12.md) |
+| **Aggressive injection battery (evening)** | `f1_aggressive_software_pass.py`: diagnostics/SSRF/device/log/import/sched reboot/WAN table/AJAX — **no** demonstrated exploit; **503** after burst | [f1-aggressive-software-pass-2026-10-12.md](f1-aggressive-software-pass-2026-10-12.md) |
+| **Gap pass (evening; script later retired)** | Sched oracle, blind SSRF, offline export header — negative; auth matrix partial then **dropped** as duplicate of boundaries | [f1-gap-attack-pass-2026-10-12.md](f1-gap-attack-pass-2026-10-12.md) |
+| **BOOT-P on LAN (2026-10-13)** | pktmon + Wireshark on cabled Windows PC: **17** BOOTREQUESTs, **`GCNT-X`**, no server; `f1-bootp-reply.ps1` prepared, **not run** | [f1-bootp-lan-2026-10-13.md](f1-bootp-lan-2026-10-13.md), [composite index](f1-research-composite-2026-10-13.md) |
 
 ## Work performed and validation
 
@@ -60,6 +63,8 @@ The legacy 16-bit payload-offset read is not wrong on this reference RBI; both i
 The newly supplied `7.har` was inspected offline and left unchanged. Its 444 entries comprise 338 GETs and 106 POSTs. All 106 POSTs include a CSRF field; 105 have HTTP 200 and one has status 0 (no HTTP response recorded), with no recorded 403. HTTP 200 alone does not establish application success. Newly observed scripts construct `/ajax/wirelesscard.lua` requests and a conditional gateway `action=URL` request. These are client-code observations, not verified backend capabilities. Extracted scripts and their sanitized hash manifest remain ignored/private. No captured requests were replayed.
 
 ## Next discriminating work and limits
+
+**Pass index (2026-10-13):** [f1-research-composite-2026-10-13.md](f1-research-composite-2026-10-13.md) — blocked vs open queue (BOOTP reply, ipping probe, signed recovery, hardware key).
 
 **Config plaintext:** obtain `RIP_ID_RANDOM_KEY_B` (root `dd` of `/proc/rip/0108` or `eripv2` MTD + ECK), then run `scripts/decrypt_f1_config_export.py --randb …`. Further export downloads or UI action fuzzing will not derive the key.
 

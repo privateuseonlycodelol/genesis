@@ -53,4 +53,5 @@ Repeated automation (key probe, failed login handoffs, parallel curls) re-trigge
 
 - **Refuted (for tested POST inputs):** `action=URL` as a LAN SSRF primitive into loopback HTTP, CUPS, WPS, or `file://` paths.
 - **Narrowed:** TCP **8080** — fixed path list is uniformly nginx **404**; handler identity still **UNKNOWN**.
-- **Open:** unauthenticated `wirelesscard.lua` / `GET action=URL` when **503** is clear; whether `urlVal` is stored server-side for Z-Wave when `showZwave` is true on other SKUs.
+- **Superseded for unauth :80 (evening pass):** without a session, `GET ?action=URL` and `/ajax/wirelesscard.lua` return **login HTML** (~5.8 KiB), not JSON or SSRF — [f1-aggressive-software-pass-2026-10-12.md](f1-aggressive-software-pass-2026-10-12.md). Morning `surface_quick` **503** rows here are cooldown artifacts only.
+- **Open:** blind out-of-band fetch (evening gap pass: **no** callback to LAN listener — [f1-gap-attack-pass-2026-10-12.md](f1-gap-attack-pass-2026-10-12.md)); whether `urlVal` is stored server-side for Z-Wave when `showZwave` is true on other SKUs.

@@ -74,3 +74,5 @@ An earlier comment asks for OpenWrt and posts PCB photos. That is a request, not
 NAND catalog part, Wi-Fi radio part, a GPL tarball or board file for EWA1330 / EWA1330TCS / GCNT-X, a public 23.1.b RBI URL, a TEST_CN20 pinout, and an OpenWrt board target. The Vantiva EWA1330TCS 19.4 file already noted in `findings/f1-api-map.md` is a module report, not a source tree. Detail of the searches that returned nothing is in `docs/gcnt-x-web-gaps.md`.
 
 The flash ID is not a part number. The next hardware fact that this public log cannot supply is the NAND catalog part on AP-BCM114-0001.
+
+**Owned unit (2026-10-12):** top-side PCB photo — no visible SPI NOR for clip read; NAND under shields per UART log. Connector inventory: [f1-board-visual-2026-10-12.md](f1-board-visual-2026-10-12.md).

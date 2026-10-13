@@ -10,7 +10,7 @@ Notes on the Telia F1 I have open. Vantiva board GCNT-X, firmware 23.1.b.0448-72
 
 Write the sha256 next to an image if you keep one. Don't commit the image.
 
-Mac UART boot capture: `bash scripts/f1-boot-capture.command` (default `/dev/cu.usbserial-0001`, 115200 baud, timestamped Desktop log). Compatible with bundled Screen 4.00.03; [UART notes](findings/f1-uart-23.1b.md).
+Mac UART boot capture: `bash scripts/f1-boot-capture.command` (default `/dev/cu.usbserial-0001`, 115200 baud, timestamped Desktop log). Compatible with bundled Screen 4.00.03; [UART notes](findings/f1-uart-23.1b.md) (board **CN1** is four through-holes, not a ready-made router pin header). The Oct 12 live input/BOOT-P follow-up confirmed BOOT-P entry; Linux Enter/`id`/Ctrl+J did not yield a shell. A 2026-10-13 Windows pktmon/Wireshark capture on a cabled PC recorded bootloader BOOTREQUESTs (boot file **`GCNT-X`**, no server) ([BOOT-P LAN](findings/f1-bootp-lan-2026-10-13.md)). Full pass status: [research composite](findings/f1-research-composite-2026-10-13.md). See [UART interaction finding](findings/f1-uart-interaction-2026-10-12.md) and [extensive handoff](UART-HANDOVER.md).
 
 Owned-unit boot evidence: [detailed 2026-10-12 UART review](findings/f1-boot-log-2026-10-12.md) and [redacted line-numbered evidence](findings/f1-boot-log-2026-10-12-evidence.md). **Linux 4.19.235**, Bank 2, UBI + dm-verity + AES-XTS root; BOOT-P/Enter invitations and JTAG warning are observed, **no shell/root/key recovery demonstrated**. The old **4.1.52** module is for the public 19.x reference and does not match this capture. Offline indexer: `python3 scripts/index_f1_boot_log.py <log>`; eight fixture tests: `python3 scripts/test_index_f1_boot_log.py`. Raw logs remain private.
 
@@ -34,7 +34,7 @@ Wireless QR modal (**bare GET 500**, **contextual GET 200**; param fuzz dead end
 
 Diagnostics Connection **RESTART** → `ipping_helper` (same helper as PING): [findings/f1-diagnostics-connection-restart-2026-10-12.md](findings/f1-diagnostics-connection-restart-2026-10-12.md). Driver: `scripts/f1_diagnostics_connection_control.py`.
 
-Config export scripts: `scripts/decrypt_f1_config_export.py`, `scripts/test_decrypt_f1_config_export.py`, `scripts/inspect_config_export_header.py`, `scripts/f1_config_key_probe.py` (paced rip/debug GET sweep — **do not** rerun at volume; caused **503**), `scripts/acquire_f1_config_key.sh` (on-router checklist after root).
+Config export scripts: `scripts/decrypt_f1_config_export.py`, `scripts/test_decrypt_f1_config_export.py`, `scripts/inspect_config_export_header.py`, `scripts/f1_config_key_probe.py` (paced rip/debug GET sweep — **do not** rerun at volume; caused **503**), `scripts/f1_aggressive_software_pass.py` (paced injection/SSRF battery — same **503** risk if stacked), `scripts/f1_gap_attack_pass.py` (retired catalog — those phases are already recorded; it does not probe), `scripts/f1-bootp-reply.ps1` (Windows BOOTP answer for BOOT-P lab — no TFTP), `scripts/f1_session_store.py` (reuse `artifacts/secrets/f1-admin.cookies.txt` across runs — skips SRP when session still valid), `scripts/f1_system_reboot.py`, `scripts/acquire_f1_config_key.sh` (on-router checklist after root).
 
 Browser HARs (offline, sanitized): [docs/f1-uploaded-hars.md](docs/f1-uploaded-hars.md) (`1`–`5` nested set); standalone [WAN Services capture `wanetc.har`](findings/f1-har-wanetc-2026-10-12.md) (`analyze_f1_har.py` / `inspect_ui_har.py`).
 

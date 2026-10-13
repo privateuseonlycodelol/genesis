@@ -1,5 +1,7 @@
 # Live read-only access checks — 2026-10-12
 
+**UART / BOOT-P (separate from this HTTP pass):** [live UART finding](f1-uart-interaction-2026-10-12.md); **2026-10-13** cabled PC listen-only capture — boot name **`GCNT-X`**, no DHCP Offer ([BOOT-P LAN](f1-bootp-lan-2026-10-13.md)). Early UART BOOT-P had no Ethernet; later had link but no server. This file’s HTTP observations are unchanged.
+
 Target: the owner's F1 at `192.168.2.1`; no other network host was probed. Normal authenticated read controls and configuration export were performed after connectivity recovered. No settings, reboot, import, upload, or firmware operations were performed. Export can create temporary backend state; no persistent settings change was requested.
 
 ## Initial connection failure, subsequently resolved

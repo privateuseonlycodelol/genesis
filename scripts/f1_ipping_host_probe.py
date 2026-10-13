@@ -17,6 +17,7 @@ import urllib.parse
 from pathlib import Path
 
 import f1_ipping_control as ping
+from f1_pacing import wait_until_login_ready
 
 MARKER = "genesis-ipping-marker"
 NEWLINE_HOST = "127.0.0.1\nlogger " + MARKER
@@ -230,7 +231,23 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--password-file", type=Path, required=True)
     parser.add_argument("--pollution", action="store_true")
+    parser.add_argument(
+        "--wait-for-login",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    parser.add_argument("--max-wait", type=float, default=1200.0)
+    parser.add_argument("--login-interval", type=float, default=90.0)
+    parser.add_argument("--post-ready-pause", type=float, default=45.0)
     args = parser.parse_args()
+    if args.wait_for_login:
+        outcome = wait_until_login_ready(
+            max_wait_s=args.max_wait,
+            interval_s=args.login_interval,
+            post_ready_pause_s=args.post_ready_pause,
+        )
+        if not outcome["ready"]:
+            raise SystemExit("login_not_ready")
     os.umask(0o077)
     directory = ROOT / "artifacts" / "ui" / (
         "ipping-host-" + time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())

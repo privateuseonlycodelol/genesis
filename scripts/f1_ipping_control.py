@@ -18,9 +18,11 @@ import urllib.parse
 from collections import Counter
 from pathlib import Path
 
+from f1_pacing import DEFAULT_REQUEST_GAP_S
 from f1_srp_login import SRPClient
 
 ROOT = Path(__file__).resolve().parents[1]
+REQUEST_GAP_S = DEFAULT_REQUEST_GAP_S
 HOST = "127.0.0.1"
 REPETITIONS = "1"
 BLOCK_SIZE = "56"
@@ -223,7 +225,7 @@ class ProbeClient(SRPClient):
 
     def open(self, url, data=None, method="GET", timeout=30):
         if self.index:
-            time.sleep(2)
+            time.sleep(REQUEST_GAP_S)
         self.index += 1
         try:
             code, body = super()._open(url, data, method, timeout=timeout)

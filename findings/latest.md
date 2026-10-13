@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-12T18:01:36Z
+**Generated:** 2026-10-13T23:22:21Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -22,7 +22,7 @@
 ```
 total 63984
 drwxr-xr-x   3 user  staff        96 Oct 12 08:08 .
-drwxr-xr-x  17 user  staff       544 Oct 12 19:45 ..
+drwxr-xr-x  18 user  staff       576 Oct 13 00:59 ..
 -rw-r--r--@  1 user  staff  32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
 ```
 
@@ -30,7 +30,7 @@ drwxr-xr-x  17 user  staff       544 Oct 12 19:45 ..
 ```
 total 31104
 drwxr-xr-x   7 user  staff      224 Oct 11 17:46 .
-drwxr-xr-x  17 user  staff      544 Oct 12 19:45 ..
+drwxr-xr-x  18 user  staff      576 Oct 13 00:59 ..
 -rw-------   1 user  staff     1708 Oct 11 05:39 f1-reboot.pcapng
 -rw-r--r--   1 user  staff      335 Oct 11 08:01 wan.pcapng
 -rw-r--r--   1 user  staff   926664 Oct 11 17:46 wan2-real.pcapng
@@ -40,9 +40,9 @@ drwxr-xr-x  17 user  staff      544 Oct 12 19:45 ..
 
 ## `artifacts/logs`
 ```
-total 288
-drwxr-xr-x  26 user  staff    832 Oct 12 09:26 .
-drwxr-xr-x  17 user  staff    544 Oct 12 19:45 ..
+total 296
+drwxr-xr-x  27 user  staff    864 Oct 12 21:24 .
+drwxr-xr-x  18 user  staff    576 Oct 13 00:59 ..
 -rw-r--r--@  1 user  staff  49359 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.png
 drwxr-xr-x@  3 user  staff     96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.extracted
 -rw-r--r--@  1 user  staff    231 Oct 11 09:02 binwalk-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.txt
@@ -51,6 +51,7 @@ drwxr-xr-x@  3 user  staff     96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLA
 -rw-r--r--@  1 user  staff    320 Oct 11 09:05 decrypt-attempt-19x.txt
 -rw-r--r--@  1 user  staff   4858 Oct 11 09:09 decrypt-attempt2.txt
 -rw-r--r--@  1 user  staff   4223 Oct 12 09:20 decrypt-attempt3.txt
+-rw-r--r--@  1 user  staff   1042 Oct 12 21:44 ipping-host-deferred-20261012T212441Z.log
 -rw-r--r--   1 user  staff     53 Oct 11 05:41 lcm-23.1.b.json
 -rw-r--r--   1 user  staff     51 Oct 11 05:41 lcm-23.1.json
 -rw-r--r--@  1 user  staff   3266 Oct 12 09:26 r2secr-build-20261012T072638Z.txt
@@ -89,14 +90,18 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`cups-http-ipp-source-boundary.md`](cups-http-ipp-source-boundary.md)
 - [`decomp-kickoff.md`](decomp-kickoff.md)
 - [`f1-advanced-ui.md`](f1-advanced-ui.md)
+- [`f1-aggressive-software-pass-2026-10-12.md`](f1-aggressive-software-pass-2026-10-12.md)
 - [`f1-api-map.md`](f1-api-map.md)
+- [`f1-board-visual-2026-10-12.md`](f1-board-visual-2026-10-12.md)
 - [`f1-boot-log-2026-10-12-evidence.md`](f1-boot-log-2026-10-12-evidence.md)
 - [`f1-boot-log-2026-10-12.md`](f1-boot-log-2026-10-12.md)
+- [`f1-bootp-lan-2026-10-13.md`](f1-bootp-lan-2026-10-13.md)
 - [`f1-bypass-crypto-options.md`](f1-bypass-crypto-options.md)
 - [`f1-config-export-decrypt-2026-10-12.md`](f1-config-export-decrypt-2026-10-12.md)
 - [`f1-cups-ipp-policy-2026-10-12.md`](f1-cups-ipp-policy-2026-10-12.md)
 - [`f1-cups-ipp-readonly-matrix-2026-10-12.md`](f1-cups-ipp-readonly-matrix-2026-10-12.md)
 - [`f1-diagnostics-connection-restart-2026-10-12.md`](f1-diagnostics-connection-restart-2026-10-12.md)
+- [`f1-gap-attack-pass-2026-10-12.md`](f1-gap-attack-pass-2026-10-12.md)
 - [`f1-gateway-url-action-2026-10-12.md`](f1-gateway-url-action-2026-10-12.md)
 - [`f1-grab-033853-auth-crypto.md`](f1-grab-033853-auth-crypto.md)
 - [`f1-grab-033853-integrity.md`](f1-grab-033853-integrity.md)
@@ -118,9 +123,11 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-ipping-host-2026-10-12.md`](f1-ipping-host-2026-10-12.md)
 - [`f1-js-deep-2026-10-12.md`](f1-js-deep-2026-10-12.md)
 - [`f1-logviewer.md`](f1-logviewer.md)
+- [`f1-research-composite-2026-10-13.md`](f1-research-composite-2026-10-13.md)
 - [`f1-trace-helper-2026-10-12.md`](f1-trace-helper-2026-10-12.md)
 - [`f1-trace-path-2026-10-12.md`](f1-trace-path-2026-10-12.md)
 - [`f1-uart-23.1b.md`](f1-uart-23.1b.md)
+- [`f1-uart-interaction-2026-10-12.md`](f1-uart-interaction-2026-10-12.md)
 - [`f1-ui-grab-2026-10-12.md`](f1-ui-grab-2026-10-12.md)
 - [`f1-ui-leads-23.1b.md`](f1-ui-leads-23.1b.md)
 - [`f1-usp-ipping-2026-10-12.md`](f1-usp-ipping-2026-10-12.md)

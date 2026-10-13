@@ -1,28 +1,29 @@
 #!/bin/bash
-# Capture UART output with macOS cu, recording the terminal session with script.
+# Capture a router UART with macOS Screen. Run this from Terminal.app, which
+# provides Screen the real PTY it needs (the embedded Genesis terminal may not).
 set -eu
 umask 077
+
+device="${1:-/dev/cu.usbserial-0001}"
 if [ "${1:-}" = "--help" ]; then
-  echo "Usage: bash f1-boot-capture.command [serial-device]"
-  echo "Default: /dev/cu.usbserial-0001 at 115200 baud; logs go to Desktop."
+  echo "Usage: bash /Users/nils/genesis/scripts/f1-boot-capture.command [serial-device]"
+  echo "Default: /dev/cu.usbserial-0001 at 115200 baud; log is saved on Desktop."
   exit 0
 fi
-device="${1:-/dev/cu.usbserial-0001}"
 if [ ! -c "$device" ]; then
   echo "Serial device not found: $device" >&2
   echo "Connect the USB adapter; list ports with: ls /dev/cu.*" >&2
   exit 1
 fi
-if [ ! -x /usr/bin/cu ] || [ ! -x /usr/bin/script ]; then
-  echo "This capture helper needs macOS /usr/bin/cu and /usr/bin/script." >&2
-  exit 1
-fi
-mkdir -p "$HOME/Desktop"
+
 stamp="$(date +%Y%m%d-%H%M%S)"
 logfile="$HOME/Desktop/router-boot-$stamp-$$.log"
+screenrc="$HOME/.f1boot-$stamp-$$.screenrc"
+printf 'startup_message off\ndeflog on\nlogfile %s\nlogfile flush 1\n' "$logfile" > "$screenrc"
+trap 'rm -f "$screenrc"' EXIT HUP INT TERM
+
 echo "Saving UART output to: $logfile"
-echo "macOS will ask for your administrator password to open the serial port."
-echo "Start the router after the serial connection opens. Blank output before boot is normal."
-echo "Exit cu by typing !. at the start of a blank line."
-echo "Wiring: router TX to adapter RX; GND to GND; leave 3.3V disconnected."
-exec /usr/bin/script -q "$logfile" /usr/bin/sudo /usr/bin/cu -E '!' -l "$device" -s 115200
+echo "Start or power-cycle the router after Screen opens."
+echo "Exit: Ctrl+A, then K, then Y. Do not detach with Ctrl+A, D."
+echo "Wiring: router TX to adapter RX; adapter TX to router RX; GND to GND; leave 3.3V disconnected."
+/usr/bin/screen -c "$screenrc" -L -S "f1boot-$stamp-$$" "$device" 115200

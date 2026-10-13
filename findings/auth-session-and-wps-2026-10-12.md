@@ -4,7 +4,7 @@ Date: 2026-10-12. Target: owner's Telia F1 at `192.168.2.1`, recorded GCNT-X / 2
 
 ## Evidence found
 
-**Later physical-console evidence:** [owned-unit UART analysis](f1-boot-log-2026-10-12.md) records BOOT-P/Enter invitations and daemon startup, without an input/authentication test. This is a separate boundary from web sessions, WPS **49152** and IPP **631**; no boot message demonstrates an HTTP/session bypass, WPS credential disclosure or CUPS administration. No network action was made in that offline review.
+**Later physical-console evidence:** [owned-unit UART interaction follow-up](f1-uart-interaction-2026-10-12.md) verifies `b` enters BOOT-P and the no-Ethernet recovery attempt times out; Linux Return/`id`/Ctrl+J produced no shell/login/UID. This is a separate boundary from web sessions, WPS **49152** and IPP **631**; no boot message demonstrates an HTTP/session bypass, WPS credential disclosure or CUPS administration. No network action was made in that UART pass.
 
 **VERIFIED:** a normal SRP login succeeded and its server proof verified. The server issued a different session ID during proof completion, and the authenticated page contained a different CSRF token. A copied pre-login cookie did not gain admin access. The export handler rejected the wrong-session, missing, and pre-login tokens, while the correct admin token returned a configuration-export envelope. An anonymous session supplied with the admin token still received login HTML.
 

@@ -16,6 +16,7 @@ import urllib.error
 import urllib.parse
 from pathlib import Path
 
+from f1_session_store import ensure_admin_session
 from f1_srp_login import SRPClient
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -77,28 +78,21 @@ def main():
     directory.mkdir(parents=True, exist_ok=False)
     client = ControlClient(directory)
     try:
-        code, body = client._open(client.base + "/login.lp")
-        if code != 200:
-            raise StopProbe("Login page failed")
-        match = re.search(rb'CSRFtoken[\"\']\s+content\s*=\s*[\"\']([^\"\']+)', body, re.I)
-        if not match:
-            raise StopProbe("CSRF meta not found")
-        client.csrf = match.group(1).decode()
         if args.password_file:
             password = args.password_file.read_text().strip("\n")
         else:
             password = getpass.getpass("Router password (not echoed): ")
-        code, result = client.login("User", password)
+        base, _how = ensure_admin_session(password)
         del password
-        if code != 200 or result != "ok":
-            raise StopProbe("Normal SRP login did not verify; stopped")
+        client.jar = base.jar
+        client.csrf = base.csrf
+        client.save_jar()
         code, body = client._open(client.base + "/gateway.lp")
         if code != 200 or client.rows[-1]["login_marker"]:
             raise StopProbe("Base authenticated page control failed")
         match = re.search(rb'CSRFtoken[\"\']\s+content\s*=\s*[\"\']([^\"\']+)', body, re.I)
         if not match:
             raise StopProbe("Authenticated-page CSRF meta not found")
-        # Normal login can rotate the token. Never export with the login-page token.
         client.csrf = match.group(1).decode()
         code, body = client._open(client.base + "/gateway.lp?auto_update=true&getSessionStatus=true")
         try:

@@ -34,6 +34,10 @@ Same day: paced **CUPS :631** IPP matrix completed without 503; a later **`logvi
 
 **Agent note:** Do not stack CUPS/WFA/SSRF experiments while `/login.lp` is **503**. CUPS IPP tools use **3 s** pacing ([docs/f1-cups-631.md](../docs/f1-cups-631.md)). See [f1-hardware-key-blocker-2026-10-12.md](f1-hardware-key-blocker-2026-10-12.md) for the key-probe summary.
 
+### 2026-10-12 evening (aggressive + gap passes)
+
+**VERIFIED:** `f1_aggressive_software_pass.py` (~40 auth cases, 2 s gap) plus stacked WFA/CUPS/8080 probes → **503** for **~20+ minutes** (`f1_ipping_host_probe.py` wait loop exited `login_not_ready`). Brief **200** window later; `f1_gap_attack_pass.py` (while it still probed) re-triggered **503** on the **fifth** unauthenticated auth-matrix GET (`wireless-qrcode-modal.lp` bare). Those matrix URLs were already covered by earlier boundary findings; the script no longer sends them. Mitigation that still applies: `scripts/f1_pacing.py` (90 s login poll, 3 s request gap); run **one** live script per cooldown ([f1-gap-attack-pass-2026-10-12.md](f1-gap-attack-pass-2026-10-12.md), [f1-aggressive-software-pass-2026-10-12.md](f1-aggressive-software-pass-2026-10-12.md)).
+
 ---
 
 ## Unauthenticated probe summary (before lockout)
@@ -135,6 +139,10 @@ Grep for: `teliasmartrgw`, `rgw.telia`, `.rbi`, `lcm`, `firmware`, `7577`, `23.1
 
 ---
 
+## Log viewer access (2026-10-12, owner UI)
+
+**VERIFIED on this build:** syslog rows are available at **`/modals/logviewer-modal.lp`** when authenticated (browser address bar on `gateway.lp` session, or `tch.loadModal('logviewer-modal.lp')`). The modal may appear under a **Management** header with a **Log Viewer** tab; the simple **User** home cards do **not** list it. Script flag `isFeatureLogViewerFlag = false` on the modal explains a hidden menu entry. **2026-10-12:** owner export `~/Downloads/logviewer-2.txt` captured tty `restricted_shell` / Clash serial denial after UART Enter — see [UART interaction](f1-uart-interaction-2026-10-12.md).
+
 ## Post-login console harvest (one line each)
 
 Use **after** the login form works and you land on the main UI (`/gateway.lp` or equivalent). Open **Developer Tools → Console** (Mac: Safari/Chrome/Firefox; phone: remote debug or in-browser console if available).
@@ -182,6 +190,6 @@ grep -iE 'teliasmartrgw|rgw\.telia|\.rbi|lcm|firmware' logviewer-modal.lp.txt ga
 
 ## Next steps
 
-1. Gateway may be in **503** cooldown again — wait/reboot until `/login.lp` → **200** before any `curl`.
-2. User: re-save HAR with cookies enabled **or** console `fetch` for `logviewer-modal.lp` after **Advanced**; drop redacted `artifacts/ui/*-modal*.txt`.
-3. Agent: when UI is **200** and session cookies are available, repeat single GET + keyword grep (max 2 GETs).
+1. **Hardware recovery (preferred over more :80 bursts):** BOOT-P reply test — `scripts/f1-bootp-reply.ps1` on Windows PC cabled to LAN; UART for outcome. Listen-only capture and boot file **`GCNT-X`** documented in [f1-bootp-lan-2026-10-13.md](f1-bootp-lan-2026-10-13.md). Index: [research composite](f1-research-composite-2026-10-13.md).
+2. **:80 when healthy:** one `f1_ipping_host_probe.py` run only if `/login.lp` → **200**; avoid stacking probes (**503**).
+3. Optional UI: re-save HAR with cookies or redacted `logviewer-modal.lp` export under `artifacts/ui/`.

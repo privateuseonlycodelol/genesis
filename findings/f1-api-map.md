@@ -108,7 +108,7 @@ The upload accepts file extensions `rbi`, `fw`, and `pkgtb`. A failed upgrade st
 
 **Verified:** `system-config-min.js` still defines an **upgrade handler** (`upgradefw`, `upgradefwstatus`, `getbanksize`, import/export, BOOTP confirm).
 
-**Not tested:** reboot, factory reset, import, BOOTP, and firmware upload. Those names were not sent in the [2026-10-12 boundary pass](f1-hidden-action-boundary-2026-10-12.md). A hand-built `POST` with `action=upgradefwstatus` returned **403** from nginx in an earlier pass (see `findings/tried.md`). Authenticated `POST export_config` does return a config envelope; the same POST without an admin session returns the login page.
+**Not tested on :80:** reboot, factory reset, import, `POST system_bootp`, and firmware upload in the [2026-10-12 boundary pass](f1-hidden-action-boundary-2026-10-12.md). **Hardware BOOT-P** (U-Boot `b` + LAN DHCP) is separate — listen-only capture done; see [BOOT-P LAN](f1-bootp-lan-2026-10-13.md). A hand-built `POST` with `action=upgradefwstatus` returned **403** from nginx in an earlier pass (see `findings/tried.md`). Authenticated `POST export_config` does return a config envelope; the same POST without an admin session returns the login page.
 
 **Key-surface sweep (2026-10-12):** `scripts/f1_config_key_probe.py` sent **119** authenticated GETs (rip/backup/debug `action=` names, fake `/proc/rip` paths, traversal). **No** new JSON or binary key material; only the known JSON pair above plus HTML shells. Details: [`f1-hardware-key-blocker-2026-10-12.md`](f1-hardware-key-blocker-2026-10-12.md). Followed by nginx **503** on new logins until cooldown.
 
@@ -139,7 +139,7 @@ This file maps **session-gated** `*.lp` / `gateway.lp` / `authenticate` on **por
 | WFA WLANConfig (WPS over UPnP) | TCP **49152**; SSDP UDP 1900 | **No** HTTP session on tested LAN SOAP/SUBSCRIBE | [f1-wfa-wlanconfig-49152-2026-10-12.md](f1-wfa-wlanconfig-49152-2026-10-12.md), [auth-session-and-wps-2026-10-12.md](auth-session-and-wps-2026-10-12.md) |
 | CUPS / IPP | TCP **631** | Browser GET/HEAD **403** (`CUPS v2.2.10` in body); **`application/ipp` POST** allows anonymous reads (e.g. **Get-Jobs** `successful-ok`); helpers `cups-deviced`/`cups-driverd` fail internally; remote queue create blocked; **not** Homeware session | [f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md), [f1-cups-ipp-readonly-matrix-2026-10-12.md](f1-cups-ipp-readonly-matrix-2026-10-12.md), [management-auth-boundaries-2026-10-12.md](management-auth-boundaries-2026-10-12.md) |
 | Alternate HTTP | TCP **8080** (observed **404** on UI paths) | Unknown handler; not the main UI | [management-auth-boundaries-2026-10-12.md](management-auth-boundaries-2026-10-12.md) |
-| Physical UART / boot recovery | `serial0` / `ttyS0`, **115200n8**; BOOT-P invitation | Input/auth outcome unknown; Enter invitation and JTAG warning do not establish a shell/root | [f1-boot-log-2026-10-12.md](f1-boot-log-2026-10-12.md), [f1-uart-23.1b.md](f1-uart-23.1b.md) |
+| Physical UART / BOOT-P (U-Boot) | `serial0` / `ttyS0`, **115200n8**; `b` → BOOT-P | No Linux shell; serial root denied; **LAN wire:** BOOTREQUEST boot file **`GCNT-X`**, no server ([BOOT-P LAN](f1-bootp-lan-2026-10-13.md)); PC BOOTP reply **not tried** | [f1-uart-interaction-2026-10-12.md](f1-uart-interaction-2026-10-12.md), [f1-bootp-lan-2026-10-13.md](f1-bootp-lan-2026-10-13.md), [f1-boot-log-2026-10-12.md](f1-boot-log-2026-10-12.md) |
 
 The admin **WPS form** (`/modals/wireless-wps-modal-newEM.lp`) is still Homeware UI state; **49152** is the separate Wi‑Fi Alliance UPnP registrar/enrollee control plane documented in the WFA finding. No demonstrated chain from UI session to unauthenticated 49152 bypass was shown.
 
@@ -171,4 +171,4 @@ This UI pass added nothing on Linux hardware, boot, or OpenWrt. It confirmed the
 
 ## Next
 
-The owned-unit log has now been read. Next access discriminator: one captured Enter interaction with bidirectional wiring verified, as proposed in [the boot finding](f1-boot-log-2026-10-12.md). The public **19.4.0856** reference remains separate — [gcnt-x-public-hardware.md](gcnt-x-public-hardware.md).
+The owned-unit boot log and UART input follow-ups are documented in [f1-uart-interaction-2026-10-12.md](f1-uart-interaction-2026-10-12.md). **VERIFIED:** logviewer export shows tty `restricted_shell` and Clash `User root has no serial access` after console activation — serial root shell is policy-blocked on this unit. BOOT-P with a connected LAN Ethernet link is still untested. The public **19.4.0856** reference remains separate — [gcnt-x-public-hardware.md](gcnt-x-public-hardware.md).
