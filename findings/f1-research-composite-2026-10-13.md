@@ -77,7 +77,7 @@ Private captures: `artifacts/bootp/2026-10-13/`, `artifacts/uart/2026-10-12/`, `
 1. **BOOT-P reply** — PC answers with `GCNT-X`, UART should show TFTP failure (no RBI).
 2. **`f1_ipping_host_probe.py`** — one run when `/login.lp` is **200** (not during 503).
 3. **Technicolor recovery server + signed GCNT-X RBI** — only after (1); wrong image bricks.
-4. **Hardware key path** — `/proc/rip/0108` or eripv2 dump after root; NAND/JTAG/`TEST_CN20` map not done.
+4. **Hardware key path** — `/proc/rip/0108` or eripv2 dump after root; NAND part **TC58NVG2S0HTAI0** (TSOP-48) documented 2026-10-14; chip-off/JTAG/`TEST_CN20` map not done.
 5. **Import/upload / stored XSS** — only with accepted brick/lab risk.
 
 ---

@@ -14,9 +14,22 @@
 | Antenna silk | `4G-ANT0`–`3` and `ANT0`–`3` at coax pigtails. |
 | Ports (bottom edge) | USB 3.0, four **LAN** (yellow), one **WAN** (red), DC power, power button, two tactile buttons (reset/WPS class). |
 
+## VERIFIED — parallel NAND (owner chip marking, 2026-10-14)
+
+| Field | Value |
+| --- | --- |
+| Manufacturer | KIOXIA (formerly Toshiba Memory) |
+| Part number | **TC58NVG2S0HTAI0** |
+| Capacity | 4 Gbit (512 MiB) |
+| Type | 8-bit parallel **SLC** NAND |
+| Package | **TSOP-48** (48 pins) |
+| Voltage | 3.3 V nominal |
+
+Matches UART driver text `Toshiba TC58NVG2S0H 4G 3.3V 8-bit` and NAND ID prefix `0x98dc9026` in [f1-boot-log-2026-10-12.md](f1-boot-log-2026-10-12.md). The driver string truncates the catalog suffix (`…TAI0`).
+
 ## DERIVED (photo + UART log)
 
-- **No exposed SOIC8/SOIC16 SPI NOR** visible on this top view; main storage on this product line is **parallel NAND** per [f1-boot-log-2026-10-12.md](f1-boot-log-2026-10-12.md) (`TC58NVG2S0H` driver text), likely under heatsink/shield — **CH341A clip kits target SPI**, not that NAND, unless a separate SPI device is found on back side or under metal.
+- **No exposed SOIC8/SOIC16 SPI NOR** visible on this top view; main storage is the **TSOP-48 parallel NAND** above (likely under heatsink/shield on this board) — **CH341A clip kits target SPI**, not that NAND, unless a separate SPI device is found on back side or under metal.
 - **USB Ethernet on Mac** remains higher priority than buying JTAG/SPI gear before **TEST_CN20** identification and NAND vs SPI inventory.
 
 ## Owner note (2026-10-13, not bench-tested)

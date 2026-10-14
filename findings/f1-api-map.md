@@ -165,9 +165,9 @@ hack-technicolor’s firmware table does not list a GCNT-X bank dump. Issue 321 
 
 ## Compared with issue 321
 
-A later public 19.4.0856 GCNT-X boot log, linked from issue 321, does print `CPU : BCM68360_B1`, 4096-byte NAND pages, and an MTD map. That log is not this 23.1.b unit. NAND catalog part and Wi-Fi chip remain unstated. See `findings/gcnt-x-public-hardware.md`.
+A later public 19.4.0856 GCNT-X boot log, linked from issue 321, does print `CPU : BCM68360_B1`, 4096-byte NAND pages, and an MTD map. That log is not this 23.1.b unit. See `findings/gcnt-x-public-hardware.md`.
 
-This UI pass added nothing on Linux hardware, boot, or OpenWrt. It confirmed the software string `23.1.b` and hardware string `GCNT-X`. At that time no owned-unit boot log was available, and syslog `restricted_shell` references did not establish UART behavior. **Superseded for boot evidence:** [the later supplied capture](f1-boot-log-2026-10-12.md) establishes **4.19.235**, storage/crypto setup and serial invitations; no interactive shell is shown. Driver strings now identify Toshiba NAND and a `43684b0` radio-firmware path; physical part markings remain unchecked.
+This UI pass added nothing on Linux hardware, boot, or OpenWrt. It confirmed the software string `23.1.b` and hardware string `GCNT-X`. At that time no owned-unit boot log was available, and syslog `restricted_shell` references did not establish UART behavior. **Superseded for boot evidence:** [the later supplied capture](f1-boot-log-2026-10-12.md) establishes **4.19.235**, storage/crypto setup and serial invitations; no interactive shell is shown. Driver strings identify Toshiba/KIOXIA-class NAND (`TC58NVG2S0H` in log); **2026-10-14** owner marking **TC58NVG2S0HTAI0** ([f1-board-visual-2026-10-12.md](f1-board-visual-2026-10-12.md)). Wi-Fi chip marking remains unstated; `43684b0` radio-firmware path only.
 
 ## Next
 
