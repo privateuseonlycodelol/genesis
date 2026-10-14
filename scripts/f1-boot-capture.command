@@ -6,7 +6,7 @@ umask 077
 
 device="${1:-/dev/cu.usbserial-0001}"
 if [ "${1:-}" = "--help" ]; then
-  echo "Usage: bash /Users/nils/genesis/scripts/f1-boot-capture.command [serial-device]"
+  echo "Usage: bash scripts/f1-boot-capture.command [serial-device]  (from repo root)"
   echo "Default: /dev/cu.usbserial-0001 at 115200 baud; log is saved on Desktop."
   exit 0
 fi

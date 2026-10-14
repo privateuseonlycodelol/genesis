@@ -11,6 +11,7 @@ import urllib.parse
 from pathlib import Path
 
 from f1_pacing import fetch_login_status
+from f1_secrets import read_password_file
 from f1_session_store import ensure_admin_session, refresh_csrf_from_modal
 
 MODAL = "/modals/system-config-modal.lp"
@@ -27,7 +28,7 @@ def main() -> int:
     import os
 
     os.umask(0o077)
-    password = args.password_file.read_text().strip("\n")
+    password = read_password_file(args.password_file)
     try:
         client, how = ensure_admin_session(password)
     except RuntimeError as err:

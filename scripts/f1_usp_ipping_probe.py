@@ -20,6 +20,7 @@ import urllib.request
 from pathlib import Path
 
 from f1_ipping_control import LOG_PATH, StopProbe, _csrf, _login_page, parse_log_rows
+from f1_secrets import read_password_file
 from f1_srp_login import SRPClient
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -241,7 +242,7 @@ def main() -> int:
     )
     args = parser.parse_args()
     try:
-        password = args.password_file.read_text().strip("\n")
+        password = read_password_file(args.password_file)
         outcome = run(password, args.wait_obuspa, args.login_wait)
         print(
             json.dumps(

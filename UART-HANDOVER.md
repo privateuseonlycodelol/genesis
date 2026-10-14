@@ -7,7 +7,7 @@
 ### What was established
 
 - The owner's Telia F1 / Vantiva EWA1330, GCNT-X, reported firmware `23.1.b`; adapter is CP2102, Mac device `/dev/cu.usbserial-0001`, adapter 3.3 V disconnected, router TX→adapter RX, adapter TX→router RX, GND common.
-- A physical Screen 4.00.03 capture now worked after the CP2102 was unplugged/replugged. Command: `bash /Users/nils/genesis/scripts/f1-boot-capture.command`, run from the user's visible macOS Terminal. Current observed Screen session: `76417.f1boot-20261012-202834-76414`; logfile: `/Users/nils/Desktop/router-boot-20261012-202834-76414.log`.
+- A physical Screen 4.00.03 capture now worked after the CP2102 was unplugged/replugged. Command: `bash ~/genesis/scripts/f1-boot-capture.command`, run from the user's visible macOS Terminal. Current observed Screen session: `76417.f1boot-20261012-202834-76414`; logfile: `~/Desktop/router-boot-20261012-202834-76414.log`.
 - At the last documented snapshot the logfile was **202,782 bytes**, SHA-256 `9f9ae07e8a4f9a2fa6005e308f24b58ede71a64f778edc6aae540a568f6add77`; it may have grown while Screen is attached. Always get its current size/hash before relying on counts. It contains three BTRM boot starts, two Linux 4.19.235 banners, one BOOT-P entry, 16 Linux activation invitations, one captured literal `id`, 17 `no active_port set` errors and one BOOTP timeout.
 - **Live input verified at the bootloader:** the user pressed lowercase `b` at `*** Press b to enter BOOT-P ***`, followed by `Entering BOOT-P mode (reason: BUTTON_PUSH )`. The timing strongly supports the keypress being accepted. Do not conflate the `BUTTON_PUSH` label alone with proof of its source.
 - **Early BOOT-P (no Ethernet):** first attempts had **no WAN/LAN cable** → `no active_port set`, then `BOOTP Reply timeout`. **Later UART capture:** Ethernet **link up**, still `BOOTP Reply timeout` (no server on the wire).
@@ -83,7 +83,7 @@ Evidence for one does not establish the others.
 
 The existing file is:
 
-`/Users/nils/Desktop/router-boot-20261012-193402-64722.log`
+`~/Desktop/router-boot-20261012-193402-64722.log`
 
 It is 86,162 bytes (about 84 KB). Previously recorded SHA-256:
 
@@ -113,7 +113,7 @@ It occurred in `configure_serial()` during `termios.tcsetattr()`.
 
 The attempted log is:
 
-`/Users/nils/Desktop/router-boot-20261012-202007-74774.log`
+`~/Desktop/router-boot-20261012-202007-74774.log`
 
 It is 0 bytes. This attempt did not capture boot output. It is a serial configuration failure, not evidence that the router produced no output.
 
@@ -161,7 +161,7 @@ Do not send the user through another untested `cu` attempt.
 
 The current helper path is:
 
-`/Users/nils/genesis/scripts/f1-boot-capture.command`
+`~/genesis/scripts/f1-boot-capture.command`
 
 It was changed back to Screen-based logging after the Python method failed with the CP2102. Its shell syntax and Screen configuration parsing were checked. The current version has **not** been tested against the physical router.
 
@@ -185,7 +185,7 @@ A password-like value was typed at a zsh shell prompt and echoed as a command; z
 
 ## Recommended next step
 
-1. If the user wants to inspect the device behavior, start with the existing verified capture at `/Users/nils/Desktop/router-boot-20261012-193402-64722.log`; no new capture is needed merely to establish that boot output exists.
+1. If the user wants to inspect the device behavior, start with the existing verified capture at `~/Desktop/router-boot-20261012-193402-64722.log`; no new capture is needed merely to establish that boot output exists.
 2. If a fresh capture is needed, use macOS Terminal.app outside the embedded Genesis terminal. Run the current helper there and verify that Screen opens before rebooting the router.
 3. Once the capture is open, power-cycle the router. Press Enter only after the “Please press Enter” console prompt appears if testing whether it accepts input.
 4. Exit Screen with **Ctrl+A, then K, then Y**. Do not suggest a backslash sequence; the user has a Swedish keyboard. Do not use Ctrl+A, D, which detaches and may leave the port occupied.

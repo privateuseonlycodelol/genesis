@@ -18,6 +18,7 @@ import urllib.parse
 from pathlib import Path
 
 from f1_pacing import DEFAULT_REQUEST_GAP_S, wait_until_login_ready
+from f1_secrets import read_password_file
 from f1_srp_login import SRPClient
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -362,7 +363,7 @@ def main() -> int:
         )
         if not outcome["ready"]:
             raise SystemExit("login_not_ready")
-    password = args.password_file.read_text().strip("\n")
+    password = read_password_file(args.password_file)
     os.umask(0o077)
     out_dir = ROOT / "artifacts" / "management" / time.strftime(
         "aggressive-%Y%m%dT%H%M%SZ", time.gmtime()

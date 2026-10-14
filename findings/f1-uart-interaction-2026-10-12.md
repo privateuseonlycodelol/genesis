@@ -10,7 +10,7 @@ This follow-up tested the live UART on the owner's Telia F1 / Vantiva EWA1330, b
 
 **VERIFIED Linux-console interaction:** Return, a typed `id` followed by Return, and later Ctrl+J were tried while the Linux `Please press Enter to activate this console.` invitation was visible. The owner explicitly clarified that they were pressing Return; the earlier literal `Enter` in the log was a separate typed-text test. The owner then reported that Ctrl+J produced the activation invitation again. The active capture has `id` as input text followed by another invitation, but no command output, `uid=`, login prompt, or shell prompt. This supports that some characters/newline reached the console path. It does **not** establish that `id` executed, identify what process the firmware launches, or prove the console is disabled. Repeated invitations may simply track repeated activation attempts; they are not by themselves evidence of an exit/crash loop.
 
-**VERIFIED on this unit (2026-10-12, log viewer):** after UART console activation, the router logged a **tty** (serial) `restricted_shell` decision, not only cron launcher rows. Private export: `/Users/nils/Downloads/logviewer-2.txt` (HTML modal snapshot, ~60 KiB, 198 log rows in the table). At **Oct 12 21:00:18** and **21:00:20** (two pairs):
+**VERIFIED on this unit (2026-10-12, log viewer):** after UART console activation, the router logged a **tty** (serial) `restricted_shell` decision, not only cron launcher rows. Private export: `~/Downloads/logviewer-2.txt` (HTML modal snapshot, ~60 KiB, 198 log rows in the table). At **Oct 12 21:00:18** and **21:00:20** (two pairs):
 
 | Process | Message (verbatim) |
 | --- | --- |
@@ -22,7 +22,7 @@ Earlier rows in the same file still show `User root is connecting through Cronta
 
 **DERIVED:** UART Enter/newline reaches the console activation path; the firmware then applies **Clash access-control** and does not offer a root serial login. That explains the repeated `Please press Enter to activate this console.` invitation with no shell/`uid=` on the UART capture. It is **not** proof that UART RX/TX is broken, and it is **not** a demonstrated bypass or exploit.
 
-**VERIFIED private artifact state:** `/Users/nils/Desktop/router-boot-20261012-202834-76414.log` is **202,782 bytes**, SHA-256 `9f9ae07e8a4f9a2fa6005e308f24b58ede71a64f778edc6aae540a568f6add77`. A later same-evening re-read (`screen -ls`, `shasum`, raw-byte scan) found the same size and hash. Screen session `76417.f1boot-20261012-202834-76414` was still **Attached**. The log contains three BTRM boot starts, two Linux 4.19.235 banners, one BOOT-P entry, 16 Linux console invitations, the literal `id` input once, 17 `no active_port set` errors, and one BOOTP timeout. The original 86,162-byte capture remains SHA-256 `3f242d10ede0a08f3c2d72ebb4966f80222ade017b3e03690ffc08c72fa27feb`.
+**VERIFIED private artifact state:** `~/Desktop/router-boot-20261012-202834-76414.log` is **202,782 bytes**, SHA-256 `9f9ae07e8a4f9a2fa6005e308f24b58ede71a64f778edc6aae540a568f6add77`. A later same-evening re-read (`screen -ls`, `shasum`, raw-byte scan) found the same size and hash. Screen session `76417.f1boot-20261012-202834-76414` was still **Attached**. The log contains three BTRM boot starts, two Linux 4.19.235 banners, one BOOT-P entry, 16 Linux console invitations, the literal `id` input once, 17 `no active_port set` errors, and one BOOTP timeout. The original 86,162-byte capture remains SHA-256 `3f242d10ede0a08f3c2d72ebb4966f80222ade017b3e03690ffc08c72fa27feb`.
 
 ### Same-capture re-read
 
@@ -36,7 +36,7 @@ Earlier rows in the same file still show `User root is connecting through Cronta
 
 ### Evening pass (same date, ~21:05–21:08)
 
-**VERIFIED:** evening capture in Cursor Terminal (`screen` `80986`, session `f1boot-20261012-210529-80983`). Primary path: `/Users/nils/Desktop/router-boot-20261012-210529-80983.log`. **Preserved copy (2026-10-12 ~21:12):** `artifacts/uart/2026-10-12/router-boot-20261012-210529-80983.log` — **232,270 bytes**, SHA-256 `eda5cdf7e38e9824b34718b87dbdb74a5d27a36a1cd73adb0d4002d07d4742a5` (gitignored; snapshot while Screen still attached). Contents: **2×** `Entering BOOT-P mode` (`BUTTON_PUSH`); first BOOT-P **17×** `no active_port set` → BOOTP timeout; second BOOT-P **`active port 0`** and **`Link Up 1 Gbps Full duplex`** → still **2×** `BOOTP Reply timeout` (no responder on that link); **2×** Linux **4.19.235**, **2×** console invitation, **4×** BTRM, no `uid=`/`id` execution.
+**VERIFIED:** evening capture in Cursor Terminal (`screen` `80986`, session `f1boot-20261012-210529-80983`). Primary path: `~/Desktop/router-boot-20261012-210529-80983.log`. **Preserved copy (2026-10-12 ~21:12):** `artifacts/uart/2026-10-12/router-boot-20261012-210529-80983.log` — **232,270 bytes**, SHA-256 `eda5cdf7e38e9824b34718b87dbdb74a5d27a36a1cd73adb0d4002d07d4742a5` (gitignored; snapshot while Screen still attached). Contents: **2×** `Entering BOOT-P mode` (`BUTTON_PUSH`); first BOOT-P **17×** `no active_port set` → BOOTP timeout; second BOOT-P **`active port 0`** and **`Link Up 1 Gbps Full duplex`** → still **2×** `BOOTP Reply timeout` (no responder on that link); **2×** Linux **4.19.235**, **2×** console invitation, **4×** BTRM, no `uid=`/`id` execution.
 
 **DERIVED:** link during the **second** U-Boot BOOT-P window was present; failure mode shifted from `no active_port set` to BOOTP timeout only. That still does **not** prove a working recovery server was offered on the cabled device.
 
@@ -46,17 +46,17 @@ Earlier rows in the same file still show `User root is connecting through Cronta
 
 - Device: owner's Telia F1 / Vantiva EWA1330, GCNT-X, reported `23.1.b`.
 - Adapter: Silicon Labs CP2102, macOS `/dev/cu.usbserial-0001`, reported `AppleUSBSLCOM`; adapter power pin disconnected. UART wiring as reported: router TX → adapter RX, adapter TX → router RX, shared GND.
-- Capture: macOS `/usr/bin/screen` **4.00.03**, started by `bash /Users/nils/genesis/scripts/f1-boot-capture.command` in the visible macOS Terminal, not the embedded Genesis terminal. Screen config enables logging; logfile is private on Desktop. Current observed Screen session: `76417.f1boot-20261012-202834-76414`; capture path above. The helper was not previously verified on physical hardware; this run did produce readable live output and a growing logfile.
+- Capture: macOS `/usr/bin/screen` **4.00.03**, started by `bash ~/genesis/scripts/f1-boot-capture.command` in the visible macOS Terminal, not the embedded Genesis terminal. Screen config enables logging; logfile is private on Desktop. Current observed Screen session: `76417.f1boot-20261012-202834-76414`; capture path above. The helper was not previously verified on physical hardware; this run did produce readable live output and a growing logfile.
 - Older adapter configuration attempts (`termios.tcsetattr`, `stty`, `IOSSIOSPEED`, `cu`) failed with the recorded errors in [UART-HANDOVER.md](../UART-HANDOVER.md). Unplugging the CP2102 from the Mac cleared stalled Screen/stty processes and removed the device node; reconnecting restored it. Earlier 0-byte attempts are not evidence of no device output.
 - Capture analysis was local and read-only; no network services were started, no firmware was sent, and no bootloader commands were issued.
 
 For a local review, without printing identifiers from the capture:
 
 ```sh
-shasum -a 256 /Users/nils/Desktop/router-boot-20261012-202834-76414.log
+shasum -a 256 ~/Desktop/router-boot-20261012-202834-76414.log
 python3 - <<'PY'
 from pathlib import Path
-p = Path('/Users/nils/Desktop/router-boot-20261012-202834-76414.log')
+p = Path('~/Desktop/router-boot-20261012-202834-76414.log').expanduser()
 b = p.read_bytes()
 for marker in (b'Entering BOOT-P mode', b'no active_port set',
                b'BOOTP Reply timeout',

@@ -15,6 +15,7 @@ import urllib.parse
 from pathlib import Path
 
 from f1_ipping_control import ProbeClient, StopProbe, _csrf, _login_page
+from f1_secrets import read_password_file
 from f1_qrcode_context_probe import BARE_PATH, NGINX_500_SHA, classify_body
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -150,7 +151,7 @@ def main():
         parser.error("--password-file required unless --unauthenticated")
     password = None
     if args.password_file:
-        password = args.password_file.read_text().strip("\n")
+        password = read_password_file(args.password_file)
     try:
         directory, outcome = run(password=password, unauthenticated=args.unauthenticated)
         print(json.dumps({"result": outcome["conclusion"], "artifacts": str(directory)}), flush=True)

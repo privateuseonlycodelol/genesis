@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# Gentle F1 UI probe: curl-only HTTP, 2s between requests. Password in F1_PASSWORD env.
+# Gentle F1 UI probe: curl-only HTTP, 2s between requests.
+# Password: F1_PASSWORD_FILE (default artifacts/secrets/f1-admin.password) or legacy F1_PASSWORD.
 set -euo pipefail
+umask 077
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-BASE="${F1_BASE:-http://192.168.2.1}"
+BASE="$(python3 -c "import os, sys; sys.path.insert(0, 'scripts'); from f1_secrets import validate_router_base; print(validate_router_base(os.environ.get('F1_BASE', 'http://192.168.2.1')))")"
 COOKIE="${F1_COOKIE_JAR:-artifacts/ui/f1-cookies.txt}"
+PASSWORD_FILE="${F1_PASSWORD_FILE:-artifacts/secrets/f1-admin.password}"
 UI_DIR="artifacts/ui"
 mkdir -p "$UI_DIR"
 
@@ -49,7 +52,14 @@ if [[ "$IDENT_HTTP" == "503" ]]; then
   exit 1
 fi
 
-PROOF="$(printf '%s' "$STATE" | F1_PASSWORD="${F1_PASSWORD:?}" python3 scripts/f1_srp_login.py proof "$UI_DIR/auth-identify.json")"
+if [[ -f "$PASSWORD_FILE" ]]; then
+  PROOF="$(printf '%s' "$STATE" | python3 scripts/f1_srp_login.py proof "$UI_DIR/auth-identify.json" --password-file "$PASSWORD_FILE")"
+elif [[ -n "${F1_PASSWORD:-}" ]]; then
+  PROOF="$(printf '%s' "$STATE" | F1_PASSWORD="${F1_PASSWORD}" python3 scripts/f1_srp_login.py proof "$UI_DIR/auth-identify.json")"
+else
+  echo "Set F1_PASSWORD_FILE or F1_PASSWORD" >&2
+  exit 1
+fi
 M_HEX="$(python3 -c "import json,sys; print(json.loads(sys.argv[1])['M'])" "$PROOF")"
 
 pause
@@ -71,6 +81,7 @@ if ! python3 -c "import sys; exit(0 if sys.argv[1].upper()==sys.argv[2].upper() 
   exit 1
 fi
 
+chmod 600 "$COOKIE" 2>/dev/null || true
 echo "login ok"
 
 for path in modals/logviewer-modal.lp overview.lp; do

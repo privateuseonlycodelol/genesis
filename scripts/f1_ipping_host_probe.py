@@ -18,6 +18,7 @@ from pathlib import Path
 
 import f1_ipping_control as ping
 from f1_pacing import wait_until_login_ready
+from f1_secrets import read_password_file
 
 MARKER = "genesis-ipping-marker"
 NEWLINE_HOST = "127.0.0.1\nlogger " + MARKER
@@ -255,7 +256,7 @@ def main():
     directory.mkdir(parents=True, exist_ok=False)
     client = ping.ProbeClient(directory)
     try:
-        password = args.password_file.read_text().strip("\n")
+        password = read_password_file(args.password_file)
         outcome = run_pollution(client, password) if args.pollution else run_probe(client, password)
         (directory / "result.json").write_text(json.dumps(outcome, indent=2) + "\n")
         print(json.dumps({"result": outcome["conclusion"], "artifacts": str(directory)}), flush=True)

@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Technicolor Homeware SRP login (matches /js/srp-min.js). Password via env F1_PASSWORD."""
+"""Technicolor Homeware SRP login (matches /js/srp-min.js).
+
+Password for `proof`: prefer `--password-file`; `F1_PASSWORD` env is legacy.
+"""
 import hashlib
 import json
 import os
@@ -9,6 +12,9 @@ import sys
 import urllib.parse
 import urllib.request
 from http.cookiejar import MozillaCookieJar
+from pathlib import Path
+
+from f1_secrets import read_password_file, validate_router_base
 
 N = int(
     "ac6bdb41324a9a9bf166de5e1389582faf72b6651987ee07fc3192943db56050a37329cbb4"
@@ -100,7 +106,7 @@ def compute_u(A: int, B: int) -> int:
 
 class SRPClient:
     def __init__(self, jar_path: str, base: str):
-        self.base = base.rstrip("/")
+        self.base = validate_router_base(base)
         self.jar = MozillaCookieJar(jar_path)
         if os.path.exists(jar_path):
             self.jar.load(ignore_discard=True, ignore_expires=True)
@@ -239,9 +245,30 @@ def main():
         return
     if len(sys.argv) >= 2 and sys.argv[1] == "proof":
         state = json.load(sys.stdin)
-        resp = json.load(open(sys.argv[2], encoding="utf-8"))
+        rest = sys.argv[2:]
+        identify_path = None
+        password_file = None
+        idx = 0
+        while idx < len(rest):
+            if rest[idx] == "--password-file" and idx + 1 < len(rest):
+                password_file = rest[idx + 1]
+                idx += 2
+                continue
+            if identify_path is None:
+                identify_path = rest[idx]
+                idx += 1
+                continue
+            print("unexpected argument: " + rest[idx], file=sys.stderr)
+            sys.exit(2)
+        if not identify_path:
+            print("usage: proof <auth-identify.json> [--password-file PATH]", file=sys.stderr)
+            sys.exit(2)
+        resp = json.load(open(identify_path, encoding="utf-8"))
         user = os.environ.get("F1_USER", "User")
-        password = os.environ.get("F1_PASSWORD", "")
+        if password_file:
+            password = read_password_file(Path(password_file))
+        else:
+            password = os.environ.get("F1_PASSWORD", "")
         if not password:
             sys.exit(2)
         out = crypto_proof(

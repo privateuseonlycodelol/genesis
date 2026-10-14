@@ -17,6 +17,7 @@ import urllib.error
 import urllib.parse
 from pathlib import Path
 
+from f1_secrets import read_password_file
 from f1_srp_login import SRPClient
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -128,7 +129,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--password-file", type=Path, required=True)
     args = parser.parse_args()
-    password = args.password_file.read_text().strip()
+    password = read_password_file(args.password_file)
     os.umask(0o077)
     out_dir = ROOT / "artifacts" / "ui" / ("key-probe-" + time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()))
     out_dir.mkdir(parents=True, exist_ok=False)

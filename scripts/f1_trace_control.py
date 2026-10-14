@@ -11,6 +11,7 @@ import urllib.parse
 from pathlib import Path
 
 from f1_ipping_control import ProbeClient, StopProbe, _csrf, _login_page, parse_log_rows
+from f1_secrets import read_password_file
 
 
 def _diff(before, after):
@@ -25,15 +26,30 @@ IPPING_HELPER = "async run: /usr/bin/ipping_helper"
 ASYNC_RE = re.compile(r"async run: (.+)")
 
 
+def _helper_with_args(message, helper, exact):
+    if message == exact:
+        return {"helper": helper, "arguments_logged": False}
+    prefix = exact + " "
+    if not message.startswith(prefix):
+        return None
+    if len(message) <= 240 and re.fullmatch(r"[\x20-\x7e]+", message):
+        return {"helper": helper, "arguments_logged": True, "message": message}
+    return {
+        "helper": helper,
+        "arguments_logged": True,
+        "length": len(message),
+        "sha256": hashlib.sha256(message.encode()).hexdigest(),
+    }
+
+
 def classify_line(message):
-    if message == TRACE_HELPER:
-        return {"helper": "igd_traceroute_helper", "arguments_logged": False}
-    if message == IPPING_HELPER:
-        return {"helper": "ipping_helper", "arguments_logged": False}
-    if message.startswith(TRACE_HELPER + " "):
-        return {"helper": "igd_traceroute_helper", "arguments_logged": True, "message": message}
-    if message.startswith(IPPING_HELPER + " "):
-        return {"helper": "ipping_helper", "arguments_logged": True, "message": message}
+    for helper, exact in (
+        ("igd_traceroute_helper", TRACE_HELPER),
+        ("ipping_helper", IPPING_HELPER),
+    ):
+        classified = _helper_with_args(message, helper, exact)
+        if classified:
+            return classified
     m = ASYNC_RE.search(message)
     if m:
         cmd = m.group(1)
@@ -126,7 +142,7 @@ def main():
     directory.mkdir(parents=False, exist_ok=False)
     client = ProbeClient(directory)
     try:
-        password = args.password_file.read_text().strip("\n")
+        password = read_password_file(args.password_file)
         outcome = run(client, password)
         (directory / "result.json").write_text(json.dumps(outcome, indent=2) + "\n")
         print(json.dumps({"result": outcome["conclusion"], "artifacts": str(directory)}), flush=True)

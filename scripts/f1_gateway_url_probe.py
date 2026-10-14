@@ -16,6 +16,7 @@ import urllib.error
 import urllib.parse
 from pathlib import Path
 
+from f1_secrets import read_password_file
 from f1_srp_login import SRPClient
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -102,7 +103,7 @@ def main() -> None:
     parser.add_argument("--wait-minutes", type=float, default=45.0,
                         help="poll login.lp every 60s until HTTP 200")
     args = parser.parse_args()
-    password = args.password_file.read_text().rstrip("\n")
+    password = read_password_file(args.password_file)
     os.umask(0o077)
     out_dir = ROOT / "artifacts" / "ui" / time.strftime("gateway-url-%Y%m%dT%H%M%SZ", time.gmtime())
     out_dir.mkdir(parents=True, exist_ok=False)

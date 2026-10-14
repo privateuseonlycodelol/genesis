@@ -14,6 +14,7 @@ import urllib.parse
 from pathlib import Path
 
 from f1_ipping_control import ProbeClient, StopProbe, _csrf, _login_page, parse_log_rows
+from f1_secrets import read_password_file
 
 ROOT = Path(__file__).resolve().parents[1]
 BARE_PATH = "/modals/wireless-qrcode-modal.lp"
@@ -156,7 +157,7 @@ def main():
     directory.mkdir(parents=True, exist_ok=False)
     client = ProbeClient(directory)
     try:
-        password = args.password_file.read_text().strip("\n")
+        password = read_password_file(args.password_file)
         outcome = run_probe(client, password)
         (directory / "result.json").write_text(json.dumps(outcome, indent=2) + "\n")
         print(json.dumps({"result": outcome["conclusion"], "artifacts": str(directory)}), flush=True)

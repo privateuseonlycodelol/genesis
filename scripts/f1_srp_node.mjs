@@ -1,17 +1,48 @@
 #!/usr/bin/env node
 /**
  * Compute SRP M/v using router srp-min.js (no HTTP). Uses fresh random A from JS.
- * Usage: F1_PASSWORD=... F1_CSRF=... node f1_srp_node.mjs auth-identify.json
+ * Usage: node f1_srp_node.mjs auth-identify.json [--password-file PATH]
+ * Legacy: F1_PASSWORD env (avoid on shared hosts).
  */
 import fs from "fs";
 import vm from "vm";
 import path from "path";
 import { fileURLToPath } from "url";
 
+function readPasswordFile(filePath) {
+  const st = fs.statSync(filePath);
+  if (st.mode & 0o077) {
+    throw new Error(`password file must be mode 0600 (no group/other access): ${filePath}`);
+  }
+  return fs.readFileSync(filePath, "utf8").trim();
+}
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
-const server = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
-const password = process.env.F1_PASSWORD || "";
+const argv = process.argv.slice(2);
+let identifyPath = null;
+let passwordFile = null;
+for (let i = 0; i < argv.length; i++) {
+  if (argv[i] === "--password-file" && i + 1 < argv.length) {
+    passwordFile = argv[i + 1];
+    i += 1;
+    continue;
+  }
+  if (!identifyPath) {
+    identifyPath = argv[i];
+  }
+}
+if (!identifyPath) process.exit(2);
+
+const server = JSON.parse(fs.readFileSync(identifyPath, "utf8"));
+let password = "";
+if (passwordFile) {
+  password = readPasswordFile(passwordFile);
+} else if (process.env.F1_PASSWORD_FILE) {
+  password = readPasswordFile(process.env.F1_PASSWORD_FILE);
+} else {
+  password = process.env.F1_PASSWORD || "";
+}
 const username = process.env.F1_USER || "User";
 const csrf = process.env.F1_CSRF || "dummy";
 

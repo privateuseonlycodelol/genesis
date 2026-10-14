@@ -16,6 +16,7 @@ import urllib.error
 import urllib.parse
 from pathlib import Path
 
+from f1_secrets import read_password_file
 from f1_session_store import ensure_admin_session
 from f1_srp_login import SRPClient
 
@@ -79,7 +80,7 @@ def main():
     client = ControlClient(directory)
     try:
         if args.password_file:
-            password = args.password_file.read_text().strip("\n")
+            password = read_password_file(args.password_file)
         else:
             password = getpass.getpass("Router password (not echoed): ")
         base, _how = ensure_admin_session(password)

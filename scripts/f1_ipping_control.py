@@ -19,6 +19,7 @@ from collections import Counter
 from pathlib import Path
 
 from f1_pacing import DEFAULT_REQUEST_GAP_S
+from f1_secrets import read_password_file
 from f1_srp_login import SRPClient
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -386,7 +387,7 @@ def main():
     directory.mkdir(parents=True, exist_ok=False)
     client = ProbeClient(directory)
     try:
-        password = args.password_file.read_text().strip("\n")
+        password = read_password_file(args.password_file)
         outcome = run(client, password)
         (directory / "result.json").write_text(json.dumps(outcome, indent=2) + "\n")
         print(json.dumps({"result": outcome["conclusion"], "artifacts": str(directory)}), flush=True)
