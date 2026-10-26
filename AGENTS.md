@@ -86,6 +86,15 @@ Do not fake successful tests, silently skip failures, weaken assertions to make 
 
 Guardrails must improve research quality, **not cause paralysis**. It is legitimate to start with a speculative theory and attempt a controlled experiment; it is not legitimate to report speculation as a discovery.
 
+## F1 lab tooling (language and gates)
+
+See `scripts/TOOLING.md`. Summary for agents:
+
+- **Python** — all live LAN/router automation, SRP session/login (`f1_srp_login.py`), paced probes, secrets (`f1_secrets.py`).
+- **TypeScript** — only `scripts/password-encoding/`: password-change blobs must match pinned `srp-min.js` via `referencePasswordBlob()` and `npm test` golden cases.
+- **Never** implement SRP verifier or `sha512crypt` password-change output in Python for device POSTs; shell out through `f1_password_blob.py`.
+- Before `f1_password_encoding_impact.py` on a real device: run `./scripts/verify_password_encoding_tooling.sh` and require owner `--ack-lockout-risk`. Treat `login_with_new != ok` after change as a failed experiment (possible lockout).
+
 ## Current project baseline — verify before relying on it
 
 Start with `README.md`, then consult only the relevant findings. These are documented starting points, **not immutable conclusions**:

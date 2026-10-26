@@ -30,6 +30,7 @@ Single index for **this unit** (Telia F1 / GCNT-X, **23.1.b**). Detailed evidenc
 | Stored XSS via device rename + second session | **Not sent** | same |
 | `POST system_reboot` tooling | Script exists; not part of recovery track | `scripts/f1_system_reboot.py` |
 | Session cookie reuse | Script exists; reduces SRP bursts | `scripts/f1_session_store.py` |
+| Password-change UTF-8 vs `sha512crypt` encoding + community Clash/`pwcrypt` trace | **Offline only** — client defect + crypt hash collisions; **no** live F1 auth impact shown | [auth-crypto](f1-grab-033853-auth-crypto.md), [CLI trace 2026-10-15](f1-password-encoding-cli-trace-2026-10-15.md) |
 
 **Operational:** nginx **503** is sticky per client after bursts; prefer **no** stacked live scripts when UI is yellow. Physical reboot clears penalty faster than waiting.
 
@@ -74,7 +75,7 @@ Private captures: `artifacts/bootp/2026-10-13/`, `artifacts/uart/2026-10-12/`, `
 
 ## Explicitly not tried (still the real queue)
 
-1. **BOOT-P reply** — PC answers with `GCNT-X`, UART should show TFTP failure (no RBI).
+1. **BOOT-P reply** — PC answers with `GCNT-X`, UART should show TFTP failure (no RBI). **2026-10-27:** raised priority — byte-exact reparse of the capture found the request's `file` field carries an undocumented second string (`23KN/0/TL`) and options 1/3 carry non-address ASCII-shaped garbage (HYPOTHESIS: uninitialized-buffer leak in the request builder), which is a reason to suspect the reply-parsing path may have similar weaknesses; see [BOOT-P LAN addendum](f1-bootp-lan-2026-10-13.md).
 2. **`f1_ipping_host_probe.py`** — one run when `/login.lp` is **200** (not during 503).
 3. **Technicolor recovery server + signed GCNT-X RBI** — only after (1); wrong image bricks.
 4. **Hardware key path** — `/proc/rip/0108` or eripv2 dump after root; NAND part **TC58NVG2S0HTAI0** (TSOP-48) documented 2026-10-14; chip-off/JTAG/`TEST_CN20` map not done.

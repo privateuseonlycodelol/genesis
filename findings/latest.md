@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-14T00:20:08Z
+**Generated:** 2026-10-26T23:38:34Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -123,6 +123,8 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-ipping-host-2026-10-12.md`](f1-ipping-host-2026-10-12.md)
 - [`f1-js-deep-2026-10-12.md`](f1-js-deep-2026-10-12.md)
 - [`f1-logviewer.md`](f1-logviewer.md)
+- [`f1-password-encoding-cli-trace-2026-10-15.md`](f1-password-encoding-cli-trace-2026-10-15.md)
+- [`f1-rea-har-pass-2026-10-17.md`](f1-rea-har-pass-2026-10-17.md)
 - [`f1-research-composite-2026-10-13.md`](f1-research-composite-2026-10-13.md)
 - [`f1-trace-helper-2026-10-12.md`](f1-trace-helper-2026-10-12.md)
 - [`f1-trace-path-2026-10-12.md`](f1-trace-path-2026-10-12.md)

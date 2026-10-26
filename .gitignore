@@ -17,5 +17,7 @@ tools/**/.git/
 .env
 .DS_Store
 __pycache__/
+node_modules/
+scripts/password-encoding/dist/
 _findings.tmp/
 **/_*.extracted/
