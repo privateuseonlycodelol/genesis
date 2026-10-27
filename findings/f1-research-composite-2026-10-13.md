@@ -10,8 +10,10 @@ Single index for **this unit** (Telia F1 / GCNT-X, **23.1.b**). Detailed evidenc
 | Root / shell via UART Linux console | **REFUTED** on this unit — Clash denies serial root ([UART interaction](f1-uart-interaction-2026-10-12.md)) |
 | Auth bypass / key via Homeware :80 | **REFUTED** for mapped reads — boundaries + aggressive pass ([management-auth-boundaries](management-auth-boundaries-2026-10-12.md), [aggressive pass](f1-aggressive-software-pass-2026-10-12.md)) |
 | BOOT-P on LAN wire | **VERIFIED** — requests, boot name **`GCNT-X`**, no server ([BOOT-P LAN](f1-bootp-lan-2026-10-13.md)) |
-| BOOT-P **answer** from PC | **VERIFIED 2026-10-27** — router accepts the reply and moves to TFTP; TFTP DATA does not reach the router on the LAN (leaves via Tailscale source), see [BOOT-P LAN addendum](f1-bootp-lan-2026-10-13.md) |
-| Signed RBI recovery / flash | **NOT TRIED** — no suitable 23.1.b Type-2 image in repo; 19.x flash **dangerous** ([gcnt-x-root-path](gcnt-x-root-path.md)) |
+| BOOT-P **answer** & TFTP delivery | **VERIFIED 2026-10-27** — Full automated handshake (`scripts/f1_bootp_tftp_mac.py`) on macOS `en10`. Multiblock TFTP transfer confirmed on wire. |
+| Signed RBI recovery / flash | **NOT APPLICABLE** to BOOT-P — bootloader recovery parser strictly expects an ITB/FIT image (`0xd00dfeed`), not an RBI ([BOOT-P LAN Addendum 5](f1-bootp-lan-2026-10-13.md)) |
+| Unsigned FIT recovery flashing | **VERIFIED 2026-10-27** — U-Boot `flash_upgrade_img_bundle` accepts unsigned FIT images (`compatible = "GCNT-X"`), updates UBI metadata, and switches boot bank ([BOOT-P LAN Addenda 7–8](f1-bootp-lan-2026-10-13.md)) |
+| Rootfs decryption key | **VERIFIED 2026-10-27** — Plaintext 32-byte AES key leaked at UART boot line 598 (`/trust/key_image_aes` from Broadcom BCMBCA U-Boot `sdk_test_commands.c`) ([rootfs key finding](f1-rootfs-key-l598-2026-10-27.md)) |
 
 ---
 
@@ -53,7 +55,8 @@ Single index for **this unit** (Telia F1 / GCNT-X, **23.1.b**). Detailed evidenc
 | `b` → BOOT-P, no Ethernet | `no active_port set` | [UART interaction](f1-uart-interaction-2026-10-12.md) |
 | `b` → BOOT-P, Ethernet up, **no PC server** | `BOOTP Reply timeout` (UART) | same |
 | Windows PC on LAN, **pktmon** + **Wireshark** listen | 17× BOOTREQUEST, file **`GCNT-X`**, no Offer | [BOOT-P LAN](f1-bootp-lan-2026-10-13.md) |
-| `f1-bootp-reply.ps1` on Windows | **Executed 2026-10-27** (~01:04 local) — reply accepted; later TFTP runs use `scripts/f1-bootp-tftp-combined-test.ps1` | `scripts/f1-bootp-reply.ps1`, [BOOT-P LAN](f1-bootp-lan-2026-10-13.md) |
+| `f1-bootp-reply.ps1` on Windows | **Executed 2026-10-27** (~01:04 local) — reply accepted; later superseded by macOS native script | `scripts/f1-bootp-reply.ps1`, [BOOT-P LAN](f1-bootp-lan-2026-10-13.md) |
+| macOS native BOOTP/TFTP responder (`scripts/f1_bootp_tftp_mac.py`) | **Executed 2026-10-27** — 100% automated: UART auto-b, BOOTREPLY sent, multiblock TFTP transfer confirmed. Tested minimal/standard FIT skeletons; verified parser states `/images`, `/configurations`, SHA-256 hash, and accepted `compatible = "GCNT-X"`. U-Boot executed `flash_upgrade_img_bundle`, updated UBI metadata volumes, and switched active boot bank from Bank 2 to Bank 1. | `scripts/f1_bootp_tftp_mac.py`, [BOOT-P LAN Addenda 5–8](f1-bootp-lan-2026-10-13.md) |
 | Enter / `id` / Ctrl+J on Linux console | No shell; logviewer: serial denied | [UART interaction](f1-uart-interaction-2026-10-12.md) |
 | Top-side PCB photo (`CN1`, `TEST_CN20`, `ANT*` vs `4G-ANT*`) | Documented | [board visual](f1-board-visual-2026-10-12.md) |
 | Owner removed/reseated Wi‑Fi coax | **Not electrically tested** — reseat on **`ANT0`–`ANT3`**, not `4G-ANT*` | [board visual](f1-board-visual-2026-10-12.md) |
@@ -66,6 +69,7 @@ Private captures: `artifacts/bootp/2026-10-13/`, `artifacts/uart/2026-10-12/`, `
 
 | Work | Outcome | Doc |
 | --- | --- | --- |
+| L598 boot leak rootfs key identification | **VERIFIED 2026-10-27** — Broadcom BCMBCA `sdk_test_commands.c` leaks 32-byte `/trust/key_image_aes` in plaintext to UART at line 598. Does not unwrap 19.x RBI (pad 0xbc). Decrypts `rootfs2` dm-crypt partition. | [rootfs key finding](f1-rootfs-key-l598-2026-10-27.md) |
 | `THENC`/`GW` envelope + decrypt tooling | Format OK; **no RandB** | [config export decrypt](f1-config-export-decrypt-2026-10-12.md) |
 | 71 OSCK / boot-log derivations on 19.x RBI | All `bad_osck` | [rbi-crypto-attempt3](rbi-crypto-attempt3.md) |
 | `r2secr` 4.1.52 ko build | No match to **4.19.235** unit | [r2secr-build](r2secr-build-2026-10-12.md) |
@@ -75,11 +79,12 @@ Private captures: `artifacts/bootp/2026-10-13/`, `artifacts/uart/2026-10-12/`, `
 
 ## Explicitly not tried (still the real queue)
 
-1. ~~**BOOT-P reply** — PC answers with `GCNT-X`, UART should show TFTP failure (no RBI).~~ **DONE 2026-10-27 ~01:04 local:** reply accepted and used (TFTP/Filename/Load-address lines confirm it); TFTP timed out after 10 retries (no server running, by design), re-negotiation also timed out, device did an **explicit reset** (`Resetting the gateway`, confirmed `BTRM` on the next line) — not a silent fall-through. Normal boot resumed on the next power cycle. New next step: serve a small non-firmware file named `GCNT-X` via a real TFTP server to exercise the loader's handling of present-but-invalid content — still gated, no real/signed image until that outcome is known. See [BOOT-P LAN addendum](f1-bootp-lan-2026-10-13.md).
-2. **`f1_ipping_host_probe.py`** — one run when `/login.lp` is **200** (not during 503).
-3. **Technicolor recovery server + signed GCNT-X RBI** — only after (1); wrong image bricks.
-4. **Hardware key path** — `/proc/rip/0108` or eripv2 dump after root; NAND part **TC58NVG2S0HTAI0** (TSOP-48) documented 2026-10-14; chip-off/JTAG/`TEST_CN20` map not done.
-5. **Import/upload / stored XSS** — only with accepted brick/lab risk.
+1. ~~**BOOT-P reply** — PC answers with `GCNT-X`, UART should show TFTP failure (no RBI).~~ **DONE 2026-10-27 ~01:04 local:** reply accepted and used (TFTP/Filename/Load-address lines confirm it); TFTP timed out after 10 retries (no server running, by design), re-negotiation also timed out, device did an **explicit reset** (`Resetting the gateway`, confirmed `BTRM` on the next line) — not a silent fall-through. Normal boot resumed on the next power cycle.
+2. ~~**Minimal TFTP test** — serve small non-firmware file named `GCNT-X` via real TFTP server to exercise loader.~~ **DONE 2026-10-27 ~18:11 local:** `scripts/f1_bootp_tftp_mac.py` served 18-byte test payload; U-Boot ACKed block 1 (`#`) and executed `action 3` on image loaded at `0x1000000`. Parser revealed: expects U-Boot FIT image (`action 3Can't find images parent node '/images' (FDT_ERR_BADMAGIC)`). See [BOOT-P LAN Addendum 5](f1-bootp-lan-2026-10-13.md).
+3. **`f1_ipping_host_probe.py`** — one run when `/login.lp` is **200** (not during 503).
+4. **FIT recovery image exploration** — craft minimal valid ITB/FIT skeleton (`0xd00dfeed`) with `/images` node to map subsequent parser/signature constraints.
+5. **Hardware key path** — `/proc/rip/0108` or eripv2 dump after root; NAND part **TC58NVG2S0HTAI0** (TSOP-48) documented 2026-10-14; chip-off/JTAG/`TEST_CN20` map not done.
+6. **Import/upload / stored XSS** — only with accepted brick/lab risk.
 
 ---
 

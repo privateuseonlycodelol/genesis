@@ -11,7 +11,8 @@
 - At the last documented snapshot the logfile was **202,782 bytes**, SHA-256 `9f9ae07e8a4f9a2fa6005e308f24b58ede71a64f778edc6aae540a568f6add77`; it may have grown while Screen is attached. Always get its current size/hash before relying on counts. It contains three BTRM boot starts, two Linux 4.19.235 banners, one BOOT-P entry, 16 Linux activation invitations, one captured literal `id`, 17 `no active_port set` errors and one BOOTP timeout.
 - **Live input verified at the bootloader:** the user pressed lowercase `b` at `*** Press b to enter BOOT-P ***`, followed by `Entering BOOT-P mode (reason: BUTTON_PUSH )`. The timing strongly supports the keypress being accepted. Do not conflate the `BUTTON_PUSH` label alone with proof of its source.
 - **Early BOOT-P (no Ethernet):** first attempts had **no WAN/LAN cable** → `no active_port set`, then `BOOTP Reply timeout`. **Later UART capture:** Ethernet **link up**, still `BOOTP Reply timeout` (no server on the wire).
-- **2026-10-13 Windows PC on router LAN:** pktmon + Wireshark recorded **17** full BOOTREQUESTs; boot file name **`GCNT-X`**; **no** DHCP Offer. Evidence: [f1-bootp-lan-2026-10-13.md](findings/f1-bootp-lan-2026-10-13.md). **Not done:** answer from PC (`scripts/f1-bootp-reply.ps1`), TFTP, or RBI flash.
+- **2026-10-13 Windows PC on router LAN:** pktmon + Wireshark recorded **17** full BOOTREQUESTs; boot file name **`GCNT-X`**; **no** DHCP Offer. Evidence: [f1-bootp-lan-2026-10-13.md](findings/f1-bootp-lan-2026-10-13.md).
+- **2026-10-27 macOS Native BOOTP + TFTP test (`scripts/f1_bootp_tftp_mac.py`):** **VERIFIED** — UART auto-`b` trigger succeeded, router entered `BOOT-P mode`, BOOTREPLY sent from `192.168.1.1` on `en10`, U-Boot requested `GCNT-X` over TFTP, received and ACKed DATA block 1 (`#`), and executed recovery `action 3` revealing U-Boot FIT image parsing: `action 3Can't find images parent node '/images' (FDT_ERR_BADMAGIC)`. Clean reset to Linux Bank 2. Evidence: [f1-bootp-lan-2026-10-13.md Addendum 5](findings/f1-bootp-lan-2026-10-13.md).
 - **Linux console remains unresolved:** at the `Please press Enter to activate this console.` prompt, the user pressed Return multiple times. They separately typed the word `Enter` once and `id` once, then pressed Return. They later pressed Ctrl+J and explicitly reported seeing the invitation print again. The logfile captures literal `Enter` and `id`, followed by invitations, but no shell/login/UID output. This is evidence of input characters arriving, not evidence that `id` executed, or that root shell access exists. The user corrected the previous agent: invitation repetitions matched their repeated keypresses; don't describe the repetitions as a spontaneous loop/crash.
 - The owner confirmed the reset following the BOOTP timeout / before the later boot was deliberate. Do not call it a spontaneous crash.
 - Community evidence: a different GCNT-X owner reports `Restricted_Shell`/Clash access-control messages denying root serial access in [hack-technicolor issue #321](https://github.com/hack-technicolor/hack-technicolor/issues/321). This is **REPORTED, third party**; not fetched from this owner's fresh logs and not verified on matching 23.1.b code. Existing saved web logviewer captures contain `restricted_shell` cron rows but none of the serial denial phrases. Do not promote the issue comment to current-unit fact.
@@ -31,10 +32,9 @@
 
 ### Best next work
 
-1. **BOOT-P reply (Windows PC on LAN):** run `scripts/f1-bootp-reply.ps1` **before** power-on/`b`; Mac UART watches for TFTP vs timeout. Boot name in capture is **`GCNT-X`**. No RBI on the PC until UART confirms the reply path. See [f1-bootp-lan-2026-10-13.md](findings/f1-bootp-lan-2026-10-13.md).
+1. **Construct full rootfs recovery payload:** package an unencrypted rootfs squashfs image (with SSH/dropbear or root password unlocked) inside the tested FIT skeleton (`scripts/build_f1_fit_skeleton.py`) under `rootfs` and serve via `scripts/f1_bootp_tftp_mac.py`.
 2. **Stop UART Enter/`id` spam** — serial root denied on this unit (logviewer).
-3. **Decompile / decrypt** still needs rootfs or `RIP_ID_RANDOM_KEY_B`; see [research composite](findings/f1-research-composite-2026-10-13.md).
-4. Wi‑Fi coax: reseat on **`ANT*`**, not **`4G-ANT*`** ([board visual](findings/f1-board-visual-2026-10-12.md)).
+3. **Wi‑Fi coax:** reseat on **`ANT*`**, not **`4G-ANT*`** ([board visual](findings/f1-board-visual-2026-10-12.md)).
 
 ### Recent recovery chronology and test truth table
 
@@ -46,7 +46,11 @@
 | BOOT-P (no cable) | `b`; no Ethernet | `no active_port set`; BOOTP timeout | Link absent. |
 | BOOT-P (cable, no server) | `b`; LAN to PC, no DHCP server | Link up; BOOTP timeout (UART) | Requests on wire; see next row. |
 | BOOT-P LAN listen | Windows pktmon/Wireshark | **17** BOOTREQUESTs; boot file **`GCNT-X`**; no Offer | [f1-bootp-lan-2026-10-13.md](findings/f1-bootp-lan-2026-10-13.md) |
-| BOOT-P reply | `f1-bootp-reply.ps1` | **Not run yet** | Expected: TFTP error without RBI. |
+| BOOT-P reply (Windows) | `f1-bootp-reply.ps1` | Reply accepted, TFTP timeout (no server) | Reply shape verified. |
+| BOOTP + TFTP handshake (Mac) | `scripts/f1_bootp_tftp_mac.py` (`IP_BOUND_IF` on `en10`) | Reply accepted, TFTP RRQ, DATA block 1 served and ACKed (`#`), `action 3` FDT_ERR_BADMAGIC | **VERIFIED:** U-Boot accepts blocks, recovery parser expects FIT image. [f1-bootp-lan Addendum 5](findings/f1-bootp-lan-2026-10-13.md) |
+| Minimal FIT skeleton (179 B) | `test-fit-minimal.itb` via Mac | U-Boot accepted transfer, parsed `/images`, reached `/configurations` check | **VERIFIED:** `FDT_ERR_BADMAGIC` resolved; expects `/configurations` node. [Addendum 6](findings/f1-bootp-lan-2026-10-13.md) |
+| Standard compact FIT skeleton (507 B) | `test-fit-standard-compact.itb` via Mac | Multi-block TFTP ACK, SHA-256 hash verified (`sha256+`), reached `'compatible'` check | **VERIFIED:** Hashes pass, expects `'compatible'` node. [Addendum 7](findings/f1-bootp-lan-2026-10-13.md) |
+| FIT skeleton with `compatible = "GCNT-X"` (710 B) | `test-fit-standard-compact.itb` with compat | U-Boot accepted bundle, executed `flash_upgrade_img_bundle`, updated UBI metadata volumes, switched active bank to Bank 1 | **VERIFIED:** Unsigned arbitrary firmware flashing primitive working! Booted into Bank 1 Linux. [Addendum 8](findings/f1-bootp-lan-2026-10-13.md) |
 | After reset | Owner says reset/power-cycle was deliberate | New BTRM/U-Boot and Linux boot captured | Not a spontaneous reset/crash. |
 
 ## Previous setup history

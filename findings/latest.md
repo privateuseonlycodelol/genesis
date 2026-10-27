@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-27T00:44:12Z
+**Generated:** 2026-10-27T18:21:41Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -20,10 +20,13 @@
 
 ## `artifacts/firmware`
 ```
-total 63984
-drwxr-xr-x   3 user  staff        96 Oct 12 08:08 .
+total 64008
+drwxr-xr-x   6 user  staff       192 Oct 27 18:31 .
 drwxr-xr-x  18 user  staff       576 Oct 13 00:59 ..
 -rw-r--r--@  1 user  staff  32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
+-rw-r--r--@  1 user  staff       179 Oct 27 18:22 test-fit-minimal.itb
+-rw-r--r--@  1 user  staff       710 Oct 27 19:07 test-fit-standard-compact.itb
+-rw-r--r--@  1 user  staff       885 Oct 27 19:07 test-fit-standard.itb
 ```
 
 ## `artifacts/captures`
@@ -126,6 +129,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-password-encoding-cli-trace-2026-10-15.md`](f1-password-encoding-cli-trace-2026-10-15.md)
 - [`f1-rea-har-pass-2026-10-17.md`](f1-rea-har-pass-2026-10-17.md)
 - [`f1-research-composite-2026-10-13.md`](f1-research-composite-2026-10-13.md)
+- [`f1-rootfs-key-l598-2026-10-27.md`](f1-rootfs-key-l598-2026-10-27.md)
 - [`f1-trace-helper-2026-10-12.md`](f1-trace-helper-2026-10-12.md)
 - [`f1-trace-path-2026-10-12.md`](f1-trace-path-2026-10-12.md)
 - [`f1-uart-23.1b.md`](f1-uart-23.1b.md)

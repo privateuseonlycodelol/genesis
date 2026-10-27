@@ -41,19 +41,25 @@ def configure_serial(fd: int, baud: int = 115200) -> None:
 
 
 class BootPTrigger:
-    """Decides, line by line, when to send 'b'. Sends at most once per boot."""
+    """Decides when to send 'b'. Sends at most once per boot, triggering immediately on prompt."""
 
     def __init__(self) -> None:
+        self.buffer = ""
         self.answered = False
         self.sent_count = 0
 
-    def feed(self, line: str) -> bool:
-        if BOOT_START in line:
+    def feed(self, chunk: str) -> bool:
+        self.buffer += chunk
+        if BOOT_START in self.buffer:
             self.answered = False
-        if PROMPT in line and not self.answered:
+            idx = self.buffer.rfind(BOOT_START)
+            self.buffer = self.buffer[idx:]
+        if PROMPT in self.buffer and not self.answered:
             self.answered = True
             self.sent_count += 1
             return True
+        if len(self.buffer) > 4096:
+            self.buffer = self.buffer[-2048:]
         return False
 
 
@@ -85,16 +91,14 @@ def main() -> int:
                 break
             log.write(data)
             log.flush()
-            partial += data.decode("utf-8", "replace").replace("\r", "")
-            *lines, partial = partial.split("\n")
-            for line in lines:
-                if trigger.feed(line):
-                    os.write(fd, b"b")
-                    stamp = time.strftime("%H:%M:%S")
-                    note = f"[{stamp}] sent 'b' at BOOT-P prompt (#{trigger.sent_count})\n"
-                    log.write(note.encode())
-                    log.flush()
-                    print(note.strip(), flush=True)
+            chunk = data.decode("utf-8", "replace").replace("\r", "")
+            if trigger.feed(chunk):
+                os.write(fd, b"b")
+                stamp = time.strftime("%H:%M:%S")
+                note = f"[{stamp}] sent 'b' at BOOT-P prompt (#{trigger.sent_count})\n"
+                log.write(note.encode())
+                log.flush()
+                print(note.strip(), flush=True)
 
     os.close(fd)
     print(f"stopped; 'b' sent {trigger.sent_count} time(s)", flush=True)

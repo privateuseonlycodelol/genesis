@@ -2,7 +2,7 @@
 
 | Layer | Language | Examples |
 | --- | --- | --- |
-| Live F1 HTTP/SRP, probes, captures | **Python 3** | `f1_srp_login.py`, `f1_readonly_control.py`, `f1_*_probe.py` |
+| Live F1 HTTP/SRP, probes, captures, BOOTP/TFTP recovery | **Python 3** | `f1_srp_login.py`, `f1_readonly_control.py`, `f1_*_probe.py`, `f1_bootp_tftp_mac.py` |
 | Shell / OS integration | **bash** / **PowerShell** | `report.sh`, `wan-capture.sh`, `f1-bootp-reply.ps1` |
 | Must match vendor **srp-min.js** | **TypeScript** (`scripts/password-encoding/`) | `referencePasswordBlob`, golden tests |
 | Browser / Tampermonkey | **JavaScript** | `f1-grab-artifacts.user.js` |
