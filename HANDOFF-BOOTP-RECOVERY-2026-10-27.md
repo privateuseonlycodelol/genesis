@@ -1,5 +1,8 @@
 # Comprehensive Project Handoff: Telia F1 / Vantiva GCNT-X Recovery & Rootfs Decryption (2026-10-27)
 
+> **Correction (2026-10-27, offline recheck):** the "Unsigned Arbitrary Firmware Flashing Primitive" and the "Full arbitrary flashing primitive verified" claims are withdrawn. All five bundle members were logged `not found ... skipping!`, so only the bank metadata changed. The rootfs AES key claim is also unverified (see [f1-rootfs-key-l598-2026-10-27.md](findings/f1-rootfs-key-l598-2026-10-27.md)). See [f1-bootp-lan-2026-10-13.md Addendum 9](findings/f1-bootp-lan-2026-10-13.md).
+
+
 **Target:** Telia F1 / Vantiva GCNT-X (EWA1330), firmware `23.1.b.0448-7201004-20231013110243`.  
 **Operating Mode:** 100% Software-driven on macOS host via existing connections (USB-Ethernet adapter `en10` + USB-UART serial cable `/dev/cu.usbserial-0001`).  
 **Physical Work Required:** **Zero** (no soldering, no hardware programmer, no SPI/NAND clips, no JTAG).
