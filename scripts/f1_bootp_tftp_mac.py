@@ -6,7 +6,8 @@ running natively on macOS. Eliminates Tailscale/virtual interface route hijackin
 Parsec remote desktop disconnects, and Windows firewall UDP drops.
 
 What it does:
-  1. (Optional) Configures the specified macOS Ethernet interface to static 192.168.1.1/24.
+  1. (Optional) Configures the specified macOS Ethernet interface to a static IP (default
+     192.168.1.100/24). The prior service config is restored on exit unless --keep-ip is set.
   2. (Optional) Watches UART (/dev/cu.usbserial-0001) and presses 'b' at the BOOT-P prompt.
   3. Listens on UDP/67 for the router's BOOTREQUEST (file='GCNT-X') and sends RFC 951 BOOTREPLY.
   4. Listens on UDP/69 for the router's TFTP RRQ and serves block 1 of a test payload.
@@ -19,6 +20,7 @@ Usage (requires sudo to bind privileged UDP ports 67 and 69):
 from __future__ import annotations
 
 import argparse
+import atexit
 import os
 import select
 import shutil
@@ -172,6 +174,57 @@ def get_service_name_for_iface(iface: str) -> str | None:
     return None
 
 
+def parse_getinfo(output: str) -> dict:
+    """Parses `networksetup -getinfo` output into mode, ip, mask, and router."""
+    info: dict = {}
+    for raw in output.splitlines():
+        line = raw.strip()
+        if line.endswith("Configuration"):
+            info["mode"] = line.split()[0]
+        elif ":" in line:
+            key, value = (part.strip() for part in line.split(":", 1))
+            if key == "IP address":
+                info["ip"] = value
+            elif key == "Subnet mask":
+                info["mask"] = value
+            elif key == "Router":
+                info["router"] = value
+    return info
+
+
+def snapshot_service(svc: str) -> dict | None:
+    """Returns the service's current IP configuration, or None if it cannot be read."""
+    try:
+        return parse_getinfo(subprocess.check_output(["networksetup", "-getinfo", svc], text=True))
+    except Exception:
+        return None
+
+
+def restore_commands(svc: str | None, prior: dict | None, client_ip: str) -> list[list[str]]:
+    """Commands that return the service and ARP table to their state before this run."""
+    cmds: list[list[str]] = []
+    if svc and prior:
+        mode = prior.get("mode")
+        if mode == "DHCP":
+            cmds.append(["networksetup", "-setdhcp", svc])
+        elif mode == "Manual" and {"ip", "mask", "router"} <= prior.keys():
+            cmds.append(["networksetup", "-setmanual", svc, prior["ip"], prior["mask"], prior["router"]])
+    cmds.append(["arp", "-d", client_ip])
+    return cmds
+
+
+def restore_interface(svc: str | None, prior: dict | None, client_ip: str) -> None:
+    """Runs the restore commands. Failures are printed and never raised."""
+    if svc and not prior:
+        print(f"[-] Could not read prior config for '{svc}'; it stays on the static IP.", file=sys.stderr)
+    for cmd in restore_commands(svc, prior, client_ip):
+        try:
+            subprocess.run(cmd, check=True, capture_output=True, text=True)
+            print(f"[*] Restored: {' '.join(cmd)}")
+        except Exception as exc:
+            print(f"[-] Restore failed for {' '.join(cmd)}: {exc}", file=sys.stderr)
+
+
 def send_tftp_packet_with_retry(
     sock: socket.socket,
     pkt: bytes,
@@ -297,6 +350,7 @@ def main() -> int:
     )
     parser.add_argument("--iface", help="macOS Ethernet interface to check/bind (e.g. en4, en5, en10)")
     parser.add_argument("--no-set-ip", action="store_true", help="Do not configure static IP automatically on iface")
+    parser.add_argument("--keep-ip", action="store_true", help="Leave the static IP and ARP entry in place after exit")
     parser.add_argument("--uart", default="/dev/cu.usbserial-0001", help="Serial device to watch and auto-press 'b'")
     parser.add_argument("--no-uart", action="store_true", help="Disable UART watching")
     parser.add_argument("--client-mac", default=None, help="Target router MAC address (optional, default: accept any)")
@@ -326,9 +380,11 @@ def main() -> int:
     tftp_blocks = chunk_tftp_payload(test_payload, block_size=512)
     total_blocks = len(tftp_blocks)
 
-    # Automatic interface IP and routing setup
+    # Automatic interface IP and routing setup. The prior service config is saved and
+    # restored at exit, unless --keep-ip is given.
     if args.iface and not args.no_set_ip:
         svc = get_service_name_for_iface(args.iface)
+        prior = snapshot_service(svc) if svc else None
         if svc:
             print(f"[*] Locking macOS manual IP {args.server_ip} on '{svc}' ({args.iface})...")
             os.system(f"networksetup -setmanual '{svc}' {args.server_ip} 255.255.255.0 {args.server_ip} >/dev/null 2>&1")
@@ -336,6 +392,8 @@ def main() -> int:
         os.system(f"ifconfig {args.iface} {args.server_ip} netmask 255.255.255.0 up >/dev/null 2>&1")
         os.system(f"arp -d {args.client_ip} >/dev/null 2>&1")
         os.system(f"arp -s {args.client_ip} {last_client_mac} >/dev/null 2>&1")
+        if not args.keep_ip:
+            atexit.register(restore_interface, svc, prior, args.client_ip)
 
     print(f"=== Telia F1 / GCNT-X macOS BOOTP & TFTP Responder ===")
     print(f"Interface:    {args.iface or 'all'}")

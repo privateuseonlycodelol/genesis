@@ -50,11 +50,12 @@ def ensure_admin_session(
     password: str,
     jar_path: Path | None = None,
     username: str = "User",
+    base: str = "http://192.168.2.1",
 ) -> tuple[SRPClient, str]:
     """Return (client, how) where how is 'reused' or 'srp_login'."""
     jar_path = jar_path or DEFAULT_JAR
     load_jar(jar_path)
-    client = SRPClient(str(jar_path), "http://192.168.2.1")
+    client = SRPClient(str(jar_path), base)
     _fix_session_cookies(client.jar)
 
     try:

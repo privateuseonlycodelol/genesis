@@ -154,3 +154,8 @@ Offline summary of five uploaded browser HARs: `docs/f1-uploaded-hars.md`
 2026-10-27 docs: consolidated session index written (findings/f1-firmware-session-index-2026-10-27.md); README pointer added; stale status lines updated in acquisition paths and NAND plan.
 2026-10-27 offline source trace: vendor U-Boot copy hashes OK; copy does not match device build (fn_table lacks rootfs_data/ramfs_rd). Bundle commit is metadata-only and permanent (no rollback in copy); bcm_sec_validate_fit result gates only the FDT fixup, not boot. No device contact. See findings/f1-uboot-source-trace-2026-10-27.md.
 2026-10-27 offline continuation: check_fallback has no caller in the indexed repo; bootm hash check is on unless env verify=no (upstream code); device chip BCM68360_B1 is not in the 5.04behnd tree (REPORTED neighbour: 6856 family); no public GPL source for GCNT-X found by web search. See findings/f1-uboot-source-trace-2026-10-27.md (Continuation section).
+2026-10-27 cold a-key run (interrupt-probe-key-a-2.log): SPL menu at line 74 after 32 a-keys; no progress; see findings/f1-boot-menu-a-key-2026-10-27.md
+2026-10-27 cold control CR-only (interrupt-probe-cr-control.log): no SPL menu; boot to Linux mount_root
+2026-10-27 web restart with a held (interrupt-probe-restart-a.log): SPL menu at line 484; router unreachable after; f1_restart_router.py HTTP 200
+2026-10-27 one CR after menu (interrupt-probe-enter-after-menu.log): blank response only; login.lp HTTP 000
+2026-10-27 key-a earlier run (interrupt-probe-key-a.log): inconclusive, router not powered in window
