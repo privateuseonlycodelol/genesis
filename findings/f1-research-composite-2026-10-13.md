@@ -75,7 +75,7 @@ Private captures: `artifacts/bootp/2026-10-13/`, `artifacts/uart/2026-10-12/`, `
 
 ## Explicitly not tried (still the real queue)
 
-1. **BOOT-P reply** — PC answers with `GCNT-X`, UART should show TFTP failure (no RBI). **2026-10-27:** raised priority — byte-exact reparse of the capture found the request's `file` field carries an undocumented second string (`23KN/0/TL`) and options 1/3 carry non-address ASCII-shaped garbage (HYPOTHESIS: uninitialized-buffer leak in the request builder), which is a reason to suspect the reply-parsing path may have similar weaknesses; see [BOOT-P LAN addendum](f1-bootp-lan-2026-10-13.md).
+1. ~~**BOOT-P reply** — PC answers with `GCNT-X`, UART should show TFTP failure (no RBI).~~ **DONE 2026-10-27 ~01:04 local:** reply accepted and used (TFTP/Filename/Load-address lines confirm it); TFTP timed out after 10 retries (no server running, by design), re-negotiation also timed out, device did an **explicit reset** (`Resetting the gateway`, confirmed `BTRM` on the next line) — not a silent fall-through. Normal boot resumed on the next power cycle. New next step: serve a small non-firmware file named `GCNT-X` via a real TFTP server to exercise the loader's handling of present-but-invalid content — still gated, no real/signed image until that outcome is known. See [BOOT-P LAN addendum](f1-bootp-lan-2026-10-13.md).
 2. **`f1_ipping_host_probe.py`** — one run when `/login.lp` is **200** (not during 503).
 3. **Technicolor recovery server + signed GCNT-X RBI** — only after (1); wrong image bricks.
 4. **Hardware key path** — `/proc/rip/0108` or eripv2 dump after root; NAND part **TC58NVG2S0HTAI0** (TSOP-48) documented 2026-10-14; chip-off/JTAG/`TEST_CN20` map not done.

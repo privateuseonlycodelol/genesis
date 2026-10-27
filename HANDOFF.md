@@ -10,25 +10,19 @@ Owner's own router: Telia F1 / Vantiva GCNT-X (EWA1330), firmware `23.1.b`. This
 
 **One hard boundary that is not part of AGENTS.md and does not yield to it or to direct owner requests, however phrased:** do not personally execute a live login or password-change against the router — i.e. don't be the one typing/holding/piping the actual account password into a script or request, by any mechanism (file, env var, inline arg). This came up explicitly on 2026-10-27: the owner asked repeatedly, including "I give you hard permission," and the answer stayed no. State the rule, hand them the exact command to run themselves. This is not caution to be reasoned out of — don't relitigate it if asked again.
 
-## Immediate next action (highest value, nothing else queued ahead of it)
+## Immediate next action
 
-**Run the BOOTP active-reply test. This has never been executed.** Everything before it (passive capture, UART boot review, OSCK/firmware-key hunts) is done and blocked/closed; this is the one concrete unexecuted step with a real payoff path toward firmware/root access.
+**Status as of 2026-10-27 ~01:30 local — mid-experiment, waiting on one specific test result.** Full history: [findings/f1-bootp-lan-2026-10-13.md](findings/f1-bootp-lan-2026-10-13.md), three addenda, read all of them in order (dates/times inside each). Summary of where things stand:
 
-Setup (all physical, owner does this, you talk them through it):
-1. Windows PC cabled to the F1's LAN (same physical setup as the 2026-10-13 capture).
-2. Mac UART still connected and watched (Screen session on `/dev/cu.usbserial-0001`, 115200 baud, per `scripts/f1-boot-capture.command`) — need to observe the router's reaction, not just send blind.
-3. **Ethernet cable connected to the router before entering BOOT-P.** Earlier attempts failed only because no cable was plugged in (`no active_port set`) — this is not a protocol blocker, just a setup step that was missed twice before.
-4. Reboot router, press lowercase `b` at `*** Press b to enter BOOT-P ***` (via UART).
-5. On the Windows PC (Admin PowerShell), run:
-   ```powershell
-   scripts/f1-bootp-reply.ps1 -ClientMac 00-1E-E3-76-83-61 -BootFile GCNT-X
-   ```
-   This is the untried part — prior work only *listened* (pktmon/Wireshark), never replied.
-6. Watch UART. Expected success condition for *this specific step*: progression from `BOOTP Reply timeout` to a **TFTP error** (no file served yet). That confirms the reply/TFTP handshake shape works.
+1. BOOTP active-reply confirmed working (bootloader accepts an external reply, moves to a TFTP attempt). Not a vulnerability — BOOTP/DHCP has no auth by design, this is the intended recovery-mode behavior, just previously untested in this project. Don't re-explain this or re-walk the owner through basic setup.
+2. First TFTP-serving attempt: RRQ **is** reaching a real listener (confirmed via owner's Windows PowerShell transcript), a correctly-shaped DATA block **is** being sent back (payload length independently verified), but the router **never ACKs it** — 11 retries, all identical, matching the UART's `10× T` retry count almost exactly (same phenomenon, two vantage points).
+3. HYPOTHESIS (two candidates, same fix for both): the bootloader's TFTP client may not implement RFC 1350 TID tracking (expects the reply from port 69, not a fresh ephemeral port), or Windows Firewall is silently dropping inbound to the new ephemeral port. `scripts/f1-tftp-serve-test.ps1` was revised 2026-10-27 to reply from port 69 instead of a new port — **this fix has NOT yet been tested against the real device as of this handoff.**
 
-**What this step does NOT do:** offer firmware, flash anything, or grant shell/root by itself. Serving an actual signed RBI is a separate, higher-risk decision gated behind this step succeeding first — a wrong/unsigned image can brick the device. Don't conflate the two or skip ahead.
+**What to do right now:** the owner has (or is about to) run the port-69-fix version of the combined script. Wait for them to report back the `Get-Content C:\bootp_tftp_result.log` output and the UART capture. Read for: `received ACK block=1` (fix worked — router's bootloader does respond once the TID issue is sidestepped) vs. the same `no ACK received` pattern repeating (rules out both current hypotheses, needs a new one — check Windows Firewall logs next, or try a packet capture on the Windows side to see whether the router's ACK is being sent at all).
 
-**Why this is the top priority (not just "the next thing on a list"):** a 2026-10-27 byte-exact reparse of the existing capture (`artifacts/bootp/2026-10-13/wan.pcapng`) found the router's own BOOTREQUEST packets contain an undocumented second string in the boot-file field (`"GCNT-X\0" + "23KN/0/TL\0"`) and ASCII-shaped garbage in DHCP options 1/3 (`"U-Bo"`/`".arm"`, decoding to `"U-Bo.arm"` — HYPOTHESIS: leaked uninitialized buffer content in the bootloader's own request-encoding path). Full detail and the new tested decoder: [findings/f1-bootp-lan-2026-10-13.md](findings/f1-bootp-lan-2026-10-13.md) addendum, `scripts/decode_f1_bootp_leak.py`. A sloppy request-builder raises (doesn't prove) the odds the reply-parser on the same code path is also weak — reason to prioritize actually exercising it.
+**If the fix works (ACK received):** that's the point where the loader's actual file-handling/validation behavior finally gets exercised for the first time. Watch UART closely for what happens after the transfer completes — document it immediately, same rigor as the rest of this file (VERIFIED tags, exact log lines, no inferring success from silence). Still gated: no real/signed firmware until this step's outcome (clean rejection vs. something else) is understood.
+
+**Owner's working style on this track, learned this session:** works via Parsec remote desktop into the Windows PC, often without a mouse — give fully self-contained copy-paste PowerShell blocks (heredoc `@'...'@ | Set-Content` pattern to avoid Notepad/Save-As dialogs), not multi-step GUI instructions. Expect Parsec to visibly disconnect when the adapter goes static (normal, not a failure) and reconnect on its own once the script's `finally` block restores DHCP — but if Parsec itself dies mid-script (not just the visible disconnect), the `finally` block may never run and the owner will need a manual DHCP-restore one-liner; this already happened once. The owner also relays guidance from a separate ChatGPT session sometimes — treat anything relayed that way as REPORTED, not verified, same as any other secondhand claim, and say so plainly rather than silently accepting it.
 
 ## Other open threads, lower priority than the above
 
