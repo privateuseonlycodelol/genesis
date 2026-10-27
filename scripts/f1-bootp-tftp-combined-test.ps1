@@ -35,6 +35,16 @@ $pcapFile = "C:\bootp_tftp_capture.pcapng"
 $tailscaleExe = "C:\Program Files\Tailscale\tailscale.exe"
 $tailnetTarget = "macbook-pro-som-tillhr-nils:"
 $capStarted = $false
+$switched = $false
+
+# Guard: if something already answers on the static address, the router is up on
+# its normal LAN (it owns 192.168.1.1). Taking that address then fails duplicate
+# detection and leaves the PC with no DHCP lease. Stop before touching the adapter.
+if (Test-Connection -ComputerName $ServerIp -Count 1 -Quiet -ErrorAction SilentlyContinue) {
+    Write-Host "ABORT: $ServerIp already answers on the network (router running normally). Adapter NOT changed. Power-cycle the router into U-Boot (press b window) first, then rerun." -ForegroundColor Red
+    exit 1
+}
+
 Start-Transcript -Path $logFile -Append
 Write-Host "=== STARTING COMBINED BOOTP+TFTP TEST (port-69-reply fix + pktmon capture) ===" -ForegroundColor Cyan
 Write-Host "Adapter: $InterfaceAlias / Target MAC: $ClientMac / Timeout: $TimeoutSec s"
@@ -48,8 +58,21 @@ try {
     else { Write-Host "pktmon start failed (exit $LASTEXITCODE): no packet capture this run" -ForegroundColor Yellow }
 
     Write-Host "Switching $InterfaceAlias to static IP $ServerIp (Parsec will disconnect now)..." -ForegroundColor Yellow
+    $switched = $true
     Remove-NetIPAddress -InterfaceAlias $InterfaceAlias -Confirm:$false -ErrorAction SilentlyContinue
-    New-NetIPAddress -InterfaceAlias $InterfaceAlias -IPAddress $ServerIp -PrefixLength 24 -ErrorAction Stop
+    Set-NetIPInterface -InterfaceAlias $InterfaceAlias -Dhcp Disabled -ErrorAction Stop
+    New-NetIPAddress -InterfaceAlias $InterfaceAlias -IPAddress $ServerIp -PrefixLength 24 -PolicyStore ActiveStore -ErrorAction Stop
+    $addrReady = $false
+    for ($w = 0; $w -lt 15 -and -not $addrReady; $w++) {
+        Start-Sleep -Seconds 1
+        $addrReady = [bool](Get-NetIPAddress -InterfaceAlias $InterfaceAlias -IPAddress $ServerIp -AddressState Preferred -ErrorAction SilentlyContinue)
+    }
+    if (-not $addrReady) { throw "static $ServerIp did not reach Preferred state within 15 s" }
+    Write-Host "static ${ServerIp} is Preferred on ${InterfaceAlias}" -ForegroundColor Cyan
+    New-NetRoute -DestinationPrefix "${OfferIp}/32" -InterfaceAlias $InterfaceAlias -NextHop 0.0.0.0 -ErrorAction SilentlyContinue | Out-Null
+    $hostRoute = Get-NetRoute -DestinationPrefix "${OfferIp}/32" -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
+    if ($hostRoute) { Write-Host "route ${OfferIp}/32 pinned to ${InterfaceAlias}" -ForegroundColor Cyan }
+    else { Write-Host "WARNING: could not pin route ${OfferIp}/32 to ${InterfaceAlias}; replies may leave via another interface" -ForegroundColor Yellow }
 
     $mac = ([byte[]]($ClientMac -split '[:-]' | ForEach-Object { [Convert]::ToByte($_, 16) }))
     function IpBytes([string]$ip) { return ([byte[]]($ip.Split('.') | ForEach-Object { [byte]$_ })) }
@@ -65,7 +88,7 @@ try {
     $bootpSock.EnableBroadcast = $true
     $bootpSock.Client.ReceiveTimeout = 200
 
-    $tftpSock = New-Object System.Net.Sockets.UdpClient(69)
+    $tftpSock = New-Object System.Net.Sockets.UdpClient (New-Object System.Net.IPEndPoint ([Net.IPAddress]::Parse($ServerIp), 69))
     $tftpSock.Client.ReceiveTimeout = 200
 
     Write-Host "Listening BOOTP/udp67 and TFTP/udp69 for $TimeoutSec s (TFTP replies FROM port 69 this time)..." -ForegroundColor Green
@@ -136,7 +159,9 @@ finally {
         pktmon etl2pcap $etlFile --out $pcapFile | Out-Null
         Write-Host "packet capture saved: $pcapFile" -ForegroundColor Cyan
     }
+    if ($switched) {
     Write-Host "Restoring DHCP on $InterfaceAlias..." -ForegroundColor Yellow
+    Remove-NetRoute -DestinationPrefix "${OfferIp}/32" -InterfaceAlias $InterfaceAlias -Confirm:$false -ErrorAction SilentlyContinue
     Remove-NetIPAddress -InterfaceAlias $InterfaceAlias -Confirm:$false -ErrorAction SilentlyContinue
     Remove-NetIPAddress -InterfaceAlias $InterfaceAlias -IPAddress $ServerIp -PolicyStore PersistentStore -Confirm:$false -ErrorAction SilentlyContinue
     Set-NetIPInterface -InterfaceAlias $InterfaceAlias -Dhcp Enabled -ErrorAction SilentlyContinue
@@ -153,6 +178,10 @@ finally {
         Write-Host "DHCP lease restored on ${InterfaceAlias}: $addrs" -ForegroundColor Green
     } else {
         Write-Host "WARNING: no DHCP lease after 30 s. IPv4 now: '$addrs' (static $ServerIp still present: $staticLeft). Reboot or run ipconfig /renew by hand." -ForegroundColor Red
+    }
+    $defRoute = Get-NetRoute -DestinationPrefix "0.0.0.0/0" -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
+    if ($defRoute) { Write-Host "default route via ${InterfaceAlias}: $($defRoute.NextHop)" -ForegroundColor Green }
+    else { Write-Host "WARNING: no default route on ${InterfaceAlias} after DHCP; internet will not work until one exists" -ForegroundColor Red }
     }
     Stop-Transcript
     $send = @($logFile, $pcapFile) | Where-Object { Test-Path $_ }
