@@ -199,8 +199,15 @@ def build_standard_fit_skeleton(
     payload_data: bytes = b"INERT-TEST-PAYLOAD\n",
     compact: bool = False,
     board: str = "GCNT-X",
+    rootfs_data: bytes | None = None,
 ) -> bytes:
-    """Build a complete FIT image with /images/kernel-1 and /configurations/config-1."""
+    """Build a complete FIT image with /images/kernel-1 and /configurations/config-1.
+
+    When rootfs_data is given, also add /images/rootfs and point config-1 at it with
+    rootfs = "rootfs". The BOOTP recovery bundle handler looks up the configuration
+    property names bootfs, rootfs, loader, rootfs_data and ramfs_rd (UART evidence in
+    findings/f1-bootp-lan-2026-10-13.md, Addendum 8), so the name must match exactly.
+    """
     w = FdtWriter()
     w.begin_node("")  # Root
     w.property_string("description", "F1" if compact else description)
@@ -237,6 +244,25 @@ def build_standard_fit_skeleton(
     w.end_node()  # hash-1
 
     w.end_node()  # kernel-1
+
+    # /images/rootfs (only when a root filesystem is packaged)
+    if rootfs_data is not None:
+        w.begin_node("rootfs")
+        if not compact:
+            w.property_string("description", "SquashFS root filesystem component")
+        w.property("data", rootfs_data)
+        w.property_string("type", "filesystem")
+        w.property_string("arch", "arm64")
+        w.property_string("os", "linux")
+        w.property_string("compression", "none")
+
+        w.begin_node("hash-1")
+        w.property_string("algo", "sha256")
+        w.property("value", hashlib.sha256(rootfs_data).digest())
+        w.end_node()  # hash-1
+
+        w.end_node()  # rootfs
+
     w.end_node()  # images
 
     # /configurations node
@@ -248,6 +274,8 @@ def build_standard_fit_skeleton(
     if not compact:
         w.property_string("description", "Default recovery boot configuration")
     w.property_string("kernel", "kernel-1")
+    if rootfs_data is not None:
+        w.property_string("rootfs", "rootfs")
     w.property_string("compatible", board)
 
     # /configurations/config-1/compatible subnode
@@ -308,6 +336,10 @@ def main() -> int:
     parser.add_argument("--compact", action="store_true", help="Generate compact standard FIT image (<512B)")
     parser.add_argument("--description", default="Telia F1 GCNT-X recovery test image")
     parser.add_argument("--payload-text", default="INERT-TEST-PAYLOAD\n", help="Dummy payload text")
+    parser.add_argument(
+        "--rootfs",
+        help="SquashFS image to package as /images/rootfs (standard mode only)",
+    )
     parser.add_argument("--inspect", help="Inspect and dump an existing FIT / DTB file")
     args = parser.parse_args()
 
@@ -319,6 +351,17 @@ def main() -> int:
         print("ERROR: Specify --out <path> or --inspect <path>", file=sys.stderr)
         return 1
 
+    rootfs_data = None
+    if args.rootfs:
+        if args.mode != "standard":
+            print("ERROR: --rootfs requires --mode standard", file=sys.stderr)
+            return 1
+        rootfs_data = Path(args.rootfs).read_bytes()
+        # SquashFS superblock magic is little-endian 'hsqs' at offset 0
+        if rootfs_data[:4] != b"hsqs":
+            print(f"ERROR: {args.rootfs} does not start with SquashFS magic 'hsqs'", file=sys.stderr)
+            return 1
+
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -329,6 +372,7 @@ def main() -> int:
             description=args.description,
             payload_data=args.payload_text.encode("utf-8"),
             compact=args.compact,
+            rootfs_data=rootfs_data,
         )
 
     out_path.write_bytes(blob)

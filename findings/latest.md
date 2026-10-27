@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-27T18:21:41Z
+**Generated:** 2026-10-27T18:59:25Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -21,19 +21,20 @@
 ## `artifacts/firmware`
 ```
 total 64008
-drwxr-xr-x   6 user  staff       192 Oct 27 18:31 .
-drwxr-xr-x  18 user  staff       576 Oct 13 00:59 ..
+drwxr-xr-x   7 user  staff       224 Oct 27 19:51 .
+drwxr-xr-x  19 user  staff       608 Oct 27 19:28 ..
 -rw-r--r--@  1 user  staff  32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
 -rw-r--r--@  1 user  staff       179 Oct 27 18:22 test-fit-minimal.itb
 -rw-r--r--@  1 user  staff       710 Oct 27 19:07 test-fit-standard-compact.itb
 -rw-r--r--@  1 user  staff       885 Oct 27 19:07 test-fit-standard.itb
+drwxr-xr-x@ 11 user  staff       352 Oct 27 19:51 vendor-uboot-bcmbca-5.04behnd
 ```
 
 ## `artifacts/captures`
 ```
 total 31104
 drwxr-xr-x   7 user  staff      224 Oct 11 17:46 .
-drwxr-xr-x  18 user  staff      576 Oct 13 00:59 ..
+drwxr-xr-x  19 user  staff      608 Oct 27 19:28 ..
 -rw-------   1 user  staff     1708 Oct 11 05:39 f1-reboot.pcapng
 -rw-r--r--   1 user  staff      335 Oct 11 08:01 wan.pcapng
 -rw-r--r--   1 user  staff   926664 Oct 11 17:46 wan2-real.pcapng
@@ -45,7 +46,7 @@ drwxr-xr-x  18 user  staff      576 Oct 13 00:59 ..
 ```
 total 296
 drwxr-xr-x  27 user  staff    864 Oct 12 21:24 .
-drwxr-xr-x  18 user  staff    576 Oct 13 00:59 ..
+drwxr-xr-x  19 user  staff    608 Oct 27 19:28 ..
 -rw-r--r--@  1 user  staff  49359 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.png
 drwxr-xr-x@  3 user  staff     96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.extracted
 -rw-r--r--@  1 user  staff    231 Oct 11 09:02 binwalk-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.txt
@@ -104,6 +105,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-cups-ipp-policy-2026-10-12.md`](f1-cups-ipp-policy-2026-10-12.md)
 - [`f1-cups-ipp-readonly-matrix-2026-10-12.md`](f1-cups-ipp-readonly-matrix-2026-10-12.md)
 - [`f1-diagnostics-connection-restart-2026-10-12.md`](f1-diagnostics-connection-restart-2026-10-12.md)
+- [`f1-fit-rootfs-packaging-2026-10-27.md`](f1-fit-rootfs-packaging-2026-10-27.md)
 - [`f1-gap-attack-pass-2026-10-12.md`](f1-gap-attack-pass-2026-10-12.md)
 - [`f1-gateway-url-action-2026-10-12.md`](f1-gateway-url-action-2026-10-12.md)
 - [`f1-grab-033853-auth-crypto.md`](f1-grab-033853-auth-crypto.md)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Unit tests for build_f1_fit_skeleton.py."""
 
+import hashlib
 import struct
 import sys
 import unittest
@@ -90,6 +91,38 @@ class TestBuildF1FitSkeleton(unittest.TestCase):
     def test_fdt_reader_too_short(self):
         with self.assertRaises(ValueError):
             FdtReader(b"\xd0\x0d\xfe\xed")
+
+    def test_standard_fit_with_rootfs_roundtrip(self):
+        rootfs = b"hsqs" + bytes(range(256)) * 4
+        blob = build_standard_fit_skeleton(rootfs_data=rootfs)
+
+        nodes, props = FdtReader(blob).walk()
+        self.assertIn("/images/rootfs", nodes)
+        self.assertIn("/images/rootfs/hash-1", nodes)
+        self.assertEqual(props["/images/rootfs:data"], rootfs)
+        self.assertEqual(props["/images/rootfs:type"], b"filesystem\x00")
+        self.assertEqual(props["/images/rootfs:compression"], b"none\x00")
+        self.assertEqual(props["/images/rootfs/hash-1:algo"], b"sha256\x00")
+        self.assertEqual(props["/images/rootfs/hash-1:value"], hashlib.sha256(rootfs).digest())
+        # config-1 must name the member with the exact U-Boot lookup key
+        self.assertEqual(props["/configurations/config-1:rootfs"], b"rootfs\x00")
+        # kernel-1 stays, and no bootfs member is added
+        self.assertIn("/images/kernel-1", nodes)
+        self.assertNotIn("/images/bootfs", nodes)
+        self.assertNotIn("/configurations/config-1:bootfs", props)
+
+    def test_standard_fit_without_rootfs_has_no_rootfs_member(self):
+        blob = build_standard_fit_skeleton()
+        nodes, props = FdtReader(blob).walk()
+        self.assertNotIn("/images/rootfs", nodes)
+        self.assertNotIn("/configurations/config-1:rootfs", props)
+
+    def test_rootfs_payload_is_not_truncated_by_padding(self):
+        # 5 bytes forces 3 bytes of FDT padding; the reader must return the exact length
+        rootfs = b"hsqs!"
+        blob = build_standard_fit_skeleton(rootfs_data=rootfs)
+        _, props = FdtReader(blob).walk()
+        self.assertEqual(props["/images/rootfs:data"], rootfs)
 
 
 if __name__ == "__main__":

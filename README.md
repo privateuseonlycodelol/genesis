@@ -1,5 +1,8 @@
 # genesis
 
+> **Correction (2026-10-27):** the "Unsigned Flashing Primitive" below is overstated. The UART log of the 19:09 run shows every bundle member skipped, so no partition was written. See [f1-bootp-lan-2026-10-13.md Addendum 9](findings/f1-bootp-lan-2026-10-13.md) and [f1-fit-rootfs-packaging-2026-10-27.md](findings/f1-fit-rootfs-packaging-2026-10-27.md).
+
+
 ![findings/board-top.jpg](findings/board-top.jpg)
 
 Notes on the Telia F1 I have open. Vantiva board GCNT-X, firmware 23.1.b.0448-7241017-20260223134332.

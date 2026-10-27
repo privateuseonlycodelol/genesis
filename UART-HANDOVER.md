@@ -1,5 +1,8 @@
 # Genesis UART Handover: Telia F1 / Vantiva GCNT-X
 
+> **Correction (2026-10-27):** the 19:09 FIT run did not write any partition. It only changed the bank metadata. See [f1-bootp-lan-2026-10-13.md Addendum 9](findings/f1-bootp-lan-2026-10-13.md).
+
+
 ## Current state — read this before the older setup history
 
 **Updated 2026-10-13** (BOOT-P LAN capture). Canonical evidence: [f1-uart-interaction-2026-10-12.md](findings/f1-uart-interaction-2026-10-12.md), [f1-bootp-lan-2026-10-13.md](findings/f1-bootp-lan-2026-10-13.md), [f1-research-composite-2026-10-13.md](findings/f1-research-composite-2026-10-13.md).
