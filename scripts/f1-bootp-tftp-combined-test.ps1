@@ -1,11 +1,15 @@
 # Combined BOOTP-reply + minimal single-block TFTP server, in one script,
 # for running from a single Parsec/no-mouse-friendly PowerShell window.
-# This is the exact logic handed to the owner in chat on 2026-10-27 and
-# actually run against the device (port-69-reply revision) -- saved here
-# so the repo has the real artifact instead of only chat text. If this
-# file and what actually ran on the Windows PC ever diverge, the Windows
-# copy is ground truth for what was tested; update this file to match it,
-# don't assume this file was what ran.
+# The port-69-reply revision (run 2026-10-27 ~01:46, transcript archived in
+# artifacts/bootp/2026-10-27/) is the logic below minus the pktmon capture and
+# Tailscale send in the start/finally blocks, which were added 2026-10-27
+# after that run and have NOT been run yet. If this file and what actually ran
+# on the Windows PC ever diverge, the Windows copy is ground truth for what was
+# tested; update this file to match it, don't assume this file was what ran.
+#
+# Writes C:\bootp_tftp_result.log (transcript), C:\bootp_tftp_capture.etl and
+# C:\bootp_tftp_capture.pcapng (packet capture of BOOTP/TFTP + the router IP),
+# then sends the log and pcapng to the Mac over Tailscale (Taildrop).
 #
 # Companion/superset of scripts/f1-bootp-reply.ps1 (BOOTP only) and
 # scripts/f1-tftp-serve-test.ps1 (TFTP only, same port-69 logic). Prefer
@@ -26,10 +30,23 @@ param(
     [int]$TimeoutSec = 180
 )
 $logFile = "C:\bootp_tftp_result.log"
+$etlFile = "C:\bootp_tftp_capture.etl"
+$pcapFile = "C:\bootp_tftp_capture.pcapng"
+$tailscaleExe = "C:\Program Files\Tailscale\tailscale.exe"
+$tailnetTarget = "macbook-pro-som-tillhr-nils:"
+$capStarted = $false
 Start-Transcript -Path $logFile -Append
-Write-Host "=== STARTING COMBINED BOOTP+TFTP TEST (port-69-reply fix) ===" -ForegroundColor Cyan
+Write-Host "=== STARTING COMBINED BOOTP+TFTP TEST (port-69-reply fix + pktmon capture) ===" -ForegroundColor Cyan
 Write-Host "Adapter: $InterfaceAlias / Target MAC: $ClientMac / Timeout: $TimeoutSec s"
 try {
+    pktmon filter remove | Out-Null
+    pktmon filter add -p 67 | Out-Null
+    pktmon filter add -p 69 | Out-Null
+    pktmon filter add -i $OfferIp | Out-Null
+    pktmon start --capture --pkt-size 0 -f $etlFile | Out-Null
+    if ($LASTEXITCODE -eq 0) { $capStarted = $true; Write-Host "pktmon capture started: $etlFile" -ForegroundColor Cyan }
+    else { Write-Host "pktmon start failed (exit $LASTEXITCODE): no packet capture this run" -ForegroundColor Yellow }
+
     Write-Host "Switching $InterfaceAlias to static IP $ServerIp (Parsec will disconnect now)..." -ForegroundColor Yellow
     Remove-NetIPAddress -InterfaceAlias $InterfaceAlias -Confirm:$false -ErrorAction SilentlyContinue
     New-NetIPAddress -InterfaceAlias $InterfaceAlias -IPAddress $ServerIp -PrefixLength 24 -ErrorAction Stop
@@ -114,10 +131,32 @@ catch {
     Write-Host "ERROR: $_" -ForegroundColor Red
 }
 finally {
+    if ($capStarted) {
+        pktmon stop | Out-Null
+        pktmon etl2pcap $etlFile --out $pcapFile | Out-Null
+        Write-Host "packet capture saved: $pcapFile" -ForegroundColor Cyan
+    }
     Write-Host "Restoring DHCP on $InterfaceAlias..." -ForegroundColor Yellow
-    Set-NetIPInterface -InterfaceAlias $InterfaceAlias -Dhcp Enabled -ErrorAction SilentlyContinue
     Remove-NetIPAddress -InterfaceAlias $InterfaceAlias -Confirm:$false -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2
-    Write-Host "DHCP restored. Network should reconnect shortly." -ForegroundColor Green
+    Remove-NetIPAddress -InterfaceAlias $InterfaceAlias -IPAddress $ServerIp -PolicyStore PersistentStore -Confirm:$false -ErrorAction SilentlyContinue
+    Set-NetIPInterface -InterfaceAlias $InterfaceAlias -Dhcp Enabled -ErrorAction SilentlyContinue
+    ipconfig /release $InterfaceAlias | Out-Null
+    ipconfig /renew $InterfaceAlias | Out-Null
+    $dhcpOk = $false
+    for ($w = 0; $w -lt 30 -and -not $dhcpOk; $w++) {
+        Start-Sleep -Seconds 1
+        $dhcpOk = [bool](Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily IPv4 -PrefixOrigin Dhcp -ErrorAction SilentlyContinue)
+    }
+    $addrs = (Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily IPv4 -ErrorAction SilentlyContinue).IPAddress -join ", "
+    $staticLeft = $addrs -split ", " -contains $ServerIp
+    if ($dhcpOk -and -not $staticLeft) {
+        Write-Host "DHCP lease restored on ${InterfaceAlias}: $addrs" -ForegroundColor Green
+    } else {
+        Write-Host "WARNING: no DHCP lease after 30 s. IPv4 now: '$addrs' (static $ServerIp still present: $staticLeft). Reboot or run ipconfig /renew by hand." -ForegroundColor Red
+    }
     Stop-Transcript
+    $send = @($logFile, $pcapFile) | Where-Object { Test-Path $_ }
+    $ts = if (Test-Path $tailscaleExe) { $tailscaleExe } else { "tailscale" }
+    Write-Host "Sending $($send.Count) file(s) to $tailnetTarget over Tailscale..." -ForegroundColor Cyan
+    & $ts file cp @send $tailnetTarget
 }
