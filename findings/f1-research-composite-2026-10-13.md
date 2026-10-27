@@ -10,7 +10,7 @@ Single index for **this unit** (Telia F1 / GCNT-X, **23.1.b**). Detailed evidenc
 | Root / shell via UART Linux console | **REFUTED** on this unit — Clash denies serial root ([UART interaction](f1-uart-interaction-2026-10-12.md)) |
 | Auth bypass / key via Homeware :80 | **REFUTED** for mapped reads — boundaries + aggressive pass ([management-auth-boundaries](management-auth-boundaries-2026-10-12.md), [aggressive pass](f1-aggressive-software-pass-2026-10-12.md)) |
 | BOOT-P on LAN wire | **VERIFIED** — requests, boot name **`GCNT-X`**, no server ([BOOT-P LAN](f1-bootp-lan-2026-10-13.md)) |
-| BOOT-P **answer** from PC | **NOT TRIED** — tool ready: `scripts/f1-bootp-reply.ps1` |
+| BOOT-P **answer** from PC | **VERIFIED 2026-10-27** — router accepts the reply and moves to TFTP; TFTP DATA does not reach the router on the LAN (leaves via Tailscale source), see [BOOT-P LAN addendum](f1-bootp-lan-2026-10-13.md) |
 | Signed RBI recovery / flash | **NOT TRIED** — no suitable 23.1.b Type-2 image in repo; 19.x flash **dangerous** ([gcnt-x-root-path](gcnt-x-root-path.md)) |
 
 ---
@@ -53,7 +53,7 @@ Single index for **this unit** (Telia F1 / GCNT-X, **23.1.b**). Detailed evidenc
 | `b` → BOOT-P, no Ethernet | `no active_port set` | [UART interaction](f1-uart-interaction-2026-10-12.md) |
 | `b` → BOOT-P, Ethernet up, **no PC server** | `BOOTP Reply timeout` (UART) | same |
 | Windows PC on LAN, **pktmon** + **Wireshark** listen | 17× BOOTREQUEST, file **`GCNT-X`**, no Offer | [BOOT-P LAN](f1-bootp-lan-2026-10-13.md) |
-| `f1-bootp-reply.ps1` on Windows | **Prepared, not executed** | `scripts/f1-bootp-reply.ps1`, [BOOT-P LAN](f1-bootp-lan-2026-10-13.md) |
+| `f1-bootp-reply.ps1` on Windows | **Executed 2026-10-27** (~01:04 local) — reply accepted; later TFTP runs use `scripts/f1-bootp-tftp-combined-test.ps1` | `scripts/f1-bootp-reply.ps1`, [BOOT-P LAN](f1-bootp-lan-2026-10-13.md) |
 | Enter / `id` / Ctrl+J on Linux console | No shell; logviewer: serial denied | [UART interaction](f1-uart-interaction-2026-10-12.md) |
 | Top-side PCB photo (`CN1`, `TEST_CN20`, `ANT*` vs `4G-ANT*`) | Documented | [board visual](f1-board-visual-2026-10-12.md) |
 | Owner removed/reseated Wi‑Fi coax | **Not electrically tested** — reseat on **`ANT0`–`ANT3`**, not `4G-ANT*` | [board visual](f1-board-visual-2026-10-12.md) |
