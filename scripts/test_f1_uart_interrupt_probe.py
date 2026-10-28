@@ -51,11 +51,15 @@ class StopPromptTests(unittest.TestCase):
     def test_login_prompt_stops(self):
         self.assertTrue(should_stop(b"router login: "))
 
-    def test_linux_console_stops(self):
-        self.assertTrue(should_stop(b"Please press Enter to activate this console."))
+    def test_linux_banner_alone_does_not_stop(self):
+        # A CR reaching an already running Linux prints this banner without any boot.
+        self.assertFalse(should_stop(b"Please press Enter to activate this console."))
+        self.assertFalse(should_stop(b"mount_root: executing script in /lib/mount_root"))
 
-    def test_mount_root_stops(self):
-        self.assertTrue(should_stop(b"mount_root: executing script in /lib/mount_root"))
+    def test_linux_banner_after_spl_stops(self):
+        spl = b"U-Boot SPL 2019.07 (Jul 25 2024)\r\n"
+        self.assertTrue(should_stop(spl + b"Please press Enter to activate this console."))
+        self.assertTrue(should_stop(spl + b"mount_root: executing script in /lib/mount_root"))
 
     def test_boot_banner_does_not_stop(self):
         self.assertFalse(should_stop(b"U-Boot 2019.07 (Jan 06 2025)"))

@@ -159,3 +159,5 @@ Offline summary of five uploaded browser HARs: `docs/f1-uploaded-hars.md`
 2026-10-27 web restart with a held (interrupt-probe-restart-a.log): SPL menu at line 484; router unreachable after; f1_restart_router.py HTTP 200
 2026-10-27 one CR after menu (interrupt-probe-enter-after-menu.log): blank response only; login.lp HTTP 000
 2026-10-27 key-a earlier run (interrupt-probe-key-a.log): inconclusive, router not powered in window
+2026-10-28 CR-only web restart (interrupt-probe-restart-cr-control-3.log): SPL->TPL->U-Boot->Linux, no menu. a held on warm restart is the trigger.
+2026-10-28 release test (menu-release-test.log): one CR after menu; boot continued to Bank 2 and Linux; one run, not repeated. See finding section 'Release test'.

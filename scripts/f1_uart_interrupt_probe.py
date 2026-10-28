@@ -23,7 +23,9 @@ KEY_CYCLE = (b"\r", b"\n", b"\x1b", b"\t", b"\x01", b"\x7f")
 ALLOWED_KEYS = frozenset(KEY_CYCLE + (b"a", b" ", b"\x03"))
 FORBIDDEN_SEND = frozenset({b"b", b"B"})
 DEFAULT_INTERVAL = 0.5
-STOP_MARKERS = (b"=>", b"U-Boot>", b"login:", b"activate this console", b"mount_root:")
+CONSOLE_MARKERS = (b"=>", b"U-Boot>", b"login:")
+LINUX_MARKERS = (b"activate this console", b"mount_root:")
+SPL_BANNER = b"U-Boot SPL"
 
 
 def is_allowed(byte: bytes) -> bool:
@@ -41,8 +43,14 @@ def parse_keys(text: str) -> tuple[bytes, ...]:
 
 
 def should_stop(received: bytes) -> bool:
-    """True when the received stream shows a console, login, or Linux console marker."""
-    return any(marker in received for marker in STOP_MARKERS)
+    """True when the stream shows a console or login prompt, or a Linux marker after SPL.
+
+    The Linux console banner also appears when a CR reaches an already running system,
+    so Linux markers only count once this boot's SPL banner has been seen.
+    """
+    if any(marker in received for marker in CONSOLE_MARKERS):
+        return True
+    return SPL_BANNER in received and any(marker in received for marker in LINUX_MARKERS)
 
 
 def configure_serial(fd: int, baud: int = 115200) -> None:
@@ -75,7 +83,9 @@ def run(device: str, logfile: str, timeout: float, keys: tuple[bytes, ...], inte
                     data = os.read(fd, 4096)
                     received += data
                     log.write(data)
-                    if should_stop(received[-512:]):
+                    # Check the marker window and the SPL banner separately: SPL can scroll
+                    # out of the last 512 bytes before Linux markers appear.
+                    if should_stop(received[-512:] + (SPL_BANNER if SPL_BANNER in received else b"")):
                         log.write(b"\n# stop: console, login, or Linux marker seen\n")
                         return 0
                 if time.monotonic() >= next_send:

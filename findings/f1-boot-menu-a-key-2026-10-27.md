@@ -59,3 +59,16 @@ python3 -m unittest scripts/test_f1_uart_interrupt_probe.py scripts/test_f1_rest
 2. Warm-restart with CR only, to separate the `a` trigger from the restart itself.
 3. Test whether a CR or a timeout releases the menu, with the log running the whole time.
 4. Do not send `jtag`. Treat `go`/`lb` as a separate decision with its own review.
+
+## Release test (2026-10-28): one CR released the menu
+
+Run: `scripts/f1_menu_release_test.py` (sent `a` every 0.1 s until `Use enter to confirm` appeared, then one CR, then logged for 90 s), with a web restart via `scripts/f1_restart_router.py --yes`. Log: `artifacts/uart/2026-10-28/menu-release-test.log`.
+
+- VERIFIED: menu line at log line 276; the single CR was sent at line 279; the boot then continued through SPL to U-Boot TPL (line 580), U-Boot 2019.07 (line 689), `Press b` (line 835), and Linux `mount_root` (line 1217).
+- VERIFIED: `Booting : Bank 2` (line 839). Linux came up.
+- Not shown: whether CR is needed at all. There was no run that waited without CR, so the timeout behavior is still unknown.
+- One run. Not repeated, by request.
+
+Earlier 2026-10-28 control (`interrupt-probe-restart-cr-control-3.log`): CR-only web restart with no `a` booted through SPL with no menu. Result: holding `a` is the trigger on a warm restart, as on a cold boot.
+
+Probe bugs fixed on 2026-10-28 (both in `scripts/f1_uart_interrupt_probe.py`): the Linux banner counted as a stop marker before SPL, and SPL scrolled out of the 512-byte stop window. Tests: `scripts/test_f1_uart_interrupt_probe.py`.
