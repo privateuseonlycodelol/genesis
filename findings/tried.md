@@ -167,3 +167,14 @@ Offline summary of five uploaded browser HARs: `docs/f1-uploaded-hars.md`
 2026-10-28 community repo check (approved, read-only): hack-technicolor Repository page, full text, no GCNT-X / EWA1330 / EWA1331 / teliacompany entry. See findings/acs-telia-8888-probe-2026-10-28.md.
 2026-10-28 offline (no device or Telia contact): HAR host and URL scan of artifacts/hars (3 files), logviewer snapshot scan, LCM JSON check, tshark DNS/SNI/Host scan of want, wan2-real, bootp 2026-10-13 wan. No firmware URL, no Telia name in any capture. See findings/rbi-url-hunt-deeper-2026-10-28.md.
 2026-10-28 web reads (public, no downloads): hack-technicolor issue #321 full text; extended web search for EWA1330/GCNT-X 23.1 RBI and Telia TR-069 download. Community-only, REPORTED. No new 23.1.b URL. See findings/rbi-url-hunt-deeper-2026-10-28.md.
+2026-10-28 SG108E port mirror set (owner, screenshot): Port Mirror Enable, Mirroring Port 3, Mirrored Port 1 Ingress+Egress Enable, ports 2-8 Disable. Config saved; no traffic test yet. See findings/f1-internet-outage-2026-10-28.md.
+2026-10-28 SG108E port statistics (owner paste): ports 1-3 1000Full, port 3 RxBad 1. See findings/f1-internet-outage-2026-10-28.md.
+2026-10-28 Mac en10 IPv4 off (networksetup -setv4off): ok; later ifconfig shows no inet. Then manual 192.168.0.50/24 via ifconfig. See findings/f1-internet-outage-2026-10-28.md.
+2026-10-28 passive en10 count, IPv4 off (owner): 37, 23, 30 frames in ~9 s; 15 s breakdown 36 frames, switch-origin broadcasts only, no TCP. Positive control not run. See findings/f1-internet-outage-2026-10-28.md.
+2026-10-28 switch reachability from Mac (ping, HTTP GET /, ARP): ping 192.168.0.1 ok 2 ms; HTTP 200; ARP maps to switch MAC. See findings/f1-internet-outage-2026-10-28.md.
+2026-10-28 F1 status page (owner paste, http://192.168.1.1): Ethernet Connected, Internet Access DHCP Connecting. See findings/f1-internet-outage-2026-10-28.md.
+2026-10-28 phone on F1 Wi-Fi (owner, REPORTED): websites give "server can't be found". Not reproduced from the Mac. See findings/f1-internet-outage-2026-10-28.md.
+2026-10-28 direct wall → F1 WAN (owner report): internet works. Isolates the ISP and F1 from the switch. See findings/f1-internet-outage-2026-10-28.md.
+2026-10-28 switch in path, port 3 unplugged, Port Mirror Disable (owner report): internet works. Mirror setting is the cause. See findings/f1-internet-outage-2026-10-28.md.
+2026-10-28 switch in path, port 3 unplugged, Port Mirror Enable, Port 1 Ingress+Egress (owner report): F1 Internet Access stays DHCP Connecting. See findings/f1-internet-outage-2026-10-28.md.
+2026-10-28 SG108E Port Setting page (owner paste): ports 1-3 Auto, 1000MF, flow control Off; no link errors. See findings/f1-internet-outage-2026-10-28.md.
