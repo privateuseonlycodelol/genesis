@@ -83,3 +83,10 @@ Scratch-only: a Python venv with `cryptography` and `pypdf` in the session scrat
 3. If in-circuit reads fail: chip-off, which needs separate approval.
 4. WAN capture of the device's update download (may install firmware, needs approval).
 5. Asking Vantiva or the #321 thread for the image (outward-facing, needs approval).
+
+## 7. Update 2026-10-28: ACS and community checks
+
+- Approved ACS probe (`scripts/f1_acs_name_probe.py`, 4 GETs, plus one HEAD per host): TCP connects on `acs.telia.se:8888` and `acs.telia.lt:8888`, but no HTTP response in 15 s, control included. Inconclusive. See [acs-telia-8888-probe-2026-10-28.md](acs-telia-8888-probe-2026-10-28.md).
+- hack-technicolor Repository page: no GCNT-X / EWA1330 entry.
+- Step 4 above (WAN capture of the device's update fetch) is still the most direct open route.
+- Deeper pass 2026-10-28 (offline plus public reads): no 23.1.b URL; the saved logviewer has no CWMP rows; no local capture is WAN-side for the 23.1.b unit. Next live option is an approved authenticated `export_log`. See [rbi-url-hunt-deeper-2026-10-28.md](rbi-url-hunt-deeper-2026-10-28.md).
