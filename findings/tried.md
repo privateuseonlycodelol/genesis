@@ -161,3 +161,5 @@ Offline summary of five uploaded browser HARs: `docs/f1-uploaded-hars.md`
 2026-10-27 key-a earlier run (interrupt-probe-key-a.log): inconclusive, router not powered in window
 2026-10-28 CR-only web restart (interrupt-probe-restart-cr-control-3.log): SPL->TPL->U-Boot->Linux, no menu. a held on warm restart is the trigger.
 2026-10-28 release test (menu-release-test.log): one CR after menu; boot continued to Bank 2 and Linux; one run, not repeated. See finding section 'Release test'.
+2026-10-28 recovery option, input 1 then CR (menu-recovery-test.log): no selection printed; booted Bank 2.
+2026-10-28 recovery option, input r 1 then CR (menu-recovery-test-r1.log): no Boot Image line; booted Bank 2. Device menu parser likely differs from copy.

@@ -72,3 +72,14 @@ Run: `scripts/f1_menu_release_test.py` (sent `a` every 0.1 s until `Use enter to
 Earlier 2026-10-28 control (`interrupt-probe-restart-cr-control-3.log`): CR-only web restart with no `a` booted through SPL with no menu. Result: holding `a` is the trigger on a warm restart, as on a cold boot.
 
 Probe bugs fixed on 2026-10-28 (both in `scripts/f1_uart_interrupt_probe.py`): the Linux banner counted as a stop marker before SPL, and SPL scrolled out of the 512-byte stop window. Tests: `scripts/test_f1_uart_interrupt_probe.py`.
+
+## Recovery option tests (2026-10-28): not shown to work
+
+Two warm restarts with `a` held, then menu input sent after the menu appeared:
+
+- `menu-recovery-test.log`: input `1` then CR. The menu printed nothing for the input. Boot went to Bank 2 and Linux.
+- `menu-recovery-test-r1.log`: input `r 1` then CR (keys sent 0.2 s apart). No `Boot Image` line. Boot went to Bank 2 and Linux.
+
+- VERIFIED: neither run printed the recovery selection. Both booted Bank 2.
+- DERIVED from the copy: `r 1` should print `Boot Image: Recovery` and set the recovery flag. The device did not print it, so the device's menu parser probably differs from this copy. That matches the missing menu entries noted above.
+- Not shown: any recovery boot, any shell, or any effect of the recovery option on this build.

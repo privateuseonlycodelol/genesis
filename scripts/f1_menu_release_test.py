@@ -6,6 +6,7 @@ Phase 2: stop sending `a`, send one CR, then log everything for a fixed time.
 Only `a` and CR are ever sent. Never b or B. Writes nothing to flash.
 
 Usage: f1_menu_release_test.py SERIAL_DEVICE LOG_FILE [--timeout SECONDS] [--after SECONDS]
+       [--choice KEYS]   keys sent after the menu, default one CR (e.g. --choice 1)
 """
 import argparse
 import os
@@ -19,7 +20,18 @@ SEND_A = b"a"
 SEND_CR = b"\r"
 
 
-def run(device: str, logfile: str, timeout: float, after: float) -> int:
+ALLOWED_TEST_KEYS = frozenset({b"a", b"1", b"r", b" ", b"\r"})
+
+
+def parse_choice(text: str) -> tuple[bytes, ...]:
+    keys = tuple(char.encode("ascii") for char in text)
+    refused = [key for key in keys if key not in ALLOWED_TEST_KEYS]
+    if refused:
+        raise ValueError(f"refused key(s): {refused}")
+    return keys
+
+
+def run(device: str, logfile: str, timeout: float, after: float, choice: tuple[bytes, ...]) -> int:
     assert is_allowed(SEND_A) and is_allowed(SEND_CR)
     fd = os.open(device, os.O_RDWR | os.O_NOCTTY)
     received = b""
@@ -39,8 +51,10 @@ def run(device: str, logfile: str, timeout: float, after: float) -> int:
                     if menu_at is None and MENU_LINE in received:
                         menu_at = time.monotonic()
                         log.write(b"\n# phase 2: menu seen, stop a, send one CR\n")
-                        os.write(fd, SEND_CR)
-                        log.write(b"# sent b'\\r' (once)\n")
+                        for key in choice:
+                            os.write(fd, key)
+                            log.write(f"# sent {key!r} (after menu)\n".encode())
+                            time.sleep(0.2)
                 if menu_at is None and time.monotonic() >= next_a:
                     os.write(fd, SEND_A)
                     log.write(b"# sent b'a'\n")
@@ -60,8 +74,9 @@ def main() -> int:
     parser.add_argument("logfile")
     parser.add_argument("--timeout", type=float, default=150.0)
     parser.add_argument("--after", type=float, default=90.0)
+    parser.add_argument("--choice", default="\r", help="Keys after the menu. Allowed: a, r, 1, space, CR. Recovery is 'r 1'.")
     args = parser.parse_args()
-    return run(args.device, args.logfile, args.timeout, args.after)
+    return run(args.device, args.logfile, args.timeout, args.after, parse_choice(args.choice))
 
 
 if __name__ == "__main__":
