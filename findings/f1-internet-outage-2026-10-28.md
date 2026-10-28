@@ -90,3 +90,17 @@ If internet works, the mirror config is the cause. If it doesn't, check the swit
 ## Status
 
 Internet works with the mirror off. Capture through the switch's mirror is blocked until its cause is known.
+
+## Log export attempts (owner, 2026-10-28)
+
+- **REPORTED:** the Export All button showed "Exporting failed; please try again."
+- **REPORTED:** a console `fetch` of the same request (action=export_log with the page CSRF token) returned HTTP 403 with a 146-byte body. No log file was obtained.
+- **Not tested:** whether the 403 comes from a missing referer or a per-modal token. One attempt from the logviewer page would test that, but the table copy below needs no request.
+
+## Log viewer rows, 18:40–18:49 (owner paste, 2026-10-28)
+
+- **VERIFIED:** nginx logged `POST without CSRF token` for `/modals/logviewer-modal.lp` at 18:48:55 from `192.168.1.150`. That's the console request. The server didn't accept the token in the form sent.
+- **VERIFIED:** `192.168.1.150` is the DHCP client named `Mac` (dnsmasq DHCPACK at 18:45:07). The `GET /gateway.lp?action=scheduleReboot` requests at 18:45:08 and 18:47:42 came from the Mac's browser and were refused as unauthorized. No reboot line appears.
+- **VERIFIED:** no CWMP, ACS, firmware-URL, or `.rbi` lines in these rows. The only recurring update-related entry is `obuspa_retriever.sh` run by root's crontab every minute.
+- **Not shown:** the cause of the missing CSRF token. Possible reasons include a token expected in a header, or a stale token after login at 18:47:46. Not tested.
+- **Limit:** the viewer shows a live window of recent rows, not the full history.
