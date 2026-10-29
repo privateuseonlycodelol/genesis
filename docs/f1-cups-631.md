@@ -17,7 +17,7 @@
 2. [f1-cups-ipp-readonly-matrix-2026-10-12.md](../findings/f1-cups-ipp-readonly-matrix-2026-10-12.md) — full read-operation matrix  
 3. [management-auth-boundaries-2026-10-12.md](../findings/management-auth-boundaries-2026-10-12.md) — initial boundary pass  
 4. [cups-http-ipp-source-boundary.md](../findings/cups-http-ipp-source-boundary.md) — upstream CUPS 2.2.10/2.2.12 source vs live  
-5. [f1-printersharing-webui-2026-10-29.md](../findings/f1-printersharing-webui-2026-10-29.md) — webui toggle via modal POST: INCONCLUSIVE; device state not restored; script defect fixed  
+5. [f1-printersharing-webui-2026-10-29.md](../findings/f1-printersharing-webui-2026-10-29.md) — printersharing modal read-back: Enabled=1, no webui control served; the earlier POST used field names the form lacks  
 6. [cups-udp631-browse-source-2026-10-29.md](../findings/cups-udp631-browse-source-2026-10-29.md) — UDP 631: pinned 2.2.10 `cupsd` has no browse listener (DERIVED); the open|filtered UDP reading is probably `cups-browsed`, version UNKNOWN  
 
 Homeware **:80** routes: [f1-api-map.md](../findings/f1-api-map.md) (**Parallel surfaces** table).

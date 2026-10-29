@@ -35,8 +35,8 @@ Logviewer `export_log` with the page CSRF token returns 200 (no CWMP or firmware
 
 **2026-10-29 eRIPv2 decompilation and Web UI modal discovery:**
 - `findings/f1-kernel-rip-keystore-decomp-2026-10-29.md`: Hopper decompilation of `ripdrv.ko` and `r2secr.ko` proved item `0x0121` (OSCK) is hardcoded-suppressed from `/proc/rip`; item `0x011A` contains both client cert and RSA private key for ACS mTLS; `scripts/f1_erip_parser.py` extracts and decrypts eRIPv2 partitions offline.
-- `findings/f1-printersharing-webui-2026-10-29.md`: webui toggle via `scripts/f1_printersharing_webui_toggle.py` (INCONCLUSIVE). The script now requires `--enabled` (its earlier hardcoded Enabled=1 was a defect); tests in `scripts/test_printersharing_webui_toggle.py`.
-- `findings/f1-ui-audit-hidden-modals-2026-10-29.md`: Paced live discovery probe `scripts/f1_modal_discovery.py` mapped 10 hidden modals on firmware `23.1.b`, including admin-accessible `/modals/printersharing-modal.lp` (`uci.printersharing.config.webui`), which directly accounts for the active port 631 (CUPS) listener.
+- `findings/f1-printersharing-webui-2026-10-29.md`: printersharing read-back (`scripts/f1_printersharing_read.py`, GET only): Enabled = 1 on the served form; no webui control is served. The toggle script `scripts/f1_printersharing_webui_toggle.py` uses field names the form does not have, so do not POST with it (tests in `scripts/test_printersharing_webui_toggle.py`).
+- `findings/f1-ui-audit-hidden-modals-2026-10-29.md`: Paced live discovery probe `scripts/f1_modal_discovery.py` mapped 10 hidden modals on firmware `23.1.b`, including admin-accessible `/modals/printersharing-modal.lp`. Its served form exposes only Enabled, so the link to the port 631 (CUPS) listener is a HYPOTHESIS, not shown.
 
 
 Broadcom SPL abort keys (`r` fallback vs `r 1`), Homeware EFU signature bypass architecture (`/proc/efu/allowed` via RSA-PSS OSIK tag), U-Boot bundle upgrade requirements, and REA Hopper provider verification: [findings/f1-unturned-stones-2026-10-29.md](findings/f1-unturned-stones-2026-10-29.md).
