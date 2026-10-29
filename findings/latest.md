@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-29T17:50:06Z
+**Generated:** 2026-10-29T18:19:54Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -134,6 +134,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-ipping-helper-2026-10-12.md`](f1-ipping-helper-2026-10-12.md)
 - [`f1-ipping-host-2026-10-12.md`](f1-ipping-host-2026-10-12.md)
 - [`f1-js-deep-2026-10-12.md`](f1-js-deep-2026-10-12.md)
+- [`f1-kernel-rip-keystore-decomp-2026-10-29.md`](f1-kernel-rip-keystore-decomp-2026-10-29.md)
 - [`f1-logviewer.md`](f1-logviewer.md)
 - [`f1-nand-read-plan-2026-10-27.md`](f1-nand-read-plan-2026-10-27.md)
 - [`f1-password-encoding-cli-trace-2026-10-15.md`](f1-password-encoding-cli-trace-2026-10-15.md)
