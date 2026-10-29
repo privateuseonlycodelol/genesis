@@ -51,7 +51,7 @@ Perform deep binary decompilation and structural reverse engineering of Technico
 
 ## 2. Procedure Decompilation Records
 
-### A. Item 0x121 Suppression in `rip_proc_init` (`0x1dfc`)
+### A. Dynamic Control Nodes in `rip_proc_init` (`0x1dfc`)
 ```c
 // Decompiled via REA / Hopper
 r0 = proc_mkdir("rip", NULL);
@@ -76,6 +76,35 @@ if (r0 != NULL) {
     rip_proc_add_entry("encrypt", 0x1a4, &rip_proc_encrypt_fops, 0);
 }
 ```
+
+### B. Item Registration Blacklist in `rip_proc_new` (`0x1584`)
+When user-space writes an item ID to `/proc/rip/new` to create a virtual entry:
+```c
+// Decompiled via REA / Hopper
+sscanf(buf, "%x", &item_id);
+switch (item_id) {
+    case 282: // 0x011A = RIP_ID_CLIENT_CERTIFICATE
+        return -EEXIST;
+    case 289: // 0x0121 = RIP_ID_OSCK
+        return -EEXIST;
+    default:
+        // Allows creating virtual entries for any unblacklisted ID
+        rip_proc_add_entry(item_name, 0x1a4, fops, 1);
+        break;
+}
+```
+
+### C. Live Flash Mutation in `rip_proc_write` (`0x12c4`) and `rip2_drv_write` (`0x944`)
+- Writing to `/proc/rip/<item_id>` copies data from user space and invokes `rip2_drv_write`:
+  - If the item does not exist: calls `rip2_add_item` and writes directly to flash media.
+  - If the item exists and lock bit `0x40000000` is clear: updates the item, invalidates the old entry, and calls `rip2_flash_write` to commit the modified bytes directly into flash memory!
+  - If lock bit `0x40000000` is set: returns `-EBUSY` / `-EPERM`.
+
+### D. In-Kernel Encryption via `/proc/rip/encrypt` (`0x18e0` / `0xc38`)
+- Writing an item ID to `/proc/rip/encrypt` triggers `rip2_encrypt`:
+  - Reads plaintext item data via `rip2_get_data_ex`.
+  - Invokes `rip2_crypto_encrypt_with_ECK` using the in-kernel **`ECK` key** (Hardware Keystore Slot `0x114`).
+  - Writes the re-encrypted ciphertext back to flash with attribute `ATTR_ECK_ENCR` (`0x08000000`) set.
 
 ### B. Key Import Constraints (`rip2_crypto_import_eck` & `import_eik`)
 * **`rip2_crypto_import_eck` (`0x32c0`):**
