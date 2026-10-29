@@ -59,6 +59,31 @@ https://rgw.teliacompany.com:7577/cpe-r/p/i1SQxgUr/pmfOff.sts
 ```
 Because each update file uses a distinct 8-character pseudo-random token in `/cpe-r/p/<token>/`, the download link cannot be discovered by static URL guessing. It is delivered dynamically inside the encrypted management session between Telia's ACS/USP controller and the router.
 
+### 4. Forum Intelligence & ACS Cryptographic Hardening
+
+A survey of European telecom forums (SweClockers Sweden, Il Punto Tecnico Italy, Telia Finland Yhteisö) and community repositories revealed the following critical operational facts:
+
+1. **Serial-Targeted Rollouts (REPORTED, Telia Finland Community):**
+   - In thread `yhteiso.telia.fi/kiinteae-netti-8/...-38013`, Telia service engineers confirmed that F1 / F1x gateway updates are deployed selectively based on **device serial numbers** queued in the ACS database. Users cannot manually request or trigger firmware downloads from the UI or external links.
+2. **Mutual TLS (mTLS) Prevents ACS Emulation & MitM (VERIFIED / REPORTED):**
+   - The Homeware CWMP daemon configuration (`/etc/config/cwmpd`, confirmed by `NI-Pro` in hack-technicolor #321) enforces strict mutual authentication:
+     ```uci
+     config single_config 'cwmpd_config'
+             option state '1'
+             option upgradesmanaged '1'
+             option ssl_verifypeer '1'
+             option enforce_https '1'
+             option ssl_clientcert '/proc/rip/011a.cert'
+             option ssl_clientkey 'engine:keystore:/proc/keys/0x11A'
+             option interface 'mgmt'
+     ```
+   - Both client and server certificates are strictly verified:
+     - The client certificate is read from the Broadcom eRIP flash partition (`/proc/rip/011a.cert`).
+     - The client private key is protected by the SoC hardware keystore engine (`engine:keystore:/proc/keys/0x11A`).
+   - This explains why attempts to spoof the ACS via local DNS redirection / fake GenieACS instances (a method previously attempted on TIM HUB+ DGA4331 routers on Il Punto Tecnico topic 84353) terminate immediately with `SSL connect failed`.
+3. **Web UI Gaps vs. Shell Security (REPORTED, SweClockers Sweden):**
+   - Discussions on SweClockers (`trad/368817`) by Swedish researcher `wuseman` confirmed that although hidden administrative modals (`modals/easymesh-configuration-modal-newEM.lp`) allow changing DNS parameters, the underlying backend remains protected by `restricted_shell` and `clash-access-control` (`User root has no serial access`), preventing privilege escalation from the browser alone.
+
 ---
 
 ## 4 Viable Vectors to Acquire the Software Link or Firmware
