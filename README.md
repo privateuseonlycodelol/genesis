@@ -35,6 +35,8 @@ Logviewer `export_log` with the page CSRF token returns 200 (no CWMP or firmware
 
 Broadcom SPL abort keys (`r` fallback vs `r 1`), Homeware EFU signature bypass architecture (`/proc/efu/allowed` via RSA-PSS OSIK tag), U-Boot bundle upgrade requirements, and REA Hopper provider verification: [findings/f1-unturned-stones-2026-10-29.md](findings/f1-unturned-stones-2026-10-29.md).
 
+Software link and firmware acquisition architecture (REA UI AST analysis, Telia `:7577` dynamic token-based update delivery vs `:7547` static 404s, and 4 viable acquisition vectors): [findings/f1-software-link-hunt-2026-10-29.md](findings/f1-software-link-hunt-2026-10-29.md).
+
 CUPS on LAN TCP **631** (HTTP **403**, unauthenticated IPP reads on empty queue; no demonstrated admin/write): [docs/f1-cups-631.md](docs/f1-cups-631.md) → [findings/f1-cups-ipp-policy-2026-10-12.md](findings/f1-cups-ipp-policy-2026-10-12.md), [f1-cups-ipp-readonly-matrix-2026-10-12.md](findings/f1-cups-ipp-readonly-matrix-2026-10-12.md). Drivers: `scripts/cups_ipp_readonly_matrix.py`, `cups_ipp_followup.py`, `cups_ipp_policy_probe.py`.
 
 `POST gateway.lp` `action=URL` SSRF matrix and TCP **8080** path sweep (no SSRF; 8080 all **404**): [findings/f1-gateway-url-action-2026-10-12.md](findings/f1-gateway-url-action-2026-10-12.md). Drivers: `scripts/f1_gateway_url_probe.py`, `scripts/f1_port8080_probe.py`, `scripts/f1_surface_quick_probe.py`.

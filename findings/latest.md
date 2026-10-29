@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-29T17:03:06Z
+**Generated:** 2026-10-29T17:20:47Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -139,6 +139,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-rea-har-pass-2026-10-17.md`](f1-rea-har-pass-2026-10-17.md)
 - [`f1-research-composite-2026-10-13.md`](f1-research-composite-2026-10-13.md)
 - [`f1-rootfs-key-l598-2026-10-27.md`](f1-rootfs-key-l598-2026-10-27.md)
+- [`f1-software-link-hunt-2026-10-29.md`](f1-software-link-hunt-2026-10-29.md)
 - [`f1-trace-helper-2026-10-12.md`](f1-trace-helper-2026-10-12.md)
 - [`f1-trace-path-2026-10-12.md`](f1-trace-path-2026-10-12.md)
 - [`f1-uart-23.1b.md`](f1-uart-23.1b.md)
