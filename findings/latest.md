@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-29T18:46:47Z
+**Generated:** 2026-10-29T20:35:01Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -93,7 +93,9 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`admin-url-hunt.md`](admin-url-hunt.md)
 - [`auth-session-and-wps-2026-10-12.md`](auth-session-and-wps-2026-10-12.md)
 - [`cups-http-ipp-source-boundary.md`](cups-http-ipp-source-boundary.md)
+- [`cups-udp631-browse-source-2026-10-29.md`](cups-udp631-browse-source-2026-10-29.md)
 - [`decomp-kickoff.md`](decomp-kickoff.md)
+- [`efu-info-proc-2026-10-29.md`](efu-info-proc-2026-10-29.md)
 - [`f1-advanced-ui.md`](f1-advanced-ui.md)
 - [`f1-aggressive-software-pass-2026-10-12.md`](f1-aggressive-software-pass-2026-10-12.md)
 - [`f1-api-map.md`](f1-api-map.md)
@@ -138,6 +140,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-logviewer.md`](f1-logviewer.md)
 - [`f1-nand-read-plan-2026-10-27.md`](f1-nand-read-plan-2026-10-27.md)
 - [`f1-password-encoding-cli-trace-2026-10-15.md`](f1-password-encoding-cli-trace-2026-10-15.md)
+- [`f1-printersharing-webui-2026-10-29.md`](f1-printersharing-webui-2026-10-29.md)
 - [`f1-rea-har-pass-2026-10-17.md`](f1-rea-har-pass-2026-10-17.md)
 - [`f1-research-composite-2026-10-13.md`](f1-research-composite-2026-10-13.md)
 - [`f1-rootfs-key-l598-2026-10-27.md`](f1-rootfs-key-l598-2026-10-27.md)

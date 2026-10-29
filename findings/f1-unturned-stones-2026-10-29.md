@@ -1,5 +1,7 @@
 # Unturned Stones: Broadcom SPL Abort Keys, Homeware EFU Signature Bypass, FIT Image Requirements, and UI Grab Surfaces — 2026-10-29
 
+> **Superseded in part (2026-10-29, same day).** Items 2 and the "Tag Verification" section below are **not** established. The module analysed is `ripdrv.arm.3.4.11-rt19.ko` (ARMv7, 3.4.11), not the device's 4.19.235 aarch64 kernel. The claim that `isSignatureValid` verifies against the OSIK public key is **HYPOTHESIS**: the OSIK buffer is not an argument to the RSA calls, and the RSA key source is UNKNOWN. The "official unlock mechanism" and "OEM/Operator OSIK private key" conclusions are withdrawn. See [efu-info-proc-2026-10-29.md](efu-info-proc-2026-10-29.md) for the corrected trace and [cups-udp631-browse-source-2026-10-29.md](cups-udp631-browse-source-2026-10-29.md) for the browse-listener review. Item 1 (SPL menu keys) is REPORTED from another board tree and is not verified on the F1.
+
 ## Summary
 
 This pass performs an exhaustive audit across previously unturned leads, local artifacts, offline firmwares, kernel drivers, and upstream source trees to resolve outstanding blockers identified in recent research passes.
