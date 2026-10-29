@@ -83,3 +83,11 @@ Two warm restarts with `a` held, then menu input sent after the menu appeared:
 - VERIFIED: neither run printed the recovery selection. Both booted Bank 2.
 - DERIVED from the copy: `r 1` should print `Boot Image: Recovery` and set the recovery flag. The device did not print it, so the device's menu parser probably differs from this copy. That matches the missing menu entries noted above.
 - Not shown: any recovery boot, any shell, or any effect of the recovery option on this build.
+
+## Resolution of `r` vs `r 1` (2026-10-29 update)
+
+Detailed source analysis of `early_abort.c` and `board_tpl.c` explains why `r 1` booted Bank 2:
+- `r 1` sets `SPL_EA_IMAGE_RECOV` (recovery partition, which is only supported in Broadcom axhnd platforms and ignored in behnd TPL).
+- `r` alone sets `SPL_EA_IMAGE_FB` (Fallback image), which triggers `selected_img_idx = 3 - committed` (bank swap between Bank 1 and Bank 2).
+- The wait loop `_get_chars('\r', cmd_buf)` waits for `\r`; `go` resumes boot immediately; `h` halts timeout; `w`/`wdt` disables watchdog.
+- See full trace in [findings/f1-unturned-stones-2026-10-29.md](f1-unturned-stones-2026-10-29.md).

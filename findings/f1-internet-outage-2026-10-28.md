@@ -104,3 +104,7 @@ Internet works with the mirror off. Capture through the switch's mirror is block
 - **VERIFIED:** no CWMP, ACS, firmware-URL, or `.rbi` lines in these rows. The only recurring update-related entry is `obuspa_retriever.sh` run by root's crontab every minute.
 - **Not shown:** the cause of the missing CSRF token. Possible reasons include a token expected in a header, or a stale token after login at 18:47:46. Not tested.
 - **Limit:** the viewer shows a live window of recent rows, not the full history.
+
+## Update: in-page export succeeded (2026-10-28, later)
+
+The owner approved one paced export from the Mac. The POST used the page-level CSRF token and returned HTTP 200 with a 71,954-byte log. The export shows the WAN bound (`100.77.193.145` from `83.233.57.226`) with the mirror off, and contains no CWMP, ACS, or firmware-URL lines. See [f1-export-log-modal-2026-10-28.md](f1-export-log-modal-2026-10-28.md). The mirror-part isolation test is still open.

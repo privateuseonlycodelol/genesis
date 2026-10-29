@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-27T18:59:25Z
+**Generated:** 2026-10-29T17:03:06Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -22,7 +22,7 @@
 ```
 total 64008
 drwxr-xr-x   7 user  staff       224 Oct 27 19:51 .
-drwxr-xr-x  19 user  staff       608 Oct 27 19:28 ..
+drwxr-xr-x  23 user  staff       736 Oct 29 17:49 ..
 -rw-r--r--@  1 user  staff  32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
 -rw-r--r--@  1 user  staff       179 Oct 27 18:22 test-fit-minimal.itb
 -rw-r--r--@  1 user  staff       710 Oct 27 19:07 test-fit-standard-compact.itb
@@ -34,7 +34,7 @@ drwxr-xr-x@ 11 user  staff       352 Oct 27 19:51 vendor-uboot-bcmbca-5.04behnd
 ```
 total 31104
 drwxr-xr-x   7 user  staff      224 Oct 11 17:46 .
-drwxr-xr-x  19 user  staff      608 Oct 27 19:28 ..
+drwxr-xr-x  23 user  staff      736 Oct 29 17:49 ..
 -rw-------   1 user  staff     1708 Oct 11 05:39 f1-reboot.pcapng
 -rw-r--r--   1 user  staff      335 Oct 11 08:01 wan.pcapng
 -rw-r--r--   1 user  staff   926664 Oct 11 17:46 wan2-real.pcapng
@@ -46,7 +46,7 @@ drwxr-xr-x  19 user  staff      608 Oct 27 19:28 ..
 ```
 total 296
 drwxr-xr-x  27 user  staff    864 Oct 12 21:24 .
-drwxr-xr-x  19 user  staff    608 Oct 27 19:28 ..
+drwxr-xr-x  23 user  staff    736 Oct 29 17:49 ..
 -rw-r--r--@  1 user  staff  49359 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.png
 drwxr-xr-x@  3 user  staff     96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.extracted
 -rw-r--r--@  1 user  staff    231 Oct 11 09:02 binwalk-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.txt
@@ -89,6 +89,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 {"error":"Apps was not found GCNT-X 23.1 f1_1.0-1"}```
 
 ## Findings
+- [`acs-telia-8888-probe-2026-10-28.md`](acs-telia-8888-probe-2026-10-28.md)
 - [`admin-url-hunt.md`](admin-url-hunt.md)
 - [`auth-session-and-wps-2026-10-12.md`](auth-session-and-wps-2026-10-12.md)
 - [`cups-http-ipp-source-boundary.md`](cups-http-ipp-source-boundary.md)
@@ -99,12 +100,16 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-board-visual-2026-10-12.md`](f1-board-visual-2026-10-12.md)
 - [`f1-boot-log-2026-10-12-evidence.md`](f1-boot-log-2026-10-12-evidence.md)
 - [`f1-boot-log-2026-10-12.md`](f1-boot-log-2026-10-12.md)
+- [`f1-boot-menu-a-key-2026-10-27.md`](f1-boot-menu-a-key-2026-10-27.md)
 - [`f1-bootp-lan-2026-10-13.md`](f1-bootp-lan-2026-10-13.md)
 - [`f1-bypass-crypto-options.md`](f1-bypass-crypto-options.md)
 - [`f1-config-export-decrypt-2026-10-12.md`](f1-config-export-decrypt-2026-10-12.md)
 - [`f1-cups-ipp-policy-2026-10-12.md`](f1-cups-ipp-policy-2026-10-12.md)
 - [`f1-cups-ipp-readonly-matrix-2026-10-12.md`](f1-cups-ipp-readonly-matrix-2026-10-12.md)
 - [`f1-diagnostics-connection-restart-2026-10-12.md`](f1-diagnostics-connection-restart-2026-10-12.md)
+- [`f1-export-log-modal-2026-10-28.md`](f1-export-log-modal-2026-10-28.md)
+- [`f1-firmware-acquisition-paths-2026-10-27.md`](f1-firmware-acquisition-paths-2026-10-27.md)
+- [`f1-firmware-session-index-2026-10-27.md`](f1-firmware-session-index-2026-10-27.md)
 - [`f1-fit-rootfs-packaging-2026-10-27.md`](f1-fit-rootfs-packaging-2026-10-27.md)
 - [`f1-gap-attack-pass-2026-10-12.md`](f1-gap-attack-pass-2026-10-12.md)
 - [`f1-gateway-url-action-2026-10-12.md`](f1-gateway-url-action-2026-10-12.md)
@@ -124,10 +129,12 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-har-wanetc-2026-10-12.md`](f1-har-wanetc-2026-10-12.md)
 - [`f1-hardware-key-blocker-2026-10-12.md`](f1-hardware-key-blocker-2026-10-12.md)
 - [`f1-hidden-action-boundary-2026-10-12.md`](f1-hidden-action-boundary-2026-10-12.md)
+- [`f1-internet-outage-2026-10-28.md`](f1-internet-outage-2026-10-28.md)
 - [`f1-ipping-helper-2026-10-12.md`](f1-ipping-helper-2026-10-12.md)
 - [`f1-ipping-host-2026-10-12.md`](f1-ipping-host-2026-10-12.md)
 - [`f1-js-deep-2026-10-12.md`](f1-js-deep-2026-10-12.md)
 - [`f1-logviewer.md`](f1-logviewer.md)
+- [`f1-nand-read-plan-2026-10-27.md`](f1-nand-read-plan-2026-10-27.md)
 - [`f1-password-encoding-cli-trace-2026-10-15.md`](f1-password-encoding-cli-trace-2026-10-15.md)
 - [`f1-rea-har-pass-2026-10-17.md`](f1-rea-har-pass-2026-10-17.md)
 - [`f1-research-composite-2026-10-13.md`](f1-research-composite-2026-10-13.md)
@@ -136,14 +143,17 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-trace-path-2026-10-12.md`](f1-trace-path-2026-10-12.md)
 - [`f1-uart-23.1b.md`](f1-uart-23.1b.md)
 - [`f1-uart-interaction-2026-10-12.md`](f1-uart-interaction-2026-10-12.md)
+- [`f1-uboot-source-trace-2026-10-27.md`](f1-uboot-source-trace-2026-10-27.md)
 - [`f1-ui-grab-2026-10-12.md`](f1-ui-grab-2026-10-12.md)
 - [`f1-ui-leads-23.1b.md`](f1-ui-leads-23.1b.md)
+- [`f1-unturned-stones-2026-10-29.md`](f1-unturned-stones-2026-10-29.md)
 - [`f1-usp-ipping-2026-10-12.md`](f1-usp-ipping-2026-10-12.md)
 - [`f1-wfa-wlanconfig-49152-2026-10-12.md`](f1-wfa-wlanconfig-49152-2026-10-12.md)
 - [`f1-wireless-qrcode-context-2026-10-12.md`](f1-wireless-qrcode-context-2026-10-12.md)
 - [`gcnt-x-19x-deep.md`](gcnt-x-19x-deep.md)
 - [`gcnt-x-public-hardware.md`](gcnt-x-public-hardware.md)
 - [`gcnt-x-root-path.md`](gcnt-x-root-path.md)
+- [`l598-key-xts-19x-rbi-2026-10-27.md`](l598-key-xts-19x-rbi-2026-10-27.md)
 - [`management-auth-boundaries-2026-10-12.md`](management-auth-boundaries-2026-10-12.md)
 - [`management-offline-service-evidence.md`](management-offline-service-evidence.md)
 - [`mirror-test.md`](mirror-test.md)
@@ -151,6 +161,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`rbi-crypto-attempt2.md`](rbi-crypto-attempt2.md)
 - [`rbi-crypto-attempt3.md`](rbi-crypto-attempt3.md)
 - [`rbi-crypto-debug.md`](rbi-crypto-debug.md)
+- [`rbi-url-hunt-deeper-2026-10-28.md`](rbi-url-hunt-deeper-2026-10-28.md)
 - [`session-source-availability-boundary.md`](session-source-availability-boundary.md)
 - [`software-pass-capture-review.md`](software-pass-capture-review.md)
 - [`software-pass-config-export.md`](software-pass-config-export.md)
