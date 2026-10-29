@@ -33,6 +33,11 @@ WFA WLANConfig on LAN TCP **49152** (WPS over UPnP, paced probes, no demonstrate
 
 Logviewer `export_log` with the page CSRF token returns 200 (no CWMP or firmware-URL lines in the export): [findings/f1-export-log-modal-2026-10-28.md](findings/f1-export-log-modal-2026-10-28.md), driver `scripts/f1_export_log_modal_once.py` (single POST, requires `--confirm`).
 
+**2026-10-29 eRIPv2 decompilation and Web UI modal discovery:**
+- `findings/f1-kernel-rip-keystore-decomp-2026-10-29.md`: Hopper decompilation of `ripdrv.ko` and `r2secr.ko` proved item `0x0121` (OSCK) is hardcoded-suppressed from `/proc/rip`; item `0x011A` contains both client cert and RSA private key for ACS mTLS; `scripts/f1_erip_parser.py` extracts and decrypts eRIPv2 partitions offline.
+- `findings/f1-ui-audit-hidden-modals-2026-10-29.md`: Paced live discovery probe `scripts/f1_modal_discovery.py` mapped 10 hidden modals on firmware `23.1.b`, including admin-accessible `/modals/printersharing-modal.lp` (`uci.printersharing.config.webui`), which directly accounts for the active port 631 (CUPS) listener.
+
+
 Broadcom SPL abort keys (`r` fallback vs `r 1`), Homeware EFU signature bypass architecture (`/proc/efu/allowed` via RSA-PSS OSIK tag), U-Boot bundle upgrade requirements, and REA Hopper provider verification: [findings/f1-unturned-stones-2026-10-29.md](findings/f1-unturned-stones-2026-10-29.md).
 
 Software link and firmware acquisition architecture (REA UI AST analysis, Telia `:7577` dynamic token-based update delivery vs `:7547` static 404s, and 4 viable acquisition vectors): [findings/f1-software-link-hunt-2026-10-29.md](findings/f1-software-link-hunt-2026-10-29.md). Formal GPL request specification and dispatch template: [findings/f1-gpl-source-request-2026-10-29.md](findings/f1-gpl-source-request-2026-10-29.md). REA Hopper decompilation of `ripdrv.ko` and `r2secr.ko` (item 0x0121 suppression, 0x011A dual PEM parsing, eRIPv2 crypto architecture): [findings/f1-kernel-rip-keystore-decomp-2026-10-29.md](findings/f1-kernel-rip-keystore-decomp-2026-10-29.md).

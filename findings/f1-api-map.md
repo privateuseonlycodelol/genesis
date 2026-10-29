@@ -93,6 +93,11 @@ Matches the shared `main-min.js` table handlers ([f1-js-deep-2026-10-12.md](f1-j
 | `/modals/l2tp-ipsec-server-modal.lp` | VPN server, including a pre-shared key field (value removed from the saved copy) |
 | `/modals/contentsharing-modal.lp` | Samba, DLNA, USB mode (USB 3.1 says it reboots) |
 | `/modals/system-config-modal.lp` | Restart, factory reset, semi-reset. The buttons on the page are only those three |
+| `/modals/printersharing-modal.lp` | Printer sharing / CUPS configuration (`printersharingEnabled`, binds to `uci.printersharing.config.webui`); explains port 631 listener |
+| `/modals/wireless-client-modal.lp` | Real-time Wi-Fi client telemetry (`/js/wireless-client-modal-min.js`) querying `rpc.wireless.ap.@ap.station.` |
+| `/modals/diagnostics-xdsl-modal.lp` | DSL diagnostic statistics and SNR margin telemetry |
+| `/modals/cwmpconf-modal.lp` | Role-gated (`engineer` only): TR-069 / CWMP configuration (`acs_url`, `connectionrequest_username/password`) |
+| `/modals/usermgr-modal.lp` | Role-gated (`engineer` only): Web UI user management (`uci.web.user.`) |
 | `/password.lp` and the guided-view modal | Replace the admin password |
 
 `/js/system-config-min.js` (6816 bytes, GET 200) is loaded by the configuration modal. It posts back to that modal’s form action. Actions named in the script:
