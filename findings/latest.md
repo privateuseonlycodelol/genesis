@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-29T20:38:29Z
+**Generated:** 2026-10-30T03:00:07Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -99,6 +99,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-advanced-ui.md`](f1-advanced-ui.md)
 - [`f1-aggressive-software-pass-2026-10-12.md`](f1-aggressive-software-pass-2026-10-12.md)
 - [`f1-api-map.md`](f1-api-map.md)
+- [`f1-bank-timeline-2026-10-30.md`](f1-bank-timeline-2026-10-30.md)
 - [`f1-board-visual-2026-10-12.md`](f1-board-visual-2026-10-12.md)
 - [`f1-boot-log-2026-10-12-evidence.md`](f1-boot-log-2026-10-12-evidence.md)
 - [`f1-boot-log-2026-10-12.md`](f1-boot-log-2026-10-12.md)
@@ -149,6 +150,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-trace-path-2026-10-12.md`](f1-trace-path-2026-10-12.md)
 - [`f1-uart-23.1b.md`](f1-uart-23.1b.md)
 - [`f1-uart-interaction-2026-10-12.md`](f1-uart-interaction-2026-10-12.md)
+- [`f1-uboot-fit-flashing-schema-2026-10-30.md`](f1-uboot-fit-flashing-schema-2026-10-30.md)
 - [`f1-uboot-source-trace-2026-10-27.md`](f1-uboot-source-trace-2026-10-27.md)
 - [`f1-ui-audit-hidden-modals-2026-10-29.md`](f1-ui-audit-hidden-modals-2026-10-29.md)
 - [`f1-ui-grab-2026-10-12.md`](f1-ui-grab-2026-10-12.md)

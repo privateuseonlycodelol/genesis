@@ -200,13 +200,15 @@ def build_standard_fit_skeleton(
     compact: bool = False,
     board: str = "GCNT-X",
     rootfs_data: bytes | None = None,
+    bootfs_data: bytes | None = None,
 ) -> bytes:
     """Build a complete FIT image with /images/kernel-1 and /configurations/config-1.
 
-    When rootfs_data is given, also add /images/rootfs and point config-1 at it with
-    rootfs = "rootfs". The BOOTP recovery bundle handler looks up the configuration
-    property names bootfs, rootfs, loader, rootfs_data and ramfs_rd (UART evidence in
-    findings/f1-bootp-lan-2026-10-13.md, Addendum 8), so the name must match exactly.
+    When bootfs_data or rootfs_data is given, add /images/bootfs and/or /images/rootfs
+    and point config-1 at them with bootfs = "bootfs" and/or rootfs = "rootfs".
+    The BOOTP recovery bundle handler (U-Boot sdk_test_commands.c flash_upgrade_img_bundle)
+    looks up configuration property names: bootfs, rootfs, loader, rootfs_data, ramfs_rd
+    (UART evidence in findings/f1-bootp-lan-2026-10-13.md, Addendum 8).
     """
     w = FdtWriter()
     w.begin_node("")  # Root
@@ -245,6 +247,24 @@ def build_standard_fit_skeleton(
 
     w.end_node()  # kernel-1
 
+    # /images/bootfs (only when a boot filesystem / kernel FIT is packaged)
+    if bootfs_data is not None:
+        w.begin_node("bootfs")
+        if not compact:
+            w.property_string("description", "Boot filesystem / kernel FIT component")
+        w.property("data", bootfs_data)
+        w.property_string("type", "firmware")
+        w.property_string("arch", "arm64")
+        w.property_string("os", "linux")
+        w.property_string("compression", "none")
+
+        w.begin_node("hash-1")
+        w.property_string("algo", "sha256")
+        w.property("value", hashlib.sha256(bootfs_data).digest())
+        w.end_node()  # hash-1
+
+        w.end_node()  # bootfs
+
     # /images/rootfs (only when a root filesystem is packaged)
     if rootfs_data is not None:
         w.begin_node("rootfs")
@@ -274,6 +294,8 @@ def build_standard_fit_skeleton(
     if not compact:
         w.property_string("description", "Default recovery boot configuration")
     w.property_string("kernel", "kernel-1")
+    if bootfs_data is not None:
+        w.property_string("bootfs", "bootfs")
     if rootfs_data is not None:
         w.property_string("rootfs", "rootfs")
     w.property_string("compatible", board)
@@ -287,6 +309,90 @@ def build_standard_fit_skeleton(
     w.end_node()  # config-1
     w.end_node()  # configurations
 
+    w.end_node()  # Root
+    return w.build()
+
+
+def build_inner_bootfs_fit(
+    kernel_data: bytes,
+    dtb_data: bytes | None = None,
+    board: str = "GCNT-X",
+    description: str = "Telia F1 GCNT-X inner bootfs FIT",
+    load_addr: int = 0x01000000,
+    entry_addr: int = 0x01000000,
+) -> bytes:
+    """Build an inner bootfs FIT image containing kernel and conf_linux/conf_lx_<board>.
+
+    Omits /brcm_rootfs_encrypt so Broadcom U-Boot's bcm_handle_mapper() falls back to
+    unencrypted, non-dm-verity SquashFS mounting (root=/dev/ubiblock0_<volid>).
+    """
+    w = FdtWriter()
+    w.begin_node("")  # Root
+    w.property_string("description", description)
+    w.property_u32("#address-cells", 1)
+
+    # /images node
+    w.begin_node("images")
+
+    # /images/kernel-1
+    w.begin_node("kernel-1")
+    w.property_string("description", "Linux kernel")
+    w.property("data", kernel_data)
+    w.property_string("type", "kernel")
+    w.property_string("arch", "arm64")
+    w.property_string("os", "linux")
+    w.property_string("compression", "none")
+    w.property_u32("load", load_addr)
+    w.property_u32("entry", entry_addr)
+
+    w.begin_node("hash-1")
+    w.property_string("algo", "sha256")
+    w.property("value", hashlib.sha256(kernel_data).digest())
+    w.end_node()  # hash-1
+
+    w.end_node()  # kernel-1
+
+    if dtb_data is not None:
+        w.begin_node("fdt-1")
+        w.property_string("description", f"Flattened Device Tree for {board}")
+        w.property("data", dtb_data)
+        w.property_string("type", "flat_dt")
+        w.property_string("arch", "arm64")
+        w.property_string("compression", "none")
+
+        w.begin_node("hash-1")
+        w.property_string("algo", "sha256")
+        w.property("value", hashlib.sha256(dtb_data).digest())
+        w.end_node()  # hash-1
+
+        w.end_node()  # fdt-1
+
+    w.end_node()  # images
+
+    # /configurations node
+    w.begin_node("configurations")
+    w.property_string("default", "conf_linux")
+
+    # conf_linux
+    w.begin_node("conf_linux")
+    w.property_string("description", "Standard Linux boot configuration")
+    w.property_string("kernel", "kernel-1")
+    if dtb_data is not None:
+        w.property_string("fdt", "fdt-1")
+    w.property_string("compatible", board)
+    w.end_node()
+
+    # conf_lx_<board>
+    board_conf_name = f"conf_lx_{board}"
+    w.begin_node(board_conf_name)
+    w.property_string("description", f"Board-specific Linux boot configuration for {board}")
+    w.property_string("kernel", "kernel-1")
+    if dtb_data is not None:
+        w.property_string("fdt", "fdt-1")
+    w.property_string("compatible", board)
+    w.end_node()
+
+    w.end_node()  # configurations
     w.end_node()  # Root
     return w.build()
 
@@ -337,6 +443,10 @@ def main() -> int:
     parser.add_argument("--description", default="Telia F1 GCNT-X recovery test image")
     parser.add_argument("--payload-text", default="INERT-TEST-PAYLOAD\n", help="Dummy payload text")
     parser.add_argument(
+        "--bootfs",
+        help="Boot filesystem / kernel FIT image to package as /images/bootfs (standard mode only)",
+    )
+    parser.add_argument(
         "--rootfs",
         help="SquashFS image to package as /images/rootfs (standard mode only)",
     )
@@ -350,6 +460,13 @@ def main() -> int:
     if not args.out:
         print("ERROR: Specify --out <path> or --inspect <path>", file=sys.stderr)
         return 1
+
+    bootfs_data = None
+    if args.bootfs:
+        if args.mode != "standard":
+            print("ERROR: --bootfs requires --mode standard", file=sys.stderr)
+            return 1
+        bootfs_data = Path(args.bootfs).read_bytes()
 
     rootfs_data = None
     if args.rootfs:
@@ -373,6 +490,7 @@ def main() -> int:
             payload_data=args.payload_text.encode("utf-8"),
             compact=args.compact,
             rootfs_data=rootfs_data,
+            bootfs_data=bootfs_data,
         )
 
     out_path.write_bytes(blob)
