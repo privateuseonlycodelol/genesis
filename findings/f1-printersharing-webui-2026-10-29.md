@@ -57,3 +57,14 @@ cd scripts && python3 -m unittest test_printersharing_webui_toggle -v
 1. **Do not POST with `scripts/f1_printersharing_webui_toggle.py` as written.** Its field names do not match the served form (`printersharing_enabled` vs `printersharingEnabled`), and no webui field is known. Any future write needs the real field names first, from a source the device serves, and a before/after read.
 2. The webui flag has no visible control in the 23.1.b modal. Testing it further needs the Homeware or CUPS source (rootfs or GPL request), not more POSTs.
 3. If the modal exposes no state, the webui test is parked. The offline reading in [tried.md](tried.md) (CUPS `client.c` order: `cupsdAuthorize` runs before the WebInterface check) and the deny-by-default model in [f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md) suggest the 403 is the Location ACL, which would hide the webui flag from the LAN. This is DERIVED from upstream source; the device's `cupsd.conf` was not obtained.
+
+## Addendum (2026-10-29, re-test pass): no POST sent
+
+- **VERIFIED:** `curl http://192.168.1.1/login.lp` → 200 (5784 B) at 21:45 local. No login, no POST.
+- **VERIFIED (public, not device):** raw files from `Ansuel/tch-nginx-gui@ecd493c591afd7de47e624245bd1ac1bd9a526a2` (the commit already listed in `artifacts/source-review/manifest.json`):
+  - `www/docroot/modals/printersharing-modal.lp` (5116 B) has two switches, `printersharing_enabled` → `uci.printersharing.config.enabled` and `printersharing_webui` → `uci.printersharing.config.webui`.
+  - `usr/share/transformer/mappings/uci/printersharing.map` (622 B) declares `options = { "enabled", "webui" }`.
+- **VERIFIED:** the 23.1.b served modal (`artifacts/management/printersharing-read-20261029T203540Z/modal.html`) has only `printersharingEnabled` (camelCase) and no webui switch. So the upstream form is not the 23.1.b form.
+- **DERIVED:** `printersharing_webui` comes from an older or different GUI generation. Whether 23.1.b's handler still maps it is UNKNOWN.
+- **Why the re-test was not run:** the approved re-test needed "correct field names". The device does not serve a webui field, and no POST can be checked: `:631` stays 403 from the LAN, and the modal does not show webui. A POST with a guessed field would change device config without any observable result. Not sent.
+- **Next:** the only route to a decisive test is the device's own transformer mapping or the GPL source request (`findings/f1-gpl-source-request-2026-10-29.md`). Neither is available yet.
