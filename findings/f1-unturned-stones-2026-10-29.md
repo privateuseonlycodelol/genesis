@@ -2,6 +2,8 @@
 
 > **Superseded in part (2026-10-29, same day).** Items 2 and the "Tag Verification" section below are **not** established. The module analysed is `ripdrv.arm.3.4.11-rt19.ko` (ARMv7, 3.4.11), not the device's 4.19.235 aarch64 kernel. The claim that `isSignatureValid` verifies against the OSIK public key is **HYPOTHESIS**: the OSIK buffer is not an argument to the RSA calls, and the RSA key source is UNKNOWN. The "official unlock mechanism" and "OEM/Operator OSIK private key" conclusions are withdrawn. See [efu-info-proc-2026-10-29.md](efu-info-proc-2026-10-29.md) for the corrected trace and [cups-udp631-browse-source-2026-10-29.md](cups-udp631-browse-source-2026-10-29.md) for the browse-listener review. Item 1 (SPL menu keys) is REPORTED from another board tree and is not verified on the F1.
 
+> **Item 1 superseded (2026-10-30).** `early_abort.c` and `selected_img_idx` are **not** in `artifacts/` (checked with `find` and `grep`), so the `r`-fallback swap mechanism in item 1 cannot be re-checked here. A live test on the F1 (`r` + `go` from the SPL menu) booted **Bank 2** again and did not swap. The menu text (`r - Boot Fallback; 1 - recovery`) was observed, which is VERIFIED. `do_check_fallback` in `sdk_test_commands.c` only counts failed boots and selects no bank. See [f1-bank-timeline-2026-10-30.md](f1-bank-timeline-2026-10-30.md).
+
 ## Summary
 
 This pass performs an exhaustive audit across previously unturned leads, local artifacts, offline firmwares, kernel drivers, and upstream source trees to resolve outstanding blockers identified in recent research passes.
