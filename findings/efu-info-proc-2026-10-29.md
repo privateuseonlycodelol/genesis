@@ -1,5 +1,7 @@
 # ripdrv EFU `/proc/efu/info` and corrections to the 2026-10-29 kernel review (offline)
 
+> **Resolved and corrected (2026-11-02):** The open question in Sections 8 and 9 regarding the key buffer and whether OSIK is the RSA verification key has been fully resolved. Disassembly and Hopper decompilation confirm that the buffer populated by `EFU_getOSIK` (`sp + 0x10`) is passed directly as `r0` to `rsa_create_crypto`, which imports it via LibTomMath `mp_read_unsigned_bin` into modulus $n$ with exponent $e = 65537$. OSIK **is** verified as the RSA-PSS verification key. See [efu-osik-signature-chain-2026-11-02.md](efu-osik-signature-chain-2026-11-02.md).
+
 ## Scope and build caveat (VERIFIED)
 
 - Module: `tools/secr/ripdrv.arm.3.4.11-rt19.ko`, `.modinfo` `vermagic=3.4.11-rt19 SMP preempt mod_unload ARMv7`.

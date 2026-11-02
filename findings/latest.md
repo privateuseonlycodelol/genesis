@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-10-30T03:00:07Z
+**Generated:** 2026-11-02T03:03:19Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -96,6 +96,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`cups-udp631-browse-source-2026-10-29.md`](cups-udp631-browse-source-2026-10-29.md)
 - [`decomp-kickoff.md`](decomp-kickoff.md)
 - [`efu-info-proc-2026-10-29.md`](efu-info-proc-2026-10-29.md)
+- [`efu-osik-signature-chain-2026-11-02.md`](efu-osik-signature-chain-2026-11-02.md)
 - [`f1-advanced-ui.md`](f1-advanced-ui.md)
 - [`f1-aggressive-software-pass-2026-10-12.md`](f1-aggressive-software-pass-2026-10-12.md)
 - [`f1-api-map.md`](f1-api-map.md)
@@ -162,6 +163,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`gcnt-x-19x-deep.md`](gcnt-x-19x-deep.md)
 - [`gcnt-x-public-hardware.md`](gcnt-x-public-hardware.md)
 - [`gcnt-x-root-path.md`](gcnt-x-root-path.md)
+- [`handoff-2026-11-02.md`](handoff-2026-11-02.md)
 - [`l598-key-xts-19x-rbi-2026-10-27.md`](l598-key-xts-19x-rbi-2026-10-27.md)
 - [`management-auth-boundaries-2026-10-12.md`](management-auth-boundaries-2026-10-12.md)
 - [`management-offline-service-evidence.md`](management-offline-service-evidence.md)
