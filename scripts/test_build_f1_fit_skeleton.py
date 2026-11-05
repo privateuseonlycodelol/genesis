@@ -155,6 +155,40 @@ class TestBuildF1FitSkeleton(unittest.TestCase):
         self.assertEqual(props["/configurations/config-1:bootfs"], b"bootfs\x00")
         self.assertEqual(props["/configurations/config-1:rootfs"], b"rootfs\x00")
 
+    def test_standard_fit_with_rootfs_data_roundtrip(self):
+        rootfs_data = b"\x31\x18\x10\x06" + b"UBIFS-OVERLAY-PAYLOAD"
+        blob = build_standard_fit_skeleton(rootfs_data_component=rootfs_data)
+
+        nodes, props = FdtReader(blob).walk()
+        self.assertIn("/images/rootfs_data", nodes)
+        self.assertIn("/images/rootfs_data/hash-1", nodes)
+        self.assertEqual(props["/images/rootfs_data:data"], rootfs_data)
+        self.assertEqual(props["/images/rootfs_data:type"], b"filesystem\x00")
+        self.assertEqual(props["/images/rootfs_data:compression"], b"none\x00")
+        self.assertEqual(props["/images/rootfs_data/hash-1:algo"], b"sha256\x00")
+        self.assertEqual(props["/images/rootfs_data/hash-1:value"], hashlib.sha256(rootfs_data).digest())
+        self.assertEqual(props["/configurations/config-1:rootfs_data"], b"rootfs_data\x00")
+        self.assertNotIn("/configurations/config-1:bootfs", props)
+        self.assertNotIn("/configurations/config-1:rootfs", props)
+
+    def test_standard_fit_triple_component_roundtrip(self):
+        bootfs = b"\xd0\x0d\xfe\xed" + b"BOOTFS-PAYLOAD"
+        rootfs = b"hsqs" + b"ROOTFS-SQUASHFS-PAYLOAD"
+        rootfs_data = b"\x31\x18\x10\x06" + b"UBIFS-OVERLAY-PAYLOAD"
+        blob = build_standard_fit_skeleton(
+            bootfs_data=bootfs,
+            rootfs_data=rootfs,
+            rootfs_data_component=rootfs_data,
+        )
+
+        nodes, props = FdtReader(blob).walk()
+        self.assertIn("/images/bootfs", nodes)
+        self.assertIn("/images/rootfs", nodes)
+        self.assertIn("/images/rootfs_data", nodes)
+        self.assertEqual(props["/configurations/config-1:bootfs"], b"bootfs\x00")
+        self.assertEqual(props["/configurations/config-1:rootfs"], b"rootfs\x00")
+        self.assertEqual(props["/configurations/config-1:rootfs_data"], b"rootfs_data\x00")
+
     def test_inner_bootfs_fit_roundtrip(self):
         kernel = b"AARCH64-KERNEL-IMAGE-BYTES\x00\x01\x02\x03"
         dtb = b"\xd0\x0d\xfe\xed-DTB-BYTES"

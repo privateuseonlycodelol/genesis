@@ -201,11 +201,13 @@ def build_standard_fit_skeleton(
     board: str = "GCNT-X",
     rootfs_data: bytes | None = None,
     bootfs_data: bytes | None = None,
+    rootfs_data_component: bytes | None = None,
 ) -> bytes:
     """Build a complete FIT image with /images/kernel-1 and /configurations/config-1.
 
-    When bootfs_data or rootfs_data is given, add /images/bootfs and/or /images/rootfs
-    and point config-1 at them with bootfs = "bootfs" and/or rootfs = "rootfs".
+    When bootfs_data, rootfs_data, or rootfs_data_component is given, add /images/bootfs,
+    /images/rootfs, and/or /images/rootfs_data, and point config-1 at them with
+    bootfs = "bootfs", rootfs = "rootfs", and/or rootfs_data = "rootfs_data".
     The BOOTP recovery bundle handler (U-Boot sdk_test_commands.c flash_upgrade_img_bundle)
     looks up configuration property names: bootfs, rootfs, loader, rootfs_data, ramfs_rd
     (UART evidence in findings/f1-bootp-lan-2026-10-13.md, Addendum 8).
@@ -283,6 +285,24 @@ def build_standard_fit_skeleton(
 
         w.end_node()  # rootfs
 
+    # /images/rootfs_data (only when an overlay filesystem component is packaged)
+    if rootfs_data_component is not None:
+        w.begin_node("rootfs_data")
+        if not compact:
+            w.property_string("description", "UBIFS rootfs_data overlay component")
+        w.property("data", rootfs_data_component)
+        w.property_string("type", "filesystem")
+        w.property_string("arch", "arm64")
+        w.property_string("os", "linux")
+        w.property_string("compression", "none")
+
+        w.begin_node("hash-1")
+        w.property_string("algo", "sha256")
+        w.property("value", hashlib.sha256(rootfs_data_component).digest())
+        w.end_node()  # hash-1
+
+        w.end_node()  # rootfs_data
+
     w.end_node()  # images
 
     # /configurations node
@@ -298,6 +318,8 @@ def build_standard_fit_skeleton(
         w.property_string("bootfs", "bootfs")
     if rootfs_data is not None:
         w.property_string("rootfs", "rootfs")
+    if rootfs_data_component is not None:
+        w.property_string("rootfs_data", "rootfs_data")
     w.property_string("compatible", board)
 
     # /configurations/config-1/compatible subnode
@@ -450,6 +472,10 @@ def main() -> int:
         "--rootfs",
         help="SquashFS image to package as /images/rootfs (standard mode only)",
     )
+    parser.add_argument(
+        "--rootfs-data",
+        help="UBIFS overlay image to package as /images/rootfs_data (standard mode only)",
+    )
     parser.add_argument("--inspect", help="Inspect and dump an existing FIT / DTB file")
     args = parser.parse_args()
 
@@ -479,6 +505,13 @@ def main() -> int:
             print(f"ERROR: {args.rootfs} does not start with SquashFS magic 'hsqs'", file=sys.stderr)
             return 1
 
+    rootfs_data_component = None
+    if args.rootfs_data:
+        if args.mode != "standard":
+            print("ERROR: --rootfs-data requires --mode standard", file=sys.stderr)
+            return 1
+        rootfs_data_component = Path(args.rootfs_data).read_bytes()
+
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -491,6 +524,7 @@ def main() -> int:
             compact=args.compact,
             rootfs_data=rootfs_data,
             bootfs_data=bootfs_data,
+            rootfs_data_component=rootfs_data_component,
         )
 
     out_path.write_bytes(blob)
