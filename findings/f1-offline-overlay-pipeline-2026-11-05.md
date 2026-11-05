@@ -63,9 +63,10 @@ Populated into `artifacts/firmware/overlay_staging/` across `bank_1/`, `bank_2/`
 - `etc/inittab`: Spawns unauthenticated login shell on console: `::askconsole:/bin/ash --login` (bypassing Homeware `restricted_shell` and `clash-access-control`).
 - `etc/passwd`: Standard root user: `root:x:0:0:root:/root:/bin/ash`.
 - `etc/shadow`: Empty root password (`root::18000:0:99999:7:::`), allowing immediate root access without credentials.
-- `etc/rc.local`: Starts background telnet daemon on LAN port 23: `busybox telnetd -l /bin/ash -p 23 &`.
+- `etc/rc.local`: Starts background telnet daemon on LAN port 23 (`busybox telnetd -l /bin/ash -p 23 &`) and launches `/root/triage.sh` in the background.
 - `etc/config/clash`: Sets `config access 'serial'` enabled for root.
 - `etc/config/dropbear`: Enables SSH password authentication on LAN.
+- `root/triage.sh` (mode 0755): Automated harvester dumping `/proc/rip/*` (capturing Item `0x0108` `RANDOM_KEY_B`, `0x011a` client cert/key, and `0x0120` OSIK), `/proc/efu/*`, MTD partitions (`eripv2`), `/proc/kallsyms`, and compressing into `/tmp/f1-triage.tar.gz`.
 
 ---
 
@@ -81,12 +82,12 @@ Single command to run the entire pipeline:
 - **UBIFS Overlay Image:**
   - Path: `artifacts/firmware/rootfs_data.ubifs`
   - Size: 3,301,376 bytes
-  - SHA-256: `91f84d2b1010b99da3f1f4c63d08d1bb10328f0ee48854b9e81193e94e9891e9`
+  - SHA-256: `b4d1f35a6a2b9c7f9337200f9f3f279c5dc51ef02248d42a8bec61fdf7523a8e`
   - Magic: `\x31\x18\x10\x06` (verified)
 - **FIT Injection Bundle:**
   - Path: `artifacts/firmware/overlay-injection-bundle.itb`
   - Size: 3,302,553 bytes
-  - SHA-256: `9b69b5ebe1b628e0ed3730c9f37f981c51cea4689cbcb5ccd4ed87d7fbd42893`
+  - SHA-256: `04bbfb7a81aaa9bda033e421d984db16cae4b7aac0af32db6aa973e36edccfcd`
   - Format: Flattened Device Tree v17 (magic `0xd00dfeed`)
 
 ### C. Bundle Validation (`scripts/validate_f1_fit_bundle.py`)
@@ -123,8 +124,14 @@ When authorized live router testing begins:
    - `flash_upgrade_img_bundle()` verifies hashes, skips `bootfs` and `rootfs`, and flashes `rootfs_data` to UBI vol 20.
    - Router reboots into stock signed Bank 2 kernel.
    - Kernel mounts injected UBIFS overlay on `/overlay/bank_2`.
+   - `/etc/rc.local` starts background telnet daemon on port 23 and executes `/root/triage.sh`.
+   - `/root/triage.sh` dumps `/proc/rip/*`, `/proc/efu/*`, MTD partitions, and `/proc/kallsyms` to `/tmp/f1-triage.tar.gz`.
    - Serial console drops directly into passwordless root shell (`/bin/ash`).
-   - Telnet daemon listens on LAN port 23.
+5. On the host Mac, automatically download the triage bundle and extract keys:
+   ```bash
+   ./tools/venv/bin/python3 scripts/f1_fetch_triage.py --ip 192.168.1.1
+   ```
+   Extracts `RIP_ID_RANDOM_KEY_B` from Item `0x0108` and client mTLS credentials from Item `0x011a`.
 
 ---
 

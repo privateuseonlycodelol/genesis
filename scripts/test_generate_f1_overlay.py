@@ -12,6 +12,7 @@ from scripts.generate_f1_overlay import (
     INITTAB_CONTENT,
     PASSWD_CONTENT,
     RC_LOCAL_CONTENT,
+    TRIAGE_SCRIPT_CONTENT,
     generate_overlay_staging,
 )
 
@@ -55,6 +56,11 @@ class TestGenerateF1Overlay(unittest.TestCase):
 
             self.assertTrue(dropbear.is_file())
             self.assertEqual(dropbear.read_text(), DROPBEAR_CONFIG_CONTENT)
+
+            triage = bank2_dir / "root" / "triage.sh"
+            self.assertTrue(triage.is_file())
+            self.assertEqual(triage.read_text(), TRIAGE_SCRIPT_CONTENT)
+            self.assertEqual(oct(stat.S_IMODE(triage.stat().st_mode)), "0o755")
 
     def test_custom_password_and_hash(self):
         with tempfile.TemporaryDirectory() as tmpdir:
