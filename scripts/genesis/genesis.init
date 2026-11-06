@@ -1,0 +1,16 @@
+#!/bin/sh /etc/rc.common
+# Plugin supervisor. Starts the DNS service when its manifest says so.
+# The page is served by nginx from /genesis/ui.lua.
+
+START=18
+STOP=85
+USE_PROCD=1
+
+start_service() {
+	procd_open_instance
+	procd_set_param command /genesis/genesis-supervisor
+	procd_set_param respawn 3600 5 5
+	procd_set_param stdout 0
+	procd_set_param stderr 0
+	procd_close_instance
+}

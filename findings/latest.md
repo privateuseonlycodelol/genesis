@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-11-06T20:57:39Z
+**Generated:** 2026-11-06T21:11:32Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -163,6 +163,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-offline-overlay-pipeline-2026-11-05.md`](f1-offline-overlay-pipeline-2026-11-05.md)
 - [`f1-opt-keep-root-2026-11-06.md`](f1-opt-keep-root-2026-11-06.md)
 - [`f1-password-encoding-cli-trace-2026-10-15.md`](f1-password-encoding-cli-trace-2026-10-15.md)
+- [`f1-plugin-supervisor-2026-11-06.md`](f1-plugin-supervisor-2026-11-06.md)
 - [`f1-printersharing-webui-2026-10-29.md`](f1-printersharing-webui-2026-10-29.md)
 - [`f1-quad-overlay-flash-2026-11-06.md`](f1-quad-overlay-flash-2026-11-06.md)
 - [`f1-rea-har-pass-2026-10-17.md`](f1-rea-har-pass-2026-10-17.md)
@@ -184,6 +185,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-ui-audit-hidden-modals-2026-10-29.md`](f1-ui-audit-hidden-modals-2026-10-29.md)
 - [`f1-ui-grab-2026-10-12.md`](f1-ui-grab-2026-10-12.md)
 - [`f1-ui-leads-23.1b.md`](f1-ui-leads-23.1b.md)
+- [`f1-ui-skin-2026-11-06.md`](f1-ui-skin-2026-11-06.md)
 - [`f1-unturned-stones-2026-10-29.md`](f1-unturned-stones-2026-10-29.md)
 - [`f1-usage-dashboard-2026-11-06.md`](f1-usage-dashboard-2026-11-06.md)
 - [`f1-usp-ipping-2026-10-12.md`](f1-usp-ipping-2026-10-12.md)

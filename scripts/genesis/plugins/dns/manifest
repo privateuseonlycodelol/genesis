@@ -1,0 +1,7 @@
+id=dns
+name=DNS
+kind=service
+enabled=1
+exec=/usr/sbin/dnsproxy
+arg1=--config-path=/etc/dnsproxy.yaml
+arg2=--output=/dev/null

@@ -1,0 +1,156 @@
+/* Overlay skin for the Homeware UI. Loaded after gw.css. */
+
+body {
+  background: #0c0d10 !important;
+  color: #eceae6 !important;
+  font-family: "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif !important;
+}
+
+a {
+  color: #d6d3d1;
+}
+a:hover,
+a:focus {
+  color: #ffffff;
+}
+
+.container {
+  width: 1040px;
+}
+
+.logo-technicolor,
+#logo_mobiletab img,
+.header img.logo {
+  max-height: 36px !important;
+}
+
+.login {
+  margin-top: 16vh !important;
+  background: #16181d !important;
+  border: 1px solid #2c313a !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+  padding: 28px 28px 12px !important;
+}
+
+.login h2,
+.modal h2,
+.modal h3,
+legend {
+  color: #f5f4f1 !important;
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  border: 0;
+}
+
+.smallcard,
+.modal,
+.well,
+.dropdown-menu,
+.popover {
+  background: #16181d !important;
+  border: 1px solid #2c313a !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+  color: #eceae6 !important;
+}
+
+.smallcard {
+  overflow: hidden;
+}
+
+.smallcard .header {
+  height: auto !important;
+  background: #12141a !important;
+  background-image: none !important;
+  color: #f5f4f1 !important;
+  text-shadow: none !important;
+  border-bottom: 1px solid #2c313a !important;
+  box-shadow: none !important;
+}
+
+.smallcard .content,
+.smallcard .subinfos,
+.smallcard .subinfosBroadband,
+.smallcard .someInfos,
+.modal-body,
+.modal-footer {
+  background: transparent !important;
+  color: #d6d3d1 !important;
+}
+
+.btn,
+.btn-primary,
+.btn-group .btn {
+  background: #eceae6 !important;
+  background-image: none !important;
+  color: #111111 !important;
+  text-shadow: none !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.btn:hover,
+.btn-primary:hover {
+  background: #ffffff !important;
+  color: #111111 !important;
+}
+
+input,
+select,
+textarea,
+.uneditable-input {
+  background: #0c0d10 !important;
+  color: #f5f4f1 !important;
+  border: 1px solid #3a4150 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.table,
+.table td,
+.table th {
+  background: transparent !important;
+  color: #eceae6 !important;
+  border-color: #2c313a !important;
+}
+
+.alert {
+  background: #1c1917 !important;
+  color: #eceae6 !important;
+  border: 1px solid #44403c !important;
+  border-radius: 10px !important;
+  text-shadow: none !important;
+}
+
+.nav-tabs > li > a,
+.nav > li > a {
+  color: #d6d3d1 !important;
+  background: transparent !important;
+}
+
+.modal-header {
+  background: #12141a !important;
+  border-bottom: 1px solid #2c313a !important;
+  border-radius: 14px 14px 0 0 !important;
+}
+
+hr {
+  border-top-color: #2c313a !important;
+  border-bottom: 0 !important;
+}
+
+a.genesis-open {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 40;
+  background: #eceae6 !important;
+  color: #111111 !important;
+  text-decoration: none !important;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px;
+  line-height: 20px;
+}

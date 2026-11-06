@@ -1,0 +1,4 @@
+id=diagnostics
+name=Diagnostics
+kind=tool
+enabled=1

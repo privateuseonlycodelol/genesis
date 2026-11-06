@@ -1,0 +1,232 @@
+#!/bin/sh
+# Overlay plugin supervisor. One foreground loop, started by procd.
+# Service plugins are processes. File plugins are nginx config.
+# Tool plugins are run by the page, not by this loop.
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+ROOT=/genesis/plugins
+RUN=/var/run/genesis
+PIDFILE=$RUN/supervisor.pid
+LOCK=$RUN/lock
+
+mkdir -p "$RUN"
+
+log() {
+	logger -t genesis "$@" || true
+}
+
+field() {
+	id=$1
+	key=$2
+	file=$ROOT/$id/manifest
+	[ -f "$file" ] || return 1
+	sed -n "s/^${key}=//p" "$file" | head -n 1
+}
+
+enabled() {
+	val=$(field "$1" enabled || true)
+	[ "$val" = "1" ]
+}
+
+with_lock() {
+	n=0
+	while ! mkdir "$LOCK" 2>/dev/null; do
+		n=$((n + 1))
+		[ "$n" -gt 20 ] && return 1
+		sleep 1
+	done
+	"$@"
+	status=$?
+	rmdir "$LOCK" 2>/dev/null || true
+	return $status
+}
+
+start_dns() {
+	if pidof dnsproxy >/dev/null 2>&1; then
+		return 0
+	fi
+	execp=$(field dns exec || true)
+	a1=$(field dns arg1 || true)
+	a2=$(field dns arg2 || true)
+	[ -n "$execp" ] && [ -x "$execp" ] || return 1
+	if [ -n "$a2" ]; then
+		"$execp" "$a1" "$a2" >/dev/null 2>&1 &
+	elif [ -n "$a1" ]; then
+		"$execp" "$a1" >/dev/null 2>&1 &
+	else
+		"$execp" >/dev/null 2>&1 &
+	fi
+	log "started dns"
+}
+
+stop_dns() {
+	if pidof dnsproxy >/dev/null 2>&1; then
+		# shellcheck disable=SC2086
+		kill $(pidof dnsproxy) 2>/dev/null || true
+		log "stopped dns"
+	fi
+}
+
+sync_dns() {
+	if enabled dns; then
+		start_dns
+	else
+		stop_dns
+	fi
+}
+
+sync_skin() {
+	src=$ROOT/redesign/skin.conf
+	dst=/etc/nginx/main_genesis.conf
+	bak=$RUN/skin.conf.bak
+	changed=0
+	if enabled redesign; then
+		[ -f "$src" ] || return 0
+		if [ -f "$dst" ] && cmp -s "$src" "$dst"; then
+			return 0
+		fi
+		[ -f "$dst" ] && cp "$dst" "$bak"
+		cp "$src" "$dst"
+		changed=1
+	else
+		[ -f "$dst" ] || return 0
+		cp "$dst" "$bak"
+		rm -f "$dst"
+		changed=1
+	fi
+	if nginx -t >/dev/null 2>&1; then
+		/etc/init.d/nginx reload >/dev/null 2>&1 || true
+		log "reloaded nginx for the skin"
+	else
+		log "nginx test failed; restored the previous skin file"
+		if [ -f "$bak" ]; then
+			cp "$bak" "$dst"
+		elif [ "$changed" -eq 1 ]; then
+			rm -f "$dst"
+		fi
+	fi
+}
+
+sync_all() {
+	sync_dns
+	sync_skin
+}
+
+set_enabled() {
+	id=$1
+	val=$2
+	file=$ROOT/$id/manifest
+	[ -f "$file" ] || return 1
+	sed -i "s/^enabled=.*/enabled=${val}/" "$file"
+}
+
+toggle() {
+	id=$1
+	case "$id" in
+		dns|redesign) ;;
+		*) return 1 ;;
+	esac
+	if enabled "$id"; then
+		set_enabled "$id" 0
+	else
+		set_enabled "$id" 1
+	fi
+	sync_all
+}
+
+resolve_ips() {
+	nslookup dns.rilah.app 9.9.9.9 2>&1 | lua -e '
+		local text = io.read("*a")
+		local at = text:find("Name:")
+		local body = at and text:sub(at) or ""
+		local ips = {}
+		for ip in body:gmatch("Address[^:\n]*:%s*(%S+)") do
+			ips[#ips + 1] = ip
+		end
+		table.sort(ips)
+		io.write(table.concat(ips, " "))
+	'
+}
+
+health_ok() {
+	nslookup example.com 127.0.0.1 >/tmp/genesis-dns-health 2>&1
+	lua -e '
+		local handle = io.open("/tmp/genesis-dns-health")
+		local text = handle and handle:read("*a") or ""
+		if handle then handle:close() end
+		local at = text:find("Name:")
+		local body = at and text:sub(at) or ""
+		os.exit(body:find("Address") and 0 or 1)
+	'
+}
+
+watch_dns() {
+	# Same intervals as the retired bootstrap watcher.
+	if ! enabled dns; then
+		return 0
+	fi
+	loops=$((loops + 1))
+	if [ "$cooldown" -gt 0 ]; then
+		cooldown=$((cooldown - 1))
+	fi
+	if [ "$loops" -eq 1 ] || [ $((loops % 15)) -eq 0 ]; then
+		ips=$(resolve_ips) || ips=""
+		if [ -n "$ips" ]; then
+			if [ -n "$last_ips" ] && [ "$ips" != "$last_ips" ] && [ "$cooldown" -eq 0 ]; then
+				log "public address changed; restarting dns"
+				stop_dns
+				start_dns
+				cooldown=5
+				fail_loops=0
+			fi
+			last_ips=$ips
+		fi
+	fi
+	if [ "$loops" -ge 4 ]; then
+		if health_ok; then
+			fail_loops=0
+		else
+			fail_loops=$((fail_loops + 1))
+			if [ "$fail_loops" -ge 3 ] && [ "$cooldown" -eq 0 ]; then
+				log "dns failed for over a minute; restarting"
+				stop_dns
+				start_dns
+				cooldown=15
+				fail_loops=0
+			fi
+		fi
+	fi
+}
+
+cmd_toggle() {
+	with_lock toggle "$1"
+}
+
+loops=0
+cooldown=0
+fail_loops=0
+last_ips=""
+
+case "${1:-}" in
+	ctl)
+		case "${2:-}" in
+			toggle) cmd_toggle "$3" ;;
+			sync) with_lock sync_all ;;
+			*) exit 1 ;;
+		esac
+		exit $?
+		;;
+esac
+
+echo $$ > "$PIDFILE"
+trap 'rm -f "$PIDFILE"; exit 0' TERM INT
+log "supervisor started"
+with_lock sync_all
+
+# 20 second period, matching the retired watcher. Address check on the
+# first pass and then every fifteenth pass (about 300 seconds).
+while true; do
+	sleep 20
+	with_lock sync_dns
+	watch_dns
+done

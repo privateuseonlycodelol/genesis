@@ -17,6 +17,8 @@ The 2026-10-27 note that recovery flashing needs no vendor signature is overstat
 | Idle services | Usage meter and Airties `cloud-comm` disabled. `cwmpd` stopped. Telia MQTT still up. Wi-Fi left up | [Idle services](findings/f1-idle-services-stopped-2026-11-06.md), [reset parking lot](findings/f1-reset-persistence-2026-11-06.md) |
 | Reset | Parking lot re-seeded across an unplanned reboot. A button reset is still untested. `rtfd --all` still wipes it | [Reset parking lot](findings/f1-reset-persistence-2026-11-06.md) |
 | Upgrade wipe | A restore script is on the `opt` volume, which the flasher does not name. The launcher was left dormant and has not been shown running it | [Opt restore](findings/f1-opt-keep-root-2026-11-06.md) |
+| Admin UI | Overlay stylesheet, injected into HTML by nginx. Login page restyled. Templates unchanged | [UI skin](findings/f1-ui-skin-2026-11-06.md) |
+| Plugins | Supervisor on the overlay. DNS is the running plugin. Diagnostics and the skin are the other two. Page is `/genesis/` after login | [Plugin supervisor](findings/f1-plugin-supervisor-2026-11-06.md) |
 | WPS on port 49152 | No demonstrated pre-login bug | [WPS parser](findings/f1-hostapd-wps-parser-2026-11-06.md) |
 | Closed-case recovery | The boot flag exists. The web action that sets it has not been sent | [Closed-case BOOT-P](findings/f1-closed-case-bootp-2026-11-06.md) |
 
