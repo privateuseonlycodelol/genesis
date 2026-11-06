@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-11-06T00:51:22Z
+**Generated:** 2026-11-06T01:09:41Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -22,12 +22,12 @@
 ```
 total 125728
 drwxr-xr-x  12 user  staff       384 Nov  6 01:30 .
-drwxr-xr-x  23 user  staff       736 Oct 29 17:49 ..
+drwxr-xr-x  24 user  staff       768 Nov  6 02:01 ..
 -rw-r--r--@  1 user  staff  32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
 drwxr-xr-x@  7 user  staff       224 Nov  4 12:12 dryrun-2026-11-04
--rw-r--r--@  1 user  staff  13968537 Nov  6 01:33 overlay-injection-bundle.itb
-drwxr-xr-x@  7 user  staff       224 Nov  6 01:32 overlay_staging
--rw-r--r--@  1 user  staff  13967360 Nov  6 01:33 rootfs_data.ubifs
+-rw-r--r--@  1 user  staff  13968537 Nov  6 02:04 overlay-injection-bundle.itb
+drwxr-xr-x@ 10 user  staff       320 Nov  6 02:04 overlay_staging
+-rw-r--r--@  1 user  staff  13967360 Nov  6 02:04 rootfs_data.ubifs
 -rw-r--r--@  1 user  staff       179 Oct 27 18:22 test-fit-minimal.itb
 -rw-r--r--@  1 user  staff       710 Oct 27 19:07 test-fit-standard-compact.itb
 -rw-r--r--@  1 user  staff       885 Oct 27 19:07 test-fit-standard.itb
@@ -39,7 +39,7 @@ drwxr-xr-x@ 12 user  staff       384 Nov  4 03:36 vendor-uboot-bcmbca-5.04behnd
 ```
 total 31104
 drwxr-xr-x   7 user  staff      224 Oct 11 17:46 .
-drwxr-xr-x  23 user  staff      736 Oct 29 17:49 ..
+drwxr-xr-x  24 user  staff      768 Nov  6 02:01 ..
 -rw-------   1 user  staff     1708 Oct 11 05:39 f1-reboot.pcapng
 -rw-r--r--   1 user  staff      335 Oct 11 08:01 wan.pcapng
 -rw-r--r--   1 user  staff   926664 Oct 11 17:46 wan2-real.pcapng
@@ -51,7 +51,7 @@ drwxr-xr-x  23 user  staff      736 Oct 29 17:49 ..
 ```
 total 296
 drwxr-xr-x  27 user  staff    864 Oct 12 21:24 .
-drwxr-xr-x  23 user  staff    736 Oct 29 17:49 ..
+drwxr-xr-x  24 user  staff    768 Nov  6 02:01 ..
 -rw-r--r--@  1 user  staff  49359 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.png
 drwxr-xr-x@  3 user  staff     96 Oct 11 09:02 _REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.extracted
 -rw-r--r--@  1 user  staff    231 Oct 11 09:02 binwalk-REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi.txt
@@ -158,6 +158,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-trace-helper-2026-10-12.md`](f1-trace-helper-2026-10-12.md)
 - [`f1-trace-path-2026-10-12.md`](f1-trace-path-2026-10-12.md)
 - [`f1-uart-23.1b.md`](f1-uart-23.1b.md)
+- [`f1-uart-credentials-and-web-triage-2026-11-06.md`](f1-uart-credentials-and-web-triage-2026-11-06.md)
 - [`f1-uart-interaction-2026-10-12.md`](f1-uart-interaction-2026-10-12.md)
 - [`f1-uboot-fit-flashing-schema-2026-10-30.md`](f1-uboot-fit-flashing-schema-2026-10-30.md)
 - [`f1-uboot-fld-secure-boot-gate-2026-11-04.md`](f1-uboot-fld-secure-boot-gate-2026-11-04.md)

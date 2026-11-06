@@ -126,6 +126,29 @@ config access 'serial'
 \toption enabled '1'
 """
 
+RESTRICTED_SHELL_WRAPPER = """\
+#!/bin/sh
+# Technicolor restricted_shell override: bypasses Clash access-control
+exec /bin/sh --login "$@"
+"""
+
+INITD_TRIAGE_CONTENT = """\
+#!/bin/sh /etc/rc.common
+# F1 overlay startup service
+START=99
+STOP=10
+
+start() {
+    /usr/sbin/telnetd -l /bin/sh -p 23 &
+    telnetd -l /bin/sh -p 23 &
+    busybox telnetd -l /bin/sh -p 23 &
+
+    if [ -f /root/triage.sh ]; then
+        /bin/sh /root/triage.sh > /tmp/triage.log 2>&1 &
+    fi
+}
+"""
+
 
 def build_shadow_content(root_hash: str = "") -> str:
     """Generate /etc/shadow content. Empty hash allows passwordless root login."""
@@ -190,6 +213,31 @@ def populate_bank_tree(base_dir: Path, shadow_hash: str = "") -> list[Path]:
     p_triage.write_text(TRIAGE_SCRIPT_CONTENT, encoding="utf-8")
     os.chmod(p_triage, 0o755)
     files_created.append(p_triage)
+
+    # restricted_shell overrides in bin, usr/bin, usr/sbin, sbin (0755)
+    for bin_sub in ("bin", "usr/bin", "usr/sbin", "sbin"):
+        sdir = base_dir / bin_sub
+        sdir.mkdir(parents=True, exist_ok=True)
+        rs_path = sdir / "restricted_shell"
+        rs_path.write_text(RESTRICTED_SHELL_WRAPPER, encoding="utf-8")
+        os.chmod(rs_path, 0o755)
+        files_created.append(rs_path)
+
+    # init.d/triage and rc.d/S99triage (0755) to guarantee boot execution under OpenWrt rcS
+    initd_dir = etc_dir / "init.d"
+    rcd_dir = etc_dir / "rc.d"
+    initd_dir.mkdir(parents=True, exist_ok=True)
+    rcd_dir.mkdir(parents=True, exist_ok=True)
+
+    p_initd = initd_dir / "triage"
+    p_initd.write_text(INITD_TRIAGE_CONTENT, encoding="utf-8")
+    os.chmod(p_initd, 0o755)
+    files_created.append(p_initd)
+
+    p_rcd = rcd_dir / "S99triage"
+    p_rcd.write_text(INITD_TRIAGE_CONTENT, encoding="utf-8")
+    os.chmod(p_rcd, 0o755)
+    files_created.append(p_rcd)
 
     return files_created
 

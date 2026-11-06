@@ -9,9 +9,11 @@ from pathlib import Path
 from scripts.generate_f1_overlay import (
     CLASH_CONFIG_CONTENT,
     DROPBEAR_CONFIG_CONTENT,
+    INITD_TRIAGE_CONTENT,
     INITTAB_CONTENT,
     PASSWD_CONTENT,
     RC_LOCAL_CONTENT,
+    RESTRICTED_SHELL_WRAPPER,
     TRIAGE_SCRIPT_CONTENT,
     generate_overlay_staging,
 )
@@ -61,6 +63,22 @@ class TestGenerateF1Overlay(unittest.TestCase):
             self.assertTrue(triage.is_file())
             self.assertEqual(triage.read_text(), TRIAGE_SCRIPT_CONTENT)
             self.assertEqual(oct(stat.S_IMODE(triage.stat().st_mode)), "0o755")
+
+            # Check restricted_shell override in bin/restricted_shell
+            rs = bank2_dir / "bin" / "restricted_shell"
+            self.assertTrue(rs.is_file())
+            self.assertEqual(rs.read_text(), RESTRICTED_SHELL_WRAPPER)
+            self.assertEqual(oct(stat.S_IMODE(rs.stat().st_mode)), "0o755")
+
+            # Check init.d and rc.d triage services
+            initd = bank2_dir / "etc" / "init.d" / "triage"
+            rcd = bank2_dir / "etc" / "rc.d" / "S99triage"
+            self.assertTrue(initd.is_file())
+            self.assertEqual(initd.read_text(), INITD_TRIAGE_CONTENT)
+            self.assertEqual(oct(stat.S_IMODE(initd.stat().st_mode)), "0o755")
+            self.assertTrue(rcd.is_file())
+            self.assertEqual(rcd.read_text(), INITD_TRIAGE_CONTENT)
+            self.assertEqual(oct(stat.S_IMODE(rcd.stat().st_mode)), "0o755")
 
     def test_custom_password_and_hash(self):
         with tempfile.TemporaryDirectory() as tmpdir:
