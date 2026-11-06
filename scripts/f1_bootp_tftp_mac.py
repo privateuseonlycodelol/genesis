@@ -361,6 +361,8 @@ def main() -> int:
     parser.add_argument("--file", help="Path to custom file to serve instead of text payload")
     parser.add_argument("--timeout", type=int, default=180, help="Listen timeout in seconds")
     parser.add_argument("--log-dir", default="artifacts/bootp/live-mac", help="Directory for logs")
+    parser.add_argument("--reboot", action="store_true", help="Trigger graceful reboot via web UI once listeners are armed")
+    parser.add_argument("--router-url", default="http://192.168.1.1", help="Router base URL for reboot trigger")
     args = parser.parse_args()
 
     if os.geteuid() != 0:
@@ -472,7 +474,19 @@ def main() -> int:
     tftp_ack_received = False
 
     print(f"[*] Ready. Waiting for router boot (timeout in {args.timeout}s)...")
-    print(">>> Power on the router now! <<<")
+    if args.reboot:
+        print(f"[*] Triggering graceful router reboot via {args.router_url}...")
+        reboot_script = Path(__file__).resolve().parent / "f1_restart_router.py"
+        try:
+            subprocess.Popen(
+                [sys.executable, str(reboot_script), "--base", args.router_url, "--yes"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        except Exception as e:
+            print(f"[!] Warning: failed to trigger reboot: {e}")
+    else:
+        print(">>> Power on the router now! <<<")
 
     with open(session_log, "a") as log:
         log.write(f"=== Session started at {time.ctime()} ===\n")
@@ -593,10 +607,10 @@ def main() -> int:
                             log.write(msg)
                             log.flush()
 
-                # If ACK received, wait 15s for the bootloader's action 3 execution logs before closing
+                # If ACK received, wait for the bootloader's action 3 flash upgrade AND Linux kernel boot
                 if tftp_ack_received:
-                    print("[*] TFTP transfer complete! Waiting 15s to capture bootloader parser output...")
-                    time.sleep(15)
+                    print("[*] TFTP transfer complete! Watching flash upgrade and boot sequence for 90s...")
+                    time.sleep(90)
                     break
 
         except KeyboardInterrupt:

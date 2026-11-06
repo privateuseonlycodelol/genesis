@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-11-05T20:43:35Z
+**Generated:** 2026-11-06T00:51:22Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -20,17 +20,18 @@
 
 ## `artifacts/firmware`
 ```
-total 77968
-drwxr-xr-x  11 user  staff       352 Nov  5 17:31 .
+total 125728
+drwxr-xr-x  12 user  staff       384 Nov  6 01:30 .
 drwxr-xr-x  23 user  staff       736 Oct 29 17:49 ..
 -rw-r--r--@  1 user  staff  32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
 drwxr-xr-x@  7 user  staff       224 Nov  4 12:12 dryrun-2026-11-04
--rw-r--r--@  1 user  staff   3302553 Nov  5 21:41 overlay-injection-bundle.itb
-drwxr-xr-x@  6 user  staff       192 Nov  5 21:41 overlay_staging
--rw-r--r--@  1 user  staff   3301376 Nov  5 21:41 rootfs_data.ubifs
+-rw-r--r--@  1 user  staff  13968537 Nov  6 01:33 overlay-injection-bundle.itb
+drwxr-xr-x@  7 user  staff       224 Nov  6 01:32 overlay_staging
+-rw-r--r--@  1 user  staff  13967360 Nov  6 01:33 rootfs_data.ubifs
 -rw-r--r--@  1 user  staff       179 Oct 27 18:22 test-fit-minimal.itb
 -rw-r--r--@  1 user  staff       710 Oct 27 19:07 test-fit-standard-compact.itb
 -rw-r--r--@  1 user  staff       885 Oct 27 19:07 test-fit-standard.itb
+-rw-r--r--@  1 user  staff   3301376 Nov  6 01:30 test_ubifs.img
 drwxr-xr-x@ 12 user  staff       384 Nov  4 03:36 vendor-uboot-bcmbca-5.04behnd
 ```
 
@@ -143,6 +144,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-ipping-host-2026-10-12.md`](f1-ipping-host-2026-10-12.md)
 - [`f1-js-deep-2026-10-12.md`](f1-js-deep-2026-10-12.md)
 - [`f1-kernel-rip-keystore-decomp-2026-10-29.md`](f1-kernel-rip-keystore-decomp-2026-10-29.md)
+- [`f1-live-overlay-injection-2026-11-06.md`](f1-live-overlay-injection-2026-11-06.md)
 - [`f1-logviewer.md`](f1-logviewer.md)
 - [`f1-nand-read-plan-2026-10-27.md`](f1-nand-read-plan-2026-10-27.md)
 - [`f1-offline-overlay-pipeline-2026-11-05.md`](f1-offline-overlay-pipeline-2026-11-05.md)

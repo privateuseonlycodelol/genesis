@@ -38,7 +38,7 @@ DEFAULT_OUT_FIT = REPO_ROOT / "artifacts" / "firmware" / "overlay-injection-bund
 GCNT_X_MIN_IO_SIZE = 4096
 GCNT_X_LEB_SIZE = 253952  # 248 KiB
 GCNT_X_MAX_LEB_CNT = 403  # 97 MiB
-GCNT_X_JOURNAL_SIZE = 5079040  # 4 MiB (20 LEBs)
+GCNT_X_JOURNAL_SIZE = 1015808  # 1 MiB (4 LEBs) - ensures journal fits in dynamic UBI volume
 GCNT_X_COMPRESSION = "zlib"
 
 
@@ -61,6 +61,10 @@ def build_overlay_bundle(
         generate_overlay_staging(
             staging_dir, password=root_password if root_password else None
         )
+        # Create a 10 MiB padding file so U-Boot creates an adequately-sized dynamic UBI volume (>50 LEBs)
+        pad_path = staging_dir / "pad.dat"
+        if not pad_path.exists() or pad_path.stat().st_size != 10 * 1024 * 1024:
+            pad_path.write_bytes(os.urandom(10 * 1024 * 1024))
 
     # Step 2: Validate mkfs.ubifs binary
     if not mkfs_ubifs_bin.is_file():
@@ -85,6 +89,7 @@ def build_overlay_bundle(
         str(GCNT_X_JOURNAL_SIZE),
         "-x",
         GCNT_X_COMPRESSION,
+        "-F",  # free-space fixup on first mount
         "-U",  # squash uids to root (0:0)
         "-o",
         str(out_ubifs),

@@ -27,11 +27,11 @@ from pathlib import Path
 INITTAB_CONTENT = """\
 ::sysinit:/etc/init.d/rcS S boot
 ::shutdown:/etc/init.d/rcS K shutdown
-::askconsole:/bin/ash --login
+::askconsole:/bin/sh --login
 """
 
 PASSWD_CONTENT = """\
-root:x:0:0:root:/root:/bin/ash
+root:x:0:0:root:/root:/bin/sh
 daemon:*:1:1:daemon:/var:/bin/false
 ftp:*:55:55:ftp:/home/ftp:/bin/false
 network:*:101:101:network:/var:/bin/false
@@ -41,9 +41,9 @@ nobody:*:65534:65534:nobody:/var:/bin/false
 RC_LOCAL_CONTENT = """\
 #!/bin/sh
 # F1 recovery overlay startup script
-if command -v busybox >/dev/null 2>&1; then
-    busybox telnetd -l /bin/ash -p 23 &
-fi
+/usr/sbin/telnetd -l /bin/sh -p 23 &
+telnetd -l /bin/sh -p 23 &
+busybox telnetd -l /bin/sh -p 23 &
 
 if [ -f /root/triage.sh ]; then
     /bin/sh /root/triage.sh > /tmp/triage.log 2>&1 &
@@ -114,6 +114,7 @@ config dropbear
 \toption RootPasswordAuth 'on'
 \toption Port '22'
 \toption Interface 'lan'
+\toption enable '1'
 """
 
 CLASH_CONFIG_CONTENT = """\
