@@ -190,17 +190,33 @@ if [ -f /etc/passwd ] && grep -q "/root:.*restricted_shell" /etc/passwd; then
     sed -i 's#/root:.*$#/root:/bin/sh#' /etc/passwd
 fi
 
-# Dump keys into syslog and /tmp/rip
+# Copy RIP items aside, then log the shadow hash and the long RIP items
+# one hexdump line at a time. A single logger line is capped near 1040 chars.
+log_lines() {
+    tag="$1"
+    path="$2"
+    [ -f "$path" ] || return 0
+    n=0
+    hexdump -C "$path" 2>/dev/null | while read -r line; do
+        logger -t GENESIS_KEYS "$tag $n $line"
+        n=$((n + 1))
+    done
+    logger -t GENESIS_KEYS "$tag end"
+}
+
 if [ -d /proc/rip ]; then
     mkdir -p /tmp/rip
     for f in /proc/rip/*; do
         if [ -f "$f" ]; then
             cp "$f" /tmp/rip/ 2>/dev/null
-            val=$(hexdump -C "$f" 2>/dev/null | tr '\\n' ' ')
-            logger -t GENESIS_KEYS "$f: $val"
         fi
     done
 fi
+
+log_lines SHADOW /etc/shadow
+log_lines ROMSHADOW /rom/etc/shadow
+log_lines RIP0120 /proc/rip/0120
+log_lines RIP011A /proc/rip/011a
 
 # Run triage script if present
 if [ -f /root/triage.sh ] && [ ! -f /tmp/triage_executed.flag ]; then

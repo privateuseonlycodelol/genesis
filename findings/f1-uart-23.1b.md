@@ -9,6 +9,8 @@
 
 ## Firmware
 
+**Superseded 2026-11-06:** both 23.1.b rootfs volumes are decrypted squashfs images, and this unit's OSCK unwraps the 19.x reference RBI. See [f1-flash-volumes-2026-11-06.md](f1-flash-volumes-2026-11-06.md). The paragraph below is the state before those dumps.
+
 The live **23.1.b** image is not on disk. The only firmware file is the offline 19.x reference (`artifacts/firmware/REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi`, sha256 `2d46e728b73fda7fd2f5af2d5a4b06f8a5d5dfb1409bdaebe1f6447b6b1453de`). Unwrap failed: **71** unique OSCK trials (latest [rbi-crypto-attempt3.md](rbi-crypto-attempt3.md)), all `bad_osck`. LCM returned `Apps was not found` for GCNT-X 23.1.b and 23.1. Do not flash that 19.x RBI onto this unit.
 
 **Public boot log (not this unit):** GCNT-X **19.4.0856** UART capture ([pastebin biRghtLr](https://pastebin.com/raw/biRghtLr), quoted in [gcnt-x-public-hardware.md](gcnt-x-public-hardware.md)) — MTD map, **aarch64 Linux 4.1.52**, `.r2secr=0x17fdf000`, `OSCK Loaded!` without key bytes. Does not decrypt the sealed RBI offline.

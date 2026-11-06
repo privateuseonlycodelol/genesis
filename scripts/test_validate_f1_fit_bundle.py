@@ -261,6 +261,19 @@ class TestValidateF1FitBundle(unittest.TestCase):
         )
         del kernel_fit
 
+    def test_gled_vendor_bootfs_is_not_the_unsigned_gate(self):
+        w = FdtWriter()
+        w.begin_node("")
+        w.property_string("description", "vendor-shaped")
+        w.begin_node("brcm_rootfs_encrypt")
+        w.property_string("device", "/dev/ubiblock0_4")
+        w.end_node()
+        w.end_node()
+        report = Report()
+        validate_bootfs_payload(w.build() + b"GLED" + b"\x00" * 8, report)
+        self.assertFalse(any("SECURE-BOOT GATE" in x for x in report.warnings))
+        self.assertTrue(any("GLED" in i for i in report.info))
+
     def test_non_fdt_bootfs_payload_warns(self):
         report = Report()
         validate_bootfs_payload(b"RAWVENDORBLOB", report)

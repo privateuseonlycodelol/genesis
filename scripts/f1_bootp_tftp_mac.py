@@ -265,8 +265,11 @@ class UartPromptTrigger:
     def feed(self, chunk: str) -> bool:
         """Feed incoming text chunk. Returns True immediately if prompt triggered."""
         self.buffer += chunk
+        # One 'b' per run. Re-arming on the next U-Boot SPL sent the router
+        # back into BOOT-P after a successful flash, with no TFTP server answering.
+        if self.sent_count:
+            return False
         if self.reset_marker in self.buffer:
-            self.answered = False
             idx = self.buffer.rfind(self.reset_marker)
             self.buffer = self.buffer[idx:]
 

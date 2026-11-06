@@ -14,7 +14,7 @@ Prior matrix: [f1-cups-ipp-readonly-matrix-2026-10-12.md](f1-cups-ipp-readonly-m
 | All tested **GET/HEAD** paths (`/`, `/admin/`, `/printers/`, `/admin/conf/cupsd.conf`, `/version.txt`, `/admin/log/error_log`, …) → **403**, identical **343-byte** HTML | `<Location />` (and siblings) use **deny-by-default** without an `Allow from` matching the client; matches CUPS docs on “Forbidden” for remote web UI | **DERIVED** |
 | Body text `Forbidden - CUPS v2.2.10` | **WebInterface** likely **off** or otherwise not serving pages; version string is **body-reported** | **DERIVED** |
 | **`application/ipp` POST** reaches handlers without `WWW-Authenticate` on read probes | Default IPP **policy tail** (`<Limit All> Order deny,allow`) or vendor-equivalent allows anonymous **read** ops; separate from HTTP location ACL | **DERIVED** |
-| No `cupsd.conf` from firmware/rootfs yet | RBI/strings pass had **no** `cupsd.conf` text; offline 23.1.b rootfs still missing | **UNKNOWN** |
+| No `cupsd.conf` from firmware/rootfs yet | RBI/strings pass had **no** `cupsd.conf` text. **Superseded 2026-11-06:** the file is 1,052 bytes; see the ground-truth section | **VERIFIED** (file); HTTP pages still **403** |
 
 ## ipptool cross-check (Apple CUPS 2.3.4 client → device)
 
@@ -54,11 +54,13 @@ Driver: `scripts/cups_ipp_policy_probe.py`. Evidence: `artifacts/management/cups
 
 1. **Impact ceiling (today):** unauthenticated **IPP read/metadata** on an **empty** print server—job lists, server queries, and helper **invocation attempts**—not Homeware admin, not firmware, not config files via HTTP.
 2. **Policy model:** HTTP location ACL **denies pages**; IPP policy **allows reads** and attempts **driver/device helpers**; **remote local-queue creation** is blocked; **queue administration opcodes on this build do not mirror upstream** (treat version string as weak signal).
-3. **Blocker for “obvious” offline config:** 23.1.b rootfs / `cupsd.conf` still unavailable; RBI reference image did not yield strings.
+3. **Blocker for “obvious” offline config:** at the time of this pass, 23.1.b `cupsd.conf` was still unavailable. **Superseded 2026-11-06:** the file is 1,052 bytes and matches `/rom` and the live path. See the section below.
 
 ## Config ground truth (`cupsd.conf`) — how to obtain it
 
-**Not available today** via CUPS HTTP (`GET /admin/conf/cupsd.conf` → same **403** as `/`) or Homeware `export_config` (encrypted backup envelope, not `/etc/cups/*`).
+**At the time of this pass:** not available via CUPS HTTP (`GET /admin/conf/cupsd.conf` → same **403** as `/`) or Homeware `export_config`.
+
+**Superseded 2026-11-06 (VERIFIED).** `/rom/etc/cups/cupsd.conf` and `/etc/cups/cupsd.conf` are the same 1,052-byte file (MD5 `82b71646da074854501a4a45f45aee4e`), copied in `artifacts/firmware/rom-2026-11-06/rom.tar.gz`. It sets `Port 631`, `<Location />` allow `127.0.0.1` and `192.168.1.0/24`, and `<Location /admin>` `AuthType None` / `Allow From All`. No `<Policy>` block. `WebInterface` is unset. One GET each of `http://192.168.1.1:631/` and `/admin/` from `192.168.1.100` still returned HTTP **403**, 343 bytes, so those Allow lines do not open the HTTP pages.
 
 | Path | What you get | Status on this project |
 | --- | --- | --- |

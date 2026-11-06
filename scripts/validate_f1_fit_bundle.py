@@ -104,6 +104,16 @@ def validate_bootfs_payload(data: bytes, report: Report) -> None:
 
     # Secure-boot gate: appended tag region after fdt_totalsize.
     trailing = data[fdt_size:]
+    # On-flash 23.1.b bootfs is a small FIT header plus external image bytes.
+    # The first four of those bytes are "GLED", not the FITS/FITP tag this
+    # checker was written for. The board already boots that layout.
+    if trailing[:4] == b"GLED" and "/brcm_rootfs_encrypt" in nodes:
+        report.info.append(
+            "inner bootfs matches the on-flash vendor layout: FDT totalsize "
+            "ends at a GLED image container and /brcm_rootfs_encrypt is present. "
+            "Signature bytes are not checked offline."
+        )
+        return
     has_sig = False
     for tag in (
         BCM_TAG_FIT_HDR_SEC_SIGNATURE,
@@ -253,6 +263,11 @@ def validate_bundle(data: bytes) -> Report:
                 report.info.append(
                     "rootfs starts with UBIFS magic: nand_load_bootfs() would set "
                     "rootfstype=ubifs instead of the SquashFS fallback"
+                )
+            elif any("/brcm_rootfs_encrypt" in line and "declares" in line for line in report.info):
+                report.info.append(
+                    "rootfs has no SquashFS/UBIFS magic: expected for the encrypted "
+                    "volume paired with /brcm_rootfs_encrypt"
                 )
             else:
                 report.warnings.append(

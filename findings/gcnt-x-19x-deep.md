@@ -54,7 +54,9 @@ Cleartext `strings` in the file are limited to the header/metadata region (`GCNT
 | Brute OSCK | **71 unique keys** (attempt3) | Community `osck/` + header/HMAC + **19.4.0856 boot-log** derivations — all `bad_osck` — [rbi-crypto-attempt3.md](rbi-crypto-attempt3.md); attempt1 baseline in [rbi-crypto-debug.md](rbi-crypto-debug.md) |
 | Logviewer “key” from #321 | **Not OSCK** | 16-byte value; does not decrypt RBI |
 
-**Conclusion:** Offline decrypt on this Mac is **not possible** without extracting **GCNT-X OSCK** from hardware (root shell / NAND / `secr`-style dump) or a community-published `GCNT-X.osck`.
+**Superseded 2026-11-06:** this unit's OSCK unwraps the reference RBI. See [f1-flash-volumes-2026-11-06.md](f1-flash-volumes-2026-11-06.md). The conclusion below is the state before that key existed off the box.
+
+**Conclusion (at the time of this note):** Offline decrypt on this Mac is **not possible** without extracting **GCNT-X OSCK** from hardware (root shell / NAND / `secr`-style dump) or a community-published `GCNT-X.osck`.
 
 Expected on-device pipeline (when OSCK is known), from [hack-technicolor Upgrade](https://hack-technicolor.readthedocs.io/en/stable/Upgrade/):
 

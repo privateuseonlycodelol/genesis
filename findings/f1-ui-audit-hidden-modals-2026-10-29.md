@@ -47,7 +47,7 @@ By analyzing `usr/share/transformer/commitapply/` and `mappings/rpc/system.map` 
      - Signature algorithm: `HMAC-SHA1` with key `get_rip_random("0108"):sub(1,64)` (`RIP_ID_RANDOM_KEY_B`).
      - Plaintext / unsigned imports are gated by `uci_get_boolean("system.config.import_plaintext")` and `uci_get_boolean("system.config.import_unsigned")`.
 2. **Reboot and Recovery Primitives in `rpc_system.ca`:**
-   - `^sys%.bootp%.enable /usr/bin/bootp`: Setting `sys.bootp.enable = 1` invokes `/usr/bin/bootp`, commanding a reboot into BOOTP upgrade mode directly from userland without hardware/UART pins.
+   - `^sys%.bootp%.enable /usr/bin/bootp`: Setting `sys.bootp.enable = 1` invokes `/usr/bin/bootp`. **At the time of this audit** that was read as a reboot into the flasher. The U-Boot side was traced offline on 2026-11-06 and the live POST is still untested: [f1-closed-case-bootp-2026-11-06.md](f1-closed-case-bootp-2026-11-06.md).
    - `^rpc%.system%.switchover cat /proc/banktable/notbooted > /proc/banktable/active; reboot`: Setting `rpc.system.switchover = 1` flips the boot bank and reboots.
 
 ---
@@ -67,7 +67,7 @@ By analyzing `usr/share/transformer/commitapply/` and `mappings/rpc/system.map` 
 1. **CUPS Port 631 Manipulation via `printersharing-modal.lp`:**
    - Now that we know `printersharing-modal.lp` is live and maps to `uci.printersharing.config.webui`, we can test if submitting `printersharing_webui = 1` enables the CUPS administrative Web UI (`cupsctl WebInterface=yes`). If enabled, CUPS 631 may expose new authenticated surfaces or printer driver filters.
 2. **`system_bootp` Recovery Trigger:**
-   - An authenticated POST to `system-config-modal.lp` with `action=system_bootp` triggers `/usr/bin/bootp`, allowing controlled entry into BOOTP recovery mode on demand.
+   - An authenticated POST to `system-config-modal.lp` with `action=system_bootp` calls `/usr/bin/bootp`. Superseded as a live claim by [f1-closed-case-bootp-2026-11-06.md](f1-closed-case-bootp-2026-11-06.md): the bootloader consumer is now traced offline; the POST has not been sent.
 
 ---
 

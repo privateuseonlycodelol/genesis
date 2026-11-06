@@ -4,7 +4,7 @@
 
 This pass resolved the fundamental operational mystery of why prior overlay filesystem injections were wiped upon recovery flashing, and why root access on the serial console was rejected before `login` or password prompts could run. By reverse-engineering primary source files from Technicolor Homeware (`lib/mount_root/*`, `lib/preinit/*`, `bin/restricted_shell`, and `usr/lib/lua/clash-access-control.lua`), we identified the exact lifecycle mechanisms and engineered a robust **quadruple-vector persistence engine** inside `scripts/generate_f1_overlay.py`.
 
-**VERIFIED:**
+**VERIFIED (script order only; script bodies are UNVERIFIED, see Source Provenance below):**
 1. **The Root Cause of Overlay Wiping on TFTP Upgrade:**
    - On BOOTP/TFTP recovery flashing, U-Boot increments the sequence counter (`seq 4,3` -> `seq 4,5`), which signals an upgrade/recovery boot.
    - During Linux boot, `lib/mount_root/20_rtfd_remove` evaluates `/overlay/remove_due_to_rtfd`:
@@ -96,6 +96,13 @@ This pass resolved the fundamental operational mystery of why prior overlay file
 
 ---
 
+## Source Provenance (offline check, 2026-11-06)
+
+- **Script order: VERIFIED.** `artifacts/uart/warm-reboot-20261106-033129/console.log` lines 1003-1012 show `mount_root` running `00_overlay_bank_check.sh`, `00_rtfd_all`, `10_remove_due_to_upgrade`, `20_rtfd_remove`, `30_parameter_conversion` and `80_rtfd_restore`, on a Bank 2 boot. The log proves the scripts ran, not what they do: `80_rtfd_restore` printed no copy messages.
+- **Script bodies: UNVERIFIED.** No copy of `lib/mount_root/*`, `bin/restricted_shell` or `usr/lib/lua/clash-access-control.lua` from the 23.1.b image exists under `artifacts/` or `tools/`. Searched with `find` for `*rtfd*`, `80_*`, `clash-access*`, and with `grep` for `keep_persistent_files_rtfd` and `remove_due_to_rtfd`. The only hits are this finding and the generated overlay staging. The code blocks in items 1-4 above cannot be reproduced from local evidence.
+- **Consequences:** that `80_rtfd_restore` copies `rtfd_persistent_files/` into the active bank, and that a Lua stub bypasses Clash, are HYPOTHESES until the source is obtained or a device test confirms them. The quoted restore loop never assigns `dest_dir`, so it cannot show how the second column of `rtfd_persistent_filelist.conf` (for example `/etc/passwd etc`) is used.
+- **Staged content, flashed later the same day.** The bundle described here was written on the live unit. The cron hook ran; TCP 23 did not accept a connection. See [f1-quad-overlay-flash-2026-11-06.md](f1-quad-overlay-flash-2026-11-06.md). At the time of this section, `obuspa_retriever.sh`, `etc/rc.local` and `etc/rc.d/S99triage` each started `telnetd -l /bin/sh -p 23`, and the staged root password field was empty.
+
 ## What Was Not Shown
 
 - Root shell prompt has not yet been interacted with live on UART post-quadruple-vector injection.
@@ -108,3 +115,5 @@ This pass resolved the fundamental operational mystery of why prior overlay file
 1. **TFTP Flash with Quadruple-Vector Bundle:** Run `scripts/f1_bootp_tftp_mac.py` to flash the updated bundle containing RTFD persistence and Lua ACL overrides.
 2. **Serial Console Interaction:** Monitor boot console; verify `80_rtfd_restore` copies persistent files; observe whether serial console allows uninhibited root shell.
 3. **Extract Keys:** Collect `/proc/rip/0108` and `/proc/rip/0120` from syslog or telnet to decrypt the saved configuration backup.
+4. **Obtain the 23.1.b `lib/mount_root` and Clash sources** (GPL request or the image) before relying on the RTFD mechanism. Nothing local can settle it.
+5. **Decide on the LAN-exposed root shell before any flash.** The staged hooks open an unauthenticated root `telnetd` on TCP 23 and the root password is blank. Confirm the lab LAN is isolated, or change `scripts/generate_f1_overlay.py` first.

@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-11-06T03:10:42Z
+**Generated:** 2026-11-06T20:33:55Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -20,14 +20,21 @@
 
 ## `artifacts/firmware`
 ```
-total 125728
-drwxr-xr-x  12 user  staff       384 Nov  6 01:30 .
+total 629160
+drwxr-xr-x  19 user  staff       608 Nov  6 20:26 .
 drwxr-xr-x  24 user  staff       768 Nov  6 02:01 ..
+-rw-r--r--@  1 user  staff      6148 Nov  6 19:51 .DS_Store
+-rw-r--r--@  1 user  staff  63470903 Nov  6 20:26 GCNT-X-23.1.b-bank1.itb
+-rw-r--r--@  1 user  staff  68803903 Nov  6 20:26 GCNT-X-23.1.b-bank2.itb
 -rw-r--r--@  1 user  staff  32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
 drwxr-xr-x@  7 user  staff       224 Nov  4 12:12 dryrun-2026-11-04
--rw-r--r--@  1 user  staff  13968537 Nov  6 04:08 overlay-injection-bundle.itb
+drwxr-xr-x@ 18 user  staff       576 Nov  6 20:08 flash-2026-11-06
+-rw-r--r--@  1 user  staff  13968537 Nov  6 19:28 overlay-injection-bundle.itb
 drwxr-xr-x@ 17 user  staff       544 Nov  6 04:08 overlay_staging
--rw-r--r--@  1 user  staff  13967360 Nov  6 04:08 rootfs_data.ubifs
+-rw-r--r--@  1 user  staff  62914560 Nov  6 20:14 rbi-19x-inner.bin
+-rw-r--r--@  1 user  staff  62914566 Nov  6 20:13 rbi-19x-payload.bin
+drwxr-xr-x@  5 user  staff       160 Nov  6 19:51 rom-2026-11-06
+-rw-r--r--@  1 user  staff  13967360 Nov  6 19:28 rootfs_data.ubifs
 -rw-r--r--@  1 user  staff       179 Oct 27 18:22 test-fit-minimal.itb
 -rw-r--r--@  1 user  staff       710 Oct 27 19:07 test-fit-standard-compact.itb
 -rw-r--r--@  1 user  staff       885 Oct 27 19:07 test-fit-standard.itb
@@ -112,14 +119,17 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-boot-menu-a-key-2026-10-27.md`](f1-boot-menu-a-key-2026-10-27.md)
 - [`f1-bootp-lan-2026-10-13.md`](f1-bootp-lan-2026-10-13.md)
 - [`f1-bypass-crypto-options.md`](f1-bypass-crypto-options.md)
+- [`f1-closed-case-bootp-2026-11-06.md`](f1-closed-case-bootp-2026-11-06.md)
 - [`f1-config-export-decrypt-2026-10-12.md`](f1-config-export-decrypt-2026-10-12.md)
 - [`f1-cups-ipp-policy-2026-10-12.md`](f1-cups-ipp-policy-2026-10-12.md)
 - [`f1-cups-ipp-readonly-matrix-2026-10-12.md`](f1-cups-ipp-readonly-matrix-2026-10-12.md)
 - [`f1-diagnostics-connection-restart-2026-10-12.md`](f1-diagnostics-connection-restart-2026-10-12.md)
+- [`f1-doh-and-tracking-2026-11-06.md`](f1-doh-and-tracking-2026-11-06.md)
 - [`f1-export-log-modal-2026-10-28.md`](f1-export-log-modal-2026-10-28.md)
 - [`f1-firmware-acquisition-paths-2026-10-27.md`](f1-firmware-acquisition-paths-2026-10-27.md)
 - [`f1-firmware-session-index-2026-10-27.md`](f1-firmware-session-index-2026-10-27.md)
 - [`f1-fit-rootfs-packaging-2026-10-27.md`](f1-fit-rootfs-packaging-2026-10-27.md)
+- [`f1-flash-volumes-2026-11-06.md`](f1-flash-volumes-2026-11-06.md)
 - [`f1-gap-attack-pass-2026-10-12.md`](f1-gap-attack-pass-2026-10-12.md)
 - [`f1-gateway-url-action-2026-10-12.md`](f1-gateway-url-action-2026-10-12.md)
 - [`f1-gpl-source-request-2026-10-29.md`](f1-gpl-source-request-2026-10-29.md)
@@ -139,6 +149,8 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-har-wanetc-2026-10-12.md`](f1-har-wanetc-2026-10-12.md)
 - [`f1-hardware-key-blocker-2026-10-12.md`](f1-hardware-key-blocker-2026-10-12.md)
 - [`f1-hidden-action-boundary-2026-10-12.md`](f1-hidden-action-boundary-2026-10-12.md)
+- [`f1-hostapd-wps-parser-2026-11-06.md`](f1-hostapd-wps-parser-2026-11-06.md)
+- [`f1-idle-services-stopped-2026-11-06.md`](f1-idle-services-stopped-2026-11-06.md)
 - [`f1-internet-outage-2026-10-28.md`](f1-internet-outage-2026-10-28.md)
 - [`f1-ipping-helper-2026-10-12.md`](f1-ipping-helper-2026-10-12.md)
 - [`f1-ipping-host-2026-10-12.md`](f1-ipping-host-2026-10-12.md)
@@ -151,10 +163,12 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-offline-overlay-pipeline-2026-11-05.md`](f1-offline-overlay-pipeline-2026-11-05.md)
 - [`f1-password-encoding-cli-trace-2026-10-15.md`](f1-password-encoding-cli-trace-2026-10-15.md)
 - [`f1-printersharing-webui-2026-10-29.md`](f1-printersharing-webui-2026-10-29.md)
+- [`f1-quad-overlay-flash-2026-11-06.md`](f1-quad-overlay-flash-2026-11-06.md)
 - [`f1-rea-har-pass-2026-10-17.md`](f1-rea-har-pass-2026-10-17.md)
 - [`f1-recovery-flash-bank2-analysis-2026-11-06.md`](f1-recovery-flash-bank2-analysis-2026-11-06.md)
 - [`f1-research-composite-2026-10-13.md`](f1-research-composite-2026-10-13.md)
 - [`f1-rootfs-data-overlay-flashing-2026-11-04.md`](f1-rootfs-data-overlay-flashing-2026-11-04.md)
+- [`f1-rootfs-diff-listeners-2026-11-06.md`](f1-rootfs-diff-listeners-2026-11-06.md)
 - [`f1-rootfs-key-l598-2026-10-27.md`](f1-rootfs-key-l598-2026-10-27.md)
 - [`f1-software-link-hunt-2026-10-29.md`](f1-software-link-hunt-2026-10-29.md)
 - [`f1-trace-helper-2026-10-12.md`](f1-trace-helper-2026-10-12.md)
@@ -169,6 +183,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-ui-grab-2026-10-12.md`](f1-ui-grab-2026-10-12.md)
 - [`f1-ui-leads-23.1b.md`](f1-ui-leads-23.1b.md)
 - [`f1-unturned-stones-2026-10-29.md`](f1-unturned-stones-2026-10-29.md)
+- [`f1-usage-dashboard-2026-11-06.md`](f1-usage-dashboard-2026-11-06.md)
 - [`f1-usp-ipping-2026-10-12.md`](f1-usp-ipping-2026-10-12.md)
 - [`f1-wfa-wlanconfig-49152-2026-10-12.md`](f1-wfa-wlanconfig-49152-2026-10-12.md)
 - [`f1-wireless-qrcode-context-2026-10-12.md`](f1-wireless-qrcode-context-2026-10-12.md)

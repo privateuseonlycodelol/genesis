@@ -173,11 +173,10 @@ class TestF1BootpTftpMac(unittest.TestCase):
         trigger = UartPromptTrigger()
         self.assertTrue(trigger.feed("*** Press b to enter BOOT-P ***"))
         self.assertEqual(trigger.sent_count, 1)
-        # Reboot marker resets trigger
+        # A later boot must not be sent back into recovery.
         self.assertFalse(trigger.feed("\nU-Boot SPL 2019.07 (Jan 06 2025)\n"))
-        # Next boot prompt triggers again
-        self.assertTrue(trigger.feed("*** Press b to enter BOOT-P ***"))
-        self.assertEqual(trigger.sent_count, 2)
+        self.assertFalse(trigger.feed("*** Press b to enter BOOT-P ***"))
+        self.assertEqual(trigger.sent_count, 1)
 
 
 if __name__ == "__main__":

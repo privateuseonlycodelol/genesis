@@ -39,4 +39,4 @@ Private evidence under `artifacts/management/cups-ipp-matrix-*`, `cups-ipp-follo
 
 ## Open blockers
 
-- Shipped **`/etc/cups/cupsd.conf`** requires **23.1.b rootfs** or **root shell** ([decomp-kickoff.md](../findings/decomp-kickoff.md), [gcnt-x-root-path.md](../findings/gcnt-x-root-path.md)).
+- Shipped **`/etc/cups/cupsd.conf`** is now on disk (1,052 bytes, same file on `/rom` and live). HTTP `/` and `/admin/` from `192.168.1.100` are still **403**. See [f1-quad-overlay-flash-2026-11-06.md](../findings/f1-quad-overlay-flash-2026-11-06.md) and [f1-cups-ipp-policy-2026-10-12.md](../findings/f1-cups-ipp-policy-2026-10-12.md).

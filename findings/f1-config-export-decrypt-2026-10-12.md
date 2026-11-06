@@ -10,7 +10,7 @@ Scope: three saved authenticated `export_config` blobs only. No live router traf
 | Layout | **VERIFIED** | Header ends at offset 235, body at 237: 16-byte IV, AES ciphertext, final 20-byte trailer; ciphertext block-aligned |
 | Signed region | **VERIFIED** | HMAC-SHA1 over `header + "\n\n" + IV + ciphertext` (file minus last 20 bytes), same as public [technicolor-config-decrypt](https://github.com/antnks/technicolor-config-decrypt) PoC |
 | Cipher | **DERIVED** | AES-256-CBC, PKCS#7; AES key = first 32 bytes of 64-byte `RIP_ID_RANDOM_KEY_B`; HMAC key = full 64 bytes (`/proc/rip/0108`, `tools/secr/cfg_dec.py`) |
-| Decrypted plaintext on this unit | **BLOCKED** | No `RIP_ID_RANDOM_KEY_B` / `mtd5` / `proc_rip_0108` artifact in the workspace; **55+** offline HMAC trials (header/metadata, 37 OSCK files) — **zero** matches; see [`f1-hardware-key-blocker-2026-10-12.md`](f1-hardware-key-blocker-2026-10-12.md) |
+| Decrypted plaintext on this unit | **VERIFIED 2026-11-06** | First 64 bytes of live `/proc/rip/0108` give `hmac_ok=true` on `response-10.private` (plaintext 180,776 bytes). Key bytes stay in `artifacts/secrets/`. See [f1-quad-overlay-flash-2026-11-06.md](f1-quad-overlay-flash-2026-11-06.md). The 2026-10-12 trials below had no key. |
 | Export deltas | **VERIFIED** | Headers byte-identical across `response-10` vs `response-13`; first difference at offset 237 (IV). Ciphertext length +32 bytes between those two exports (+80 vs latest `response-07`), consistent with time-varying config size under CBC |
 
 Artifacts (private, gitignored):

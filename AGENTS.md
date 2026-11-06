@@ -100,7 +100,7 @@ See `scripts/TOOLING.md`. Summary for agents:
 Start with `README.md`, then consult only the relevant findings. These are documented starting points, **not immutable conclusions**:
 
 - The live Telia F1 is reported as GCNT-X / EWA1330 on firmware `23.1.b`.
-- `findings/gcnt-x-19x-deep.md` and `findings/rbi-crypto-attempt3.md`: a 19.x BLI2 RBI is available offline, but successful payload decryption has **not** been verified; **71** OSCK trials (community + boot-log derivations) all `bad_osck`; GCNT-X OSCK needs device/`r2secr` dump — `findings/r2secr-build-2026-10-12.md`.
+- `findings/f1-flash-volumes-2026-11-06.md`: this unit's OSCK (eRIP `0121`, RSA-PSS checked) unwraps the offline 19.x BLI2 RBI to a 60 MiB image. The earlier **71** community and boot-log trials in `findings/rbi-crypto-attempt3.md` were the wrong key. Do not flash that image.
 - `findings/decomp-kickoff.md`: the current 23.1.b image has not been confirmed acquired in the recorded work.
 - `findings/wan2-tagged-frames.md` and `findings/mirror-test.md`: previous WAN capture evidence was contaminated or misinterpreted; establish correct capture placement and encapsulation before drawing conclusions about firmware traffic.
 - `findings/f1-uart-23.1b.md`: UART evidence is a separate lead; recorded notes do not establish an interactive root shell.

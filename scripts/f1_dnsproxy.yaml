@@ -1,0 +1,22 @@
+# Overlay DNS-over-HTTPS forwarder for the Telia F1.
+# The upstream list is a separate mode-0600 file, /etc/doh-rilah.url.
+# This file must not contain that URL.
+listen-addrs:
+  - "127.0.0.1"
+listen-ports:
+  - 5053
+bootstrap:
+  - "9.9.9.9:53"
+upstream:
+  - "/etc/doh-rilah.url"
+fallback:
+  - "https://dns.quad9.net/dns-query"
+upstream-mode: "load_balance"
+cache: true
+cache-optimistic: true
+optimistic-answer-ttl: 30s
+optimistic-max-age: 12h
+cache-size: 1048576
+timeout: 5s
+hosts-file-enabled: false
+dnssec: false

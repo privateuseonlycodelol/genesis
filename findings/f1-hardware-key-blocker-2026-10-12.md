@@ -2,7 +2,9 @@
 
 ## Bottom line
 
-**BLOCKED:** the config encryption key for this Telia F1 cannot be recovered by decompiling the export, the sealed 19.x RBI, community OSCK files, or the `r2secr` kernel module alone. The 64-byte material is **per-device**, lives in the **eripv2** flash partition (encrypted under **ECK**), and is only released on-box via **`/proc/rip/0108` after root** (or offline via `eripv2.py` + ECK + MTD dump).
+**Superseded 2026-11-06:** item `0108` was read from the live unit through the overlay cron hook. The first 64 bytes verify the saved export (`hmac_ok=true`). The same evening, root SSH copied the eRIP backups (`mtd3` and `mtd4`, identical). The index in the first `0x3e000` bytes includes `0121` (OSCK, 320 bytes, encrypted) and `011f` (304 bytes). `/proc/rip` still does not expose either item. Later the same night the 16-byte ECK was read from the loaded `ripdrv` and item `0121` decrypted to 288 bytes. The plaintext is only in `artifacts/secrets/osck.bin`. See [f1-flash-volumes-2026-11-06.md](f1-flash-volumes-2026-11-06.md). The paragraph below is the state before that dump.
+
+**BLOCKED at the time of this note:** the config encryption key for this Telia F1 cannot be recovered by decompiling the export, the sealed 19.x RBI, community OSCK files, or the `r2secr` kernel module alone. The 64-byte material is **per-device**, lives in the **eripv2** flash partition (encrypted under **ECK**), and is only released on-box via **`/proc/rip/0108` after root** (or offline via `eripv2.py` + ECK + MTD dump).
 
 `CIPHERKEY=GW` in `config.bin` is a **label** for that RIP slot, not the key bytes.
 
@@ -31,7 +33,7 @@ Private artifacts: `artifacts/ui/key-probe-20261012T060025Z/summary.json`.
 | Mesh / LXC `192.168.1.2`, `192.168.2.2` | **unreachable** from lab Mac |
 | HMAC verify export with **37** `hack-technicolor/osck/*.osck` variants + logviewer token derivations | **0** matches |
 | Header/metadata weak keys (MAC, serial, build, `GW*32`, etc.) | **0** HMAC matches (prior pass + confirmed) |
-| `strings` / prior RBI decrypt matrix for GCNT-X OSCK | **57** trials, all **`bad_osck`** — no decrypted rootfs to disassemble backup code in 23.1.b |
+| `strings` / prior RBI decrypt matrix for GCNT-X OSCK | **57** trials, all **`bad_osck`** — no decrypted rootfs to disassemble backup code in 23.1.b. **Superseded 2026-11-06:** both 23.1.b rootfs volumes and the 19.x RBI are decrypted; see [f1-flash-volumes-2026-11-06.md](f1-flash-volumes-2026-11-06.md). |
 
 ## What “decompile” actually targets
 
@@ -74,4 +76,4 @@ Reverse-engineering `r2secr.arm.*.ko` (ARM EABI relocatable, not stripped) expla
 
 **Earlier proposed UART capture is now completed:** [the supplied boot log](f1-boot-log-2026-10-12.md) reports **AArch64 Linux 4.19.235** and UBI-backed storage. `scripts/select_r2secr_ko.py` returns **no_module_match**, exit 1; the old **4.1.52** module and raw-eripv2 MTD default are not validated for this unit. The capture contains `OSCK Loaded!`, named DT key-handoff messages and a separate unlabeled **32-byte-shaped hex fragment**; none establishes possession of OSCK, ECK or the **64-byte RANDOM_KEY_B**. No new candidate-key/decryption trials were performed.
 
-**Superseded next discriminator:** Return/`id`+Return/Ctrl+J were tested in the later [live UART follow-up](f1-uart-interaction-2026-10-12.md), without shell/login/UID output. If a shell appears in future evidence, confirm `id` and kernel identity, then obtain `/proc/mtd` and UBI volume names before choosing acquisition sources. `/proc/mtd` is still missing; the old raw partition map cannot be assumed. A fresh logviewer row or matching console binary is now the next useful discriminator.
+**Superseded next discriminator:** Return/`id`+Return/Ctrl+J were tested in the later [live UART follow-up](f1-uart-interaction-2026-10-12.md), without shell/login/UID output. Root and `/proc/mtd` came later. **Superseded 2026-11-06:** the live map and the carved kernel, U-Boot, and `fdt_GCNT-X` are in [f1-flash-volumes-2026-11-06.md](f1-flash-volumes-2026-11-06.md).

@@ -6,7 +6,9 @@
 
 ## Decrypt success
 
-**No.** **71** unique 32-byte OSCK trials after dedup (37 community `.osck` + **61** derived names including **21** boot-log-only constants). All **`bad_osck`** at the first `0xB7` unwrap.
+**Superseded 2026-11-06.** This unit's OSCK, recovered from eRIP item `0121`, unwraps the reference RBI. The image is `artifacts/firmware/rbi-19x-inner.bin` (60 MiB). See [f1-flash-volumes-2026-11-06.md](f1-flash-volumes-2026-11-06.md). The paragraph below is the result of the earlier guesses.
+
+**No, at the time of this note.** **71** unique 32-byte OSCK trials after dedup (37 community `.osck` + **61** derived names including **21** boot-log-only constants). All **`bad_osck`** at the first `0xB7` unwrap.
 
 Boot-log derivations included `bl_oid`, firmware/bootloader git hashes, full `bl_version` / `SW Version` strings, `.r2secr` / prozone / `flashaddress` physical addresses, NAND `flashId` prefix, and `RIP_ID_OSCK` HMAC salts. None are the RBI OSCK.
 
