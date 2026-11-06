@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-11-06T20:33:55Z
+**Generated:** 2026-11-06T20:57:39Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -161,12 +161,14 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-mount-root-rtfd-and-clash-deconstruction-2026-11-06.md`](f1-mount-root-rtfd-and-clash-deconstruction-2026-11-06.md)
 - [`f1-nand-read-plan-2026-10-27.md`](f1-nand-read-plan-2026-10-27.md)
 - [`f1-offline-overlay-pipeline-2026-11-05.md`](f1-offline-overlay-pipeline-2026-11-05.md)
+- [`f1-opt-keep-root-2026-11-06.md`](f1-opt-keep-root-2026-11-06.md)
 - [`f1-password-encoding-cli-trace-2026-10-15.md`](f1-password-encoding-cli-trace-2026-10-15.md)
 - [`f1-printersharing-webui-2026-10-29.md`](f1-printersharing-webui-2026-10-29.md)
 - [`f1-quad-overlay-flash-2026-11-06.md`](f1-quad-overlay-flash-2026-11-06.md)
 - [`f1-rea-har-pass-2026-10-17.md`](f1-rea-har-pass-2026-10-17.md)
 - [`f1-recovery-flash-bank2-analysis-2026-11-06.md`](f1-recovery-flash-bank2-analysis-2026-11-06.md)
 - [`f1-research-composite-2026-10-13.md`](f1-research-composite-2026-10-13.md)
+- [`f1-reset-persistence-2026-11-06.md`](f1-reset-persistence-2026-11-06.md)
 - [`f1-rootfs-data-overlay-flashing-2026-11-04.md`](f1-rootfs-data-overlay-flashing-2026-11-04.md)
 - [`f1-rootfs-diff-listeners-2026-11-06.md`](f1-rootfs-diff-listeners-2026-11-06.md)
 - [`f1-rootfs-key-l598-2026-10-27.md`](f1-rootfs-key-l598-2026-10-27.md)

@@ -36,7 +36,7 @@ LAN IPv4 port 53 arriving on `br-lan` is still REDIRECTed to local port 53. This
 
 This binary's DoH client forces HTTP/2 and does not open HTTP/3 unless `--http3` is set. It was not set. The TLS ALPN bytes were not captured. Serve-stale is configured and was not shown by taking the upstream down. This build allows up to two connections per host; the checks above saw one.
 
-Repo copies, with no URL in them: `scripts/f1_dnsproxy.yaml`, `scripts/f1_doh_bootstrap_watch.sh`, `scripts/f1_doh_proxy.init`. `scripts/f1_doh_proxy.lua` is the stub.
+Repo copies, with no URL in them: `scripts/f1_dnsproxy.yaml`, `scripts/f1_doh_bootstrap_watch.sh`, `scripts/f1_doh_proxy.init`. The earlier Lua forwarder is not kept in the repo. On the router it is a stub that exits.
 
 ### What this does not cover
 
@@ -75,8 +75,8 @@ Before any of this DoH work, dnsmasq used the WAN resolvers in `/tmp/resolv.conf
 | --- | --- | --- |
 | Airties `cloud-comm` | UCI auth host `device-auth-teliaprod.telia.airtiescloud.eu`. Live TLS to CloudFront (`2600:9000::`) and AWS (`2a05:d018::`). Signed Domos URLs include `licence.domos.io`, `update.domos.io`, and an Azure websocket host. | **Disabled the cloud switch.** `mesh_broker.AT_common.cloud_comm` set from `1` to `0`, committed in the overlay, then `ubus call mesh_broker.config reload`. Eight seconds later `cloud-comm` had no ESTABLISHED socket. hostapd on wl0 and wl1 stayed up. The process is still running, idle. `AT_logging.cloud_comm=2` is a log level and was left. `air-dpi` and `air-domosd` still run and had no own TCP session in this check. |
 | TR-157 bulk data | Init is enabled. Profile 1 was already off, with placeholder `http://abc.com`. No bulkdata process. | **`bulkdata.global.enabled` set to `0`.** Reversible with `uci set bulkdata.global.enabled='1'; uci commit bulkdata`. |
-| `cwmpd` | `https://rgw.teliacompany.com:7575/ACS-server/ACS`, periodic inform on. | **Left.** This is Telia TR-069 management, not a separate analytics toggle. Stopping it is reversible (`/etc/init.d/cwmpd stop` and `disable`) but was not done. |
-| `pub_rgw_messages` | MQTTS `mqtt.teliasmartrgw.com:8883` (AWS `eu-north-1`). Init lives in the LCM upper, `/opt/lcm.technicolor.com/upper/etc/init.d/pub_rgw_messages`. | **Left.** Same class as CWMP: ISP management bus. It is not required for the DHCP WAN address. Undo later would be that init script's `stop`, which is outside `bank_1`. |
+| `cwmpd` | `https://rgw.teliacompany.com:7575/ACS-server/ACS`, periodic inform on. | **Stopped later the same evening.** `pidof cwmpd` was empty after `/etc/init.d/cwmpd stop` and `disable`. Not checked after a reboot. See [reset parking lot](f1-reset-persistence-2026-11-06.md). |
+| `pub_rgw_messages` | MQTTS `mqtt.teliasmartrgw.com:8883` (AWS `eu-north-1`). Init lives in the LCM upper, `/opt/lcm.technicolor.com/upper/etc/init.d/pub_rgw_messages`. | **Still running.** The vendor `stop` returns without killing the process when its pid file is missing, and `disable` looks in `/etc/rc.d`, not the LCM `rc.d`. The `S20` link was still there when the LAN link dropped. |
 | Crash upload | `system.@coredump[0].action` and `system.@kernel_crash[0].action` are both `compress`. The URL `https://telia-core.tgwfd.org:5443/` is configured, and `core-handler` uploads only when the action is `upload`. `debug_monitor` is running on `/etc/telia_app_config`. | **Left.** The live action does not upload. |
 | `obuspa_retriever.sh` | Cron every minute. The ROM script only caches the local USP data model. The overlay copy also writes a local syslog tag. No HTTP client in the script. `obuspa.daemon_config.enable` is `0`. | **Left.** Not an outbound tracker. |
 | `wansensing.lua` | WAN state machine. The periodic "Check Debug Interface" line is local. | **Left.** Stopping it risks the WAN link. |

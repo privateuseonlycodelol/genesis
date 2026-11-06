@@ -1,6 +1,5 @@
-# Overlay DNS-over-HTTPS forwarder for the Telia F1.
-# The upstream list is a separate mode-0600 file, /etc/doh-rilah.url.
-# This file must not contain that URL.
+# Local forwarder. The upstream URL is /etc/doh-rilah.url (mode 0600).
+# Quad9 is fallback only. It is not in the upstream list.
 listen-addrs:
   - "127.0.0.1"
 listen-ports:

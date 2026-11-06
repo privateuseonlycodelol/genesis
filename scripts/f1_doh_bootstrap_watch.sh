@@ -1,7 +1,9 @@
 #!/bin/sh
-# Re-resolve dns.rilah.app through 9.9.9.9 and restart dnsproxy when that
-# address set changes. Also restart if the local proxy stops answering for
-# about a minute. This file has no upstream URL.
+# Refresh dns.rilah.app through 9.9.9.9.
+# Restart dnsproxy when the address set changes, or when local DNS has
+# failed for about a minute. This file does not contain the upstream URL.
+
+set -u
 
 fail_loops=0
 cooldown=0
@@ -10,9 +12,9 @@ last_ips=""
 
 resolve_ips() {
 	nslookup dns.rilah.app 9.9.9.9 2>&1 | lua -e '
-		local s = io.read("*a")
-		local at = s:find("Name:")
-		local body = at and s:sub(at) or ""
+		local text = io.read("*a")
+		local at = text:find("Name:")
+		local body = at and text:sub(at) or ""
 		local ips = {}
 		for ip in body:gmatch("Address[^:\n]*:%s*(%S+)") do
 			ips[#ips + 1] = ip
@@ -25,19 +27,19 @@ resolve_ips() {
 health_ok() {
 	nslookup example.com 127.0.0.1 >/tmp/doh-watch-health 2>&1
 	lua -e '
-		local f = io.open("/tmp/doh-watch-health")
-		local s = f:read("*a")
-		f:close()
-		local at = s:find("Name:")
-		local body = at and s:sub(at) or ""
-		if body:find("Address") then os.exit(0) end
-		os.exit(1)
+		local handle = io.open("/tmp/doh-watch-health")
+		local text = handle:read("*a")
+		handle:close()
+		local at = text:find("Name:")
+		local body = at and text:sub(at) or ""
+		os.exit(body:find("Address") and 0 or 1)
 	'
 }
 
 restart_proxy() {
-	pid=$(pidof dnsproxy)
+	pid=$(pidof dnsproxy) || pid=""
 	if [ -n "$pid" ]; then
+		# shellcheck disable=SC2086
 		kill $pid
 	fi
 }
@@ -49,8 +51,9 @@ while true; do
 		cooldown=$((cooldown - 1))
 	fi
 
+	# First pass, then about every 300 seconds.
 	if [ "$loops" -eq 1 ] || [ $((loops % 15)) -eq 0 ]; then
-		ips=$(resolve_ips)
+		ips=$(resolve_ips) || ips=""
 		if [ -n "$ips" ]; then
 			if [ -n "$last_ips" ] && [ "$ips" != "$last_ips" ] && [ "$cooldown" -eq 0 ]; then
 				logger -t doh-watch "public address changed; restarting proxy" || true
@@ -62,6 +65,7 @@ while true; do
 		fi
 	fi
 
+	# Skip the first minute so a cold start is not treated as a failure.
 	if [ "$loops" -ge 4 ]; then
 		if health_ok; then
 			fail_loops=0

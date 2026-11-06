@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Read-only F1 usage snapshot for the router dashboard.
+"""Read-only usage snapshot for the router dashboard.
 
-One SSH to root@192.168.1.1. Writes gitignored
-artifacts/ui/router-usage-latest.json and the canvas sidecar the
-dashboard already has open. Does not change router config.
+One SSH session to the router. Writes the gitignored JSON snapshot and,
+when the canvas file is present, the sidecar the dashboard reads.
+Does not change router configuration.
 """
 
 from __future__ import annotations
@@ -18,7 +18,10 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 JSON_PATH = REPO / "artifacts" / "ui" / "router-usage-latest.json"
 CANVAS_DATA = Path(
-    "/Users/nils/.cursor/projects/Users-nils-genesis/canvases/router-usage.canvas.data.json"
+    os.environ.get(
+        "F1_USAGE_CANVAS_DATA",
+        str(Path.home() / ".cursor/projects/Users-nils-genesis/canvases/router-usage.canvas.data.json"),
+    )
 )
 PASSWORD_PATH = REPO / "artifacts" / "secrets" / "f1-root.password"
 ASKPASS = "/tmp/f1ask/askpass.sh"
