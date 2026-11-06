@@ -639,8 +639,8 @@ def main() -> int:
 
                 # If ACK received, wait for the bootloader's action 3 flash upgrade AND Linux kernel boot
                 if tftp_ack_received:
-                    print("[*] TFTP transfer complete! Watching flash upgrade and boot sequence for 110s...")
-                    time.sleep(110)
+                    print("[*] TFTP transfer complete! Watching flash upgrade and boot sequence for 150s...")
+                    time.sleep(150)
                     break
 
         except KeyboardInterrupt:

@@ -7,10 +7,12 @@ import unittest
 from pathlib import Path
 
 from scripts.generate_f1_overlay import (
+    CLASH_ACCESS_CONTROL_LUA_CONTENT,
     CLASH_CONFIG_CONTENT,
     DROPBEAR_CONFIG_CONTENT,
     INITD_TRIAGE_CONTENT,
     INITTAB_CONTENT,
+    OBUSPA_RETRIEVER_CONTENT,
     PASSWD_CONTENT,
     RC_LOCAL_CONTENT,
     RESTRICTED_SHELL_WRAPPER,
@@ -92,6 +94,38 @@ class TestGenerateF1Overlay(unittest.TestCase):
             self.assertTrue(rcd.is_file())
             self.assertEqual(rcd.read_text(), INITD_TRIAGE_CONTENT)
             self.assertEqual(oct(stat.S_IMODE(rcd.stat().st_mode)), "0o755")
+
+            # Check obuspa_retriever.sh shadow hook
+            obuspa = bank2_dir / "usr" / "share" / "transformer" / "scripts" / "obuspa_retriever.sh"
+            self.assertTrue(obuspa.is_file())
+            self.assertEqual(obuspa.read_text(), OBUSPA_RETRIEVER_CONTENT)
+            self.assertEqual(oct(stat.S_IMODE(obuspa.stat().st_mode)), "0o755")
+
+            # Check clash-access-control.lua override
+            lua_acl = bank2_dir / "usr" / "lib" / "lua" / "clash-access-control.lua"
+            self.assertTrue(lua_acl.is_file())
+            self.assertEqual(lua_acl.read_text(), CLASH_ACCESS_CONTROL_LUA_CONTENT)
+            self.assertEqual(oct(stat.S_IMODE(lua_acl.stat().st_mode)), "0o644")
+
+            # Check Technicolor 80_rtfd_restore persistence files
+            persist_dir = target / "rtfd_persistent_files"
+            self.assertTrue(persist_dir.is_dir())
+            self.assertTrue((persist_dir / "passwd").is_file())
+            self.assertTrue((persist_dir / "shadow").is_file())
+            self.assertTrue((persist_dir / "restricted_shell").is_file())
+            self.assertTrue((persist_dir / "clash-access-control.lua").is_file())
+            conf_file = target / "rtfd_persistent_filelist.conf"
+            self.assertTrue(conf_file.is_file())
+            conf_text = conf_file.read_text()
+            self.assertIn("/etc/passwd etc", conf_text)
+            self.assertIn("/etc/shadow etc", conf_text)
+            self.assertIn("/bin/restricted_shell bin", conf_text)
+            self.assertIn("/usr/lib/lua/clash-access-control.lua usr/lib/lua", conf_text)
+
+            # Check OpenWrt 80_mount_root and 82_ispconfig_restore archives
+            self.assertTrue((target / "sysupgrade.tgz").is_file())
+            self.assertTrue((target / "ispconfig-bank_1.tgz").is_file())
+            self.assertTrue((target / "ispconfig-bank_2.tgz").is_file())
 
     def test_custom_password_and_hash(self):
         with tempfile.TemporaryDirectory() as tmpdir:
