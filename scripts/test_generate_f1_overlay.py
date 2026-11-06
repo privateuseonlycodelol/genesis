@@ -25,8 +25,21 @@ class TestGenerateF1Overlay(unittest.TestCase):
             target = Path(tmpdir)
             res = generate_overlay_staging(target)
             self.assertIn("bank_1", res)
+            self.assertIn("bank_1/upper", res)
             self.assertIn("bank_2", res)
+            self.assertIn("bank_2/upper", res)
             self.assertIn("root", res)
+            self.assertIn("root/upper", res)
+
+            # Check work directories
+            self.assertTrue((target / "bank_1" / "work").is_dir())
+            self.assertTrue((target / "bank_2" / "work").is_dir())
+            self.assertTrue((target / "work").is_dir())
+
+            # Check upper directory file in bank_2
+            bank2_upper = target / "bank_2" / "upper"
+            self.assertTrue((bank2_upper / "bin" / "restricted_shell").is_file())
+            self.assertTrue((bank2_upper / "etc" / "rc.d" / "S99triage").is_file())
 
             # Check files in bank_2 (active bank)
             bank2_dir = target / "bank_2"

@@ -34,12 +34,14 @@ import time
 from pathlib import Path
 
 DEFAULT_SERVER_IP = "192.168.1.100"
-DEFAULT_CLIENT_IP = "192.168.1.2"
+DEFAULT_CLIENT_IP = "192.168.1.50"
 DEFAULT_BOOT_FILE = "GCNT-X"
 DEFAULT_TEST_PAYLOAD = b"NOT-FIRMWARE-TEST\n"
 BOOT_PROMPT = "Press b to enter BOOT-P"
 BOOT_START = "U-Boot SPL"
 DHCP_MAGIC = b"\x63\x82\x53\x63"
+DEFAULT_CLIENT_MAC = "00:1e:e3:76:83:61"
+CONSOLE_PROMPT = "Please press Enter to activate this console."
 IP_BOUND_IF = 25  # Darwin IPPROTO_IP IP_BOUND_IF
 
 
@@ -244,6 +246,7 @@ def send_tftp_packet_with_retry(
                 if mac_str:
                     os.system(f"arp -d {ip} >/dev/null 2>&1")
                     os.system(f"arp -s {ip} {mac_str} >/dev/null 2>&1")
+                subprocess.Popen(["ping", "-c", "1", "-W", "50", ip], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 time.sleep(0.05)
                 continue
             raise
@@ -286,6 +289,7 @@ class UartWatcher(threading.Thread):
         self.log_path = log_path
         self.running = True
         self.trigger = UartPromptTrigger()
+        self.console_activated = False
 
     @property
     def b_sent_count(self) -> int:
@@ -341,6 +345,25 @@ class UartWatcher(threading.Thread):
                     log.flush()
                     print(msg.strip(), flush=True)
 
+                if CONSOLE_PROMPT in chunk and not self.console_activated:
+                    self.console_activated = True
+                    stamp = time.strftime("%H:%M:%S")
+                    msg = f"\n[{stamp}] [UART] *** DETECTED CONSOLE PROMPT -> ACTIVATING CONSOLE ***\n"
+                    log.write(msg.encode())
+                    log.flush()
+                    print(msg.strip(), flush=True)
+                    os.write(fd, b"\n")
+
+                    def probe_shell():
+                        time.sleep(2.0)
+                        try:
+                            probe_cmds = b"\nid\nuname -a\ncat /proc/rip/0108 | hexdump -C\n"
+                            os.write(fd, probe_cmds)
+                        except Exception:
+                            pass
+
+                    threading.Thread(target=probe_shell, daemon=True).start()
+
         os.close(fd)
 
 
@@ -353,21 +376,23 @@ def main() -> int:
     parser.add_argument("--keep-ip", action="store_true", help="Leave the static IP and ARP entry in place after exit")
     parser.add_argument("--uart", default="/dev/cu.usbserial-0001", help="Serial device to watch and auto-press 'b'")
     parser.add_argument("--no-uart", action="store_true", help="Disable UART watching")
-    parser.add_argument("--client-mac", default=None, help="Target router MAC address (optional, default: accept any)")
+    parser.add_argument("--client-mac", default=DEFAULT_CLIENT_MAC, help="Target router MAC address (default: 00:1e:e3:76:83:61)")
     parser.add_argument("--server-ip", default=DEFAULT_SERVER_IP, help="Mac IP (BOOTP server & TFTP server)")
     parser.add_argument("--client-ip", default=DEFAULT_CLIENT_IP, help="Offered IP for router")
     parser.add_argument("--boot-file", default=DEFAULT_BOOT_FILE, help="Boot file name in BOOTREPLY")
     parser.add_argument("--payload", default="NOT-FIRMWARE-TEST\n", help="Content to serve over TFTP")
     parser.add_argument("--file", help="Path to custom file to serve instead of text payload")
     parser.add_argument("--timeout", type=int, default=180, help="Listen timeout in seconds")
-    parser.add_argument("--log-dir", default="artifacts/bootp/live-mac", help="Directory for logs")
+    parser.add_argument("--log-dir", default="artifacts/bootp/sessions", help="Directory for logs")
     parser.add_argument("--reboot", action="store_true", help="Trigger graceful reboot via web UI once listeners are armed")
     parser.add_argument("--router-url", default="http://192.168.1.1", help="Router base URL for reboot trigger")
+    parser.add_argument("--allow-non-root", action="store_true", help="Attempt running without root privileges")
+    parser.add_argument("--no-pcap", action="store_true", help="Disable background tcpdump capture")
     args = parser.parse_args()
 
-    if os.geteuid() != 0:
+    if os.geteuid() != 0 and not args.allow_non_root:
         print("ERROR: This script must be run with sudo to bind UDP ports 67 (BOOTP) and 69 (TFTP).", file=sys.stderr)
-        print("Example: sudo python3 scripts/f1_bootp_tftp_mac.py --iface en4", file=sys.stderr)
+        print("Example: sudo python3 scripts/f1_bootp_tftp_mac.py --iface en4 (or pass --allow-non-root if permitted)", file=sys.stderr)
         return 1
 
     log_dir = Path(args.log_dir)
@@ -408,7 +433,7 @@ def main() -> int:
 
     # Optional background packet capture
     tcpdump_proc = None
-    if args.iface and shutil.which("tcpdump"):
+    if not args.no_pcap and args.iface and shutil.which("tcpdump"):
         try:
             tcpdump_cmd = [
                 "tcpdump", "-i", args.iface, "-nn", "-U", "-w", str(pcap_path),
@@ -475,16 +500,20 @@ def main() -> int:
 
     print(f"[*] Ready. Waiting for router boot (timeout in {args.timeout}s)...")
     if args.reboot:
-        print(f"[*] Triggering graceful router reboot via {args.router_url}...")
-        reboot_script = Path(__file__).resolve().parent / "f1_restart_router.py"
-        try:
-            subprocess.Popen(
+        def do_reboot():
+            time.sleep(1.0)
+            print(f"[*] Triggering graceful router reboot via {args.router_url}...", flush=True)
+            reboot_script = Path(__file__).resolve().parent / "f1_restart_router.py"
+            res = subprocess.run(
                 [sys.executable, str(reboot_script), "--base", args.router_url, "--yes"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+                capture_output=True,
+                text=True,
             )
-        except Exception as e:
-            print(f"[!] Warning: failed to trigger reboot: {e}")
+            print(f"[*] Reboot trigger output: {res.stdout.strip()}", flush=True)
+            if res.stderr.strip():
+                print(f"[!] Reboot trigger stderr: {res.stderr.strip()}", flush=True)
+
+        threading.Thread(target=do_reboot, daemon=True).start()
     else:
         print(">>> Power on the router now! <<<")
 
@@ -510,6 +539,7 @@ def main() -> int:
                             # Set static ARP for router MAC upon receiving BOOTREQUEST
                             os.system(f"arp -d {args.client_ip} >/dev/null 2>&1")
                             os.system(f"arp -s {args.client_ip} {last_client_mac} >/dev/null 2>&1")
+                            subprocess.Popen(["ping", "-c", "1", "-W", "50", args.client_ip], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
                             reply = build_bootp_reply(
                                 xid=xid,
@@ -609,8 +639,8 @@ def main() -> int:
 
                 # If ACK received, wait for the bootloader's action 3 flash upgrade AND Linux kernel boot
                 if tftp_ack_received:
-                    print("[*] TFTP transfer complete! Watching flash upgrade and boot sequence for 90s...")
-                    time.sleep(90)
+                    print("[*] TFTP transfer complete! Watching flash upgrade and boot sequence for 110s...")
+                    time.sleep(110)
                     break
 
         except KeyboardInterrupt:

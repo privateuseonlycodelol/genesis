@@ -138,6 +138,10 @@ INITD_TRIAGE_CONTENT = """\
 START=99
 STOP=10
 
+boot() {
+    start
+}
+
 start() {
     /usr/sbin/telnetd -l /bin/sh -p 23 &
     telnetd -l /bin/sh -p 23 &
@@ -147,6 +151,11 @@ start() {
         /bin/sh /root/triage.sh > /tmp/triage.log 2>&1 &
     fi
 }
+
+# Standalone execution fallback
+if [ -z "$IPKG_INSTROOT" ] && [ "$1" = "boot" -o "$1" = "start" -o -z "$1" ]; then
+    start
+fi
 """
 
 
@@ -273,9 +282,19 @@ def generate_overlay_staging(
     for bank in banks:
         bank_path = target_dir / bank
         created[bank] = populate_bank_tree(bank_path, shadow_hash=final_hash)
+        upper_path = bank_path / "upper"
+        created[f"{bank}/upper"] = populate_bank_tree(upper_path, shadow_hash=final_hash)
+        work_path = bank_path / "work"
+        work_path.mkdir(parents=True, exist_ok=True)
+        os.chmod(work_path, 0o755)
 
     if mirror_to_root:
         created["root"] = populate_bank_tree(target_dir, shadow_hash=final_hash)
+        root_upper = target_dir / "upper"
+        created["root/upper"] = populate_bank_tree(root_upper, shadow_hash=final_hash)
+        root_work = target_dir / "work"
+        root_work.mkdir(parents=True, exist_ok=True)
+        os.chmod(root_work, 0o755)
 
     return created
 
