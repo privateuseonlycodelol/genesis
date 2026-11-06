@@ -231,6 +231,9 @@ esac
 
 echo $$ > "$PIDFILE"
 trap 'rm -f "$PIDFILE"; exit 0' TERM INT
+# nginx runs as nobody and executes the Tailscale CLI to learn this node's names.
+# Keep the directory non-readable. tailscaled.state stays mode 600.
+[ -d /genesis/tailscale ] && chmod 711 /genesis/tailscale 2>/dev/null || true
 log "supervisor started"
 with_lock sync_all
 

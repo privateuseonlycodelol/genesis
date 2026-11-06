@@ -10,7 +10,7 @@ The 2026-10-27 note that recovery flashing needs no vendor signature is overstat
 
 | Topic | Status | Note |
 | --- | --- | --- |
-| Root | Overlay SSH, after one serial recovery | [Quadruple-vector flash](findings/f1-quad-overlay-flash-2026-11-06.md) |
+| Root | Overlay SSH, after one serial recovery | [Do it again](docs/root-again.md), [what happened](findings/f1-quad-overlay-flash-2026-11-06.md) |
 | Signed boot | Vendor `bootfs` is checked. `rootfs_data` is not | [FLD gate](findings/f1-uboot-fld-secure-boot-gate-2026-11-04.md) |
 | Flash and OSCK | Both banks and the 19.x reference image unwrap. Do not flash the 19.x image | [Flash volumes](findings/f1-flash-volumes-2026-11-06.md) |
 | LAN DNS | dnsmasq forwards to a local DoH proxy for `dns.rilah.app`. The URL is only on the router | [DNS and phone-home](findings/f1-doh-and-tracking-2026-11-06.md) |
@@ -19,6 +19,8 @@ The 2026-10-27 note that recovery flashing needs no vendor signature is overstat
 | Upgrade wipe | A restore script is on the `opt` volume, which the flasher does not name. The launcher was left dormant and has not been shown running it | [Opt restore](findings/f1-opt-keep-root-2026-11-06.md) |
 | Admin UI | Overlay stylesheet, injected into HTML by nginx. Login page restyled. Templates unchanged | [UI skin](findings/f1-ui-skin-2026-11-06.md) |
 | Plugins | Supervisor on the overlay. Page `/genesis/` and JSON `/genesis/api` after login. Install with `scripts/genesis/install.sh` | [Plugin supervisor](findings/f1-plugin-supervisor-2026-11-06.md) |
+| Tailscale UI | The Tailscale address loads the Sign in page. A foreign Host header stays rejected | [Tailscale UI](findings/f1-tailscale-ui-2026-11-06.md) |
+| GPL source | No public 23.1.b tree. The running kernel config is saved. 188 packages are tagged GPL-2.0 | [GPL request](findings/f1-gpl-source-request-2026-10-29.md) |
 | WPS on port 49152 | No demonstrated pre-login bug | [WPS parser](findings/f1-hostapd-wps-parser-2026-11-06.md) |
 | Closed-case recovery | The boot flag exists. The web action that sets it has not been sent | [Closed-case BOOT-P](findings/f1-closed-case-bootp-2026-11-06.md) |
 
@@ -33,7 +35,7 @@ Usage dashboard refresh: `python3 scripts/f1_usage_snapshot.py`. Index rebuild: 
 
 ## Where to look
 
-**Boot and flash.** [UART 23.1.b](findings/f1-uart-23.1b.md), [boot log](findings/f1-boot-log-2026-10-12.md), [BOOT-P on the LAN](findings/f1-bootp-lan-2026-10-13.md), [overlay flash](findings/f1-rootfs-data-overlay-flashing-2026-11-04.md), [live overlay injection](findings/f1-live-overlay-injection-2026-11-06.md), [RTFD and Clash](findings/f1-mount-root-rtfd-and-clash-deconstruction-2026-11-06.md). Mac recovery responder: `scripts/f1_bootp_tftp_mac.py`.
+**Boot and flash.** [Root this unit again](docs/root-again.md), [UART 23.1.b](findings/f1-uart-23.1b.md), [boot log](findings/f1-boot-log-2026-10-12.md), [BOOT-P on the LAN](findings/f1-bootp-lan-2026-10-13.md), [overlay flash](findings/f1-rootfs-data-overlay-flashing-2026-11-04.md), [live overlay injection](findings/f1-live-overlay-injection-2026-11-06.md), [RTFD and Clash](findings/f1-mount-root-rtfd-and-clash-deconstruction-2026-11-06.md). Mac recovery responder: `scripts/f1_bootp_tftp_mac.py`.
 
 **Keys and images.** [Rootfs key on the boot log](findings/f1-rootfs-key-l598-2026-10-27.md), [config export](findings/f1-config-export-decrypt-2026-10-12.md), [key blocker, superseded](findings/f1-hardware-key-blocker-2026-10-12.md), [19.x notes before the unwrap](findings/gcnt-x-19x-deep.md), [EFU and OSIK](findings/efu-osik-signature-chain-2026-11-02.md).
 

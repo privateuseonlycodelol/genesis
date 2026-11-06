@@ -1,5 +1,19 @@
 # Vantiva GPL Source Code Request: Formal Dispatch Specification (2026-10-29)
 
+## What was retrieved, 2026-11-06
+
+No public source tarball for GCNT-X 23.1.b turned up. Vantiva's published EWA1330 page is still the 19.4 module-name PDF, and the source itself is still "on request" at `contact-ch.opensource@vantiva.com`. The drafted mail below has not been sent. Upstream `bcm96856.dts` landed in mainline in June 2022 and only enables UART, NAND, and SPI. It is not this kernel.
+
+**VERIFIED from the copied rootfs and the running kernel:**
+
+- `/proc/config.gz` is the built configuration: `Linux/arm64 4.19.235`, 4,243 lines, 1,403 set options, 61 `CONFIG_BCM_KF_*` Broadcom patch options. `CONFIG_TUN` is unset. `CONFIG_IKCONFIG_PROC=y`. Saved at `artifacts/firmware/kernel-config-23.1.b.gz`, SHA-256 `d4285ede33f73496275f9923f77a45c0c3fb9bf54f0cdcf93c30b0fc89737cdb`. That file is the config, not the Broadcom sources those options select.
+- `usr/lib/opkg/info` has 586 packages. 188 are tagged `GPL-2.0`. 216 have no license field. The GPL-tagged userspace with exact versions includes BusyBox 1.34.1-17, dnsmasq-full 2.85-23, CUPS 2.2.10-1, iptables 1.8.7-1, nginx 1.19.6-1, dropbear 2020.81-2 (MIT), OpenSSL 3.0.15-1, ubus `2022-06-01-2bebf93c`. The `-17` and `-23` suffixes are OpenWrt/Homeware patches, so the upstream tarball is not the corresponding source.
+- Packages with no license field and no upstream include `cwmpd` 1.0, `airties-edge` 4.205.6.2.79, `transformer-tch`, `wlan_mgr`, and kernel modules `kmod-ripdrv`, `kmod-platform`, `kmod-ncr`, `kmod-qos_tch`, `kmod-keymanager`, `kmod-paragon`, `kmod-technicolor-button`, `kmod-technicolor-led`. `kmod-platform-gpl` is named as GPL and also has no license field.
+- Airties ships its own written offer on the image: `osrb@airties.com`, for the code in `airties-edge`. That mail was not sent.
+- The image already contains the Homeware text that is not a blob: 430 `.lua` files and 235 `.sh` files under the copied `/rom`.
+
+The signing key is not in any of this. An unsigned `bootfs` still hangs the board.
+
 ## Purpose
 
 Document the formal open-source compliance request for the complete corresponding source code of GPL/LGPL components running on the **Telia F1 / Vantiva GCNT-X (EWA1330)** on build **`23.1.b.0448-7241017-20260223134332`**.

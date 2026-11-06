@@ -2,6 +2,8 @@
 
 ## Result and scope
 
+**Tailscale UI, live 2026-11-06:** [f1-tailscale-ui-2026-11-06.md](f1-tailscale-ui-2026-11-06.md). `http://100.91.82.75/` was nginx 401 because the Host header was not a LAN address. The login page now loads for this node's Tailscale address. A foreign Host header stays 401.
+
 **Closed-case BOOT-P, offline 2026-11-06:** [f1-closed-case-bootp-2026-11-06.md](f1-closed-case-bootp-2026-11-06.md). The `system_bootp` POST is still session-gated and untested live. U-Boot itself enters BOOT-P when the prozone bootp bit is set. No new unauthenticated listener.
 
 **Physical-console follow-up, offline 2026-10-12:** [owned F1 boot review](f1-boot-log-2026-10-12.md) observes bootloader `serial0`, Linux `ttyS0` at 115200n8, BOOT-P and Enter invitations, plus a JTAG-unlock warning. These define separate physical/debug leads; serial input, login/shell authorization and JTAG permission were not tested. `ubus (running as root!)` is a daemon status message, not an anonymous management boundary. No listener/session/CUPS/WPS behavior was retested or changed by this review.

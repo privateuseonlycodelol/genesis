@@ -27,7 +27,11 @@ Repo copies: `scripts/genesis/`. Install from the repo with `scripts/genesis/ins
 - Skin off removed `/etc/nginx/main_genesis.conf`. After the reload, `login.lp` had no `genesis.css` link. Skin on put the file back and the link returned (`genesis.css?v=2`). The manifest was left `enabled=1`.
 - DNS off set the manifest to `enabled=0`, `dnsproxy` was absent, and it was still absent 22 seconds later, so the supervisor did not start it again. DNS on started pid 8717 and the lookup succeeded. `hostapd` pids were unchanged. The supervisor stayed pid 2158.
 
-Dashboard cards are `/www/cards/000_genesis.lp`. They sort first. Each card links its gear to `/genesis/`. DNS shows DoH on or off, bootstrap `9.9.9.9`, Quad9 fallback, and `127.0.0.1:5053`. Telemetry shows whether TR-069 and MQTT are stopped. Tailscale shows whether `/usr/sbin/tailscaled` exists, whether it is running, and that `/dev/net/tun` is absent, so the only mode would be userspace. The binary is not installed. The skin card shows whether the stylesheet is on.
+Dashboard cards are `/www/cards/000_genesis.lp`. They sort first. Each card links its gear to `/genesis/`. DNS shows DoH on or off, bootstrap `9.9.9.9`, Quad9 fallback, and `127.0.0.1:5053`. Telemetry shows whether TR-069 and MQTT are stopped. The skin card shows whether the stylesheet is on.
+
+At 22:14 the Tailscale card looked for `/usr/sbin/tailscaled` and reported the binary missing. That was wrong. The running binary is `/genesis/tailscale/tailscaled` 1.104.5, started with `--tun=userspace-networking` because `CONFIG_TUN` is unset and `/dev/net/tun` does not exist.
+
+**Superseded 22:50 CET.** The card and the settings section read `lua /genesis/tailscale_state.lua`, which uses `tailscale status`. The node row is the backend state and the 100.x address. A peer whose status column is `-` and whose JSON `Online` is true is shown as `online, no path`. The status name is the DNS label. `HostName` can differ (`tower-1` in the table, `Tower` in JSON), so the lookup uses `DNSName` when the host name does not match. Offline and idle lines are passed through. The health row is the daemon's health list, including `--accept-routes` being false. Start and stop still call `/etc/init.d/tailscale`.
 
 The clicks were these commands, not a signed-in browser session. The address-change restart was not provoked. An overlay wipe removes `/genesis`.
 
