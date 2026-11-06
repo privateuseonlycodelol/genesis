@@ -88,17 +88,58 @@ local function check_csrf(token)
   end
 end
 
+local function plugin_rows()
+  local rows = {}
+  for _, id in ipairs(plugin_ids()) do
+    local m = read_manifest(id)
+    local state = "present"
+    if m.kind == "service" then
+      state = dns_up() and "running" or "stopped"
+    elseif m.kind == "files" then
+      state = skin_on() and "on" or "off"
+    elseif m.kind == "tool" then
+      state = "on demand"
+    elseif m.kind == "enforce" then
+      state = (m.enabled == "1") and "blocking" or "allowed"
+    end
+    rows[#rows + 1] = {
+      id = id,
+      name = m.name or id,
+      kind = m.kind or "",
+      state = state,
+    }
+  end
+  return rows
+end
+
+local function json_escape(s)
+  s = tostring(s or "")
+  s = s:gsub("\\", "\\\\")
+  s = s:gsub('"', '\\"')
+  s = s:gsub("\r", "\\r")
+  s = s:gsub("\n", "\\n")
+  return s
+end
+
+local function json_plugins(rows)
+  local parts = {}
+  for i, row in ipairs(rows) do
+    parts[i] = string.format(
+      '{"id":"%s","name":"%s","kind":"%s","state":"%s"}',
+      json_escape(row.id), json_escape(row.name), json_escape(row.kind), json_escape(row.state)
+    )
+  end
+  return "[" .. table.concat(parts, ",") .. "]"
+end
+
 local notice = ""
 local output = ""
 
-ngx.req.read_body()
 if ngx.req.get_method() == "POST" then
   local args = ngx.req.get_post_args() or {}
-  local token = clean(args.csrftoken)
-  check_csrf(token)
   local action = clean(args.action)
   local id = clean(args.id)
-  if action == "toggle" and (id == "dns" or id == "redesign") then
+  if action == "toggle" and (id == "dns" or id == "redesign" or id == "telemetry") then
     os.execute("/genesis/genesis-supervisor ctl toggle " .. id .. " >/dev/null 2>&1")
     notice = id .. " updated"
   elseif action == "lookup" and id == "diagnostics" then
@@ -111,6 +152,21 @@ if ngx.req.get_method() == "POST" then
 end
 
 local token = csrf()
+local uri = ngx.var.uri or ""
+if uri == "/genesis/api" or uri == "/genesis/api/" then
+  local rows = plugin_rows()
+  ngx.header.content_type = "application/json; charset=utf-8"
+  ngx.say(string.format(
+    '{"ok":%s,"notice":"%s","output":"%s","csrf":"%s","plugins":%s}',
+    (notice ~= "" or ngx.req.get_method() == "GET") and "true" or "false",
+    json_escape(notice),
+    json_escape(output),
+    json_escape(token),
+    json_plugins(rows)
+  ))
+  return
+end
+
 ngx.header.content_type = "text/html; charset=utf-8"
 ngx.say([[<!DOCTYPE html>
 <html lang="en">
@@ -118,7 +174,7 @@ ngx.say([[<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Plugins</title>
-<link rel="stylesheet" href="/css/genesis.css?v=2">
+<link rel="stylesheet" href="/css/genesis.css?v=8">
 <style>
   body { margin: 0; }
   main { max-width: 880px; margin: 48px auto; padding: 0 20px 48px; }
@@ -134,6 +190,7 @@ ngx.say([[<!DOCTYPE html>
 </head>
 <body>
 <main>
+<p><a href="/gateway.lp">Back</a></p>
 <h1>Plugins</h1>
 <p class="lead">Services, checks, and the skin. The signed pages are unchanged.</p>
 ]])
@@ -144,32 +201,34 @@ end
 
 ngx.say("<table><thead><tr><th>Name</th><th>Kind</th><th>State</th><th></th></tr></thead><tbody>")
 
-for _, id in ipairs(plugin_ids()) do
-  local m = read_manifest(id)
-  local state = "present"
+for _, row in ipairs(plugin_rows()) do
+  local id = row.id
+  local state = row.state
   local buttons = ""
-  if m.kind == "service" then
-    state = dns_up() and "running" or "stopped"
+  if row.kind == "service" then
     buttons = string.format(
-      [[<form method="post" action="/genesis/"><input type="hidden" name="csrftoken" value="%s"><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="%s"><button class="btn" type="submit">%s</button></form>]],
+      [[<form method="post" action="/genesis/"><input type="hidden" name="CSRFtoken" value="%s"><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="%s"><button class="btn" type="submit">%s</button></form>]],
       esc(token), esc(id), state == "running" and "Stop" or "Start"
     )
-  elseif m.kind == "files" then
-    state = skin_on() and "on" or "off"
+  elseif row.kind == "enforce" then
     buttons = string.format(
-      [[<form method="post" action="/genesis/"><input type="hidden" name="csrftoken" value="%s"><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="%s"><button class="btn" type="submit">%s</button></form>]],
+      [[<form method="post" action="/genesis/"><input type="hidden" name="CSRFtoken" value="%s"><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="%s"><button class="btn" type="submit">%s</button></form>]],
+      esc(token), esc(id), state == "blocking" and "Allow" or "Block"
+    )
+  elseif row.kind == "files" then
+    buttons = string.format(
+      [[<form method="post" action="/genesis/"><input type="hidden" name="CSRFtoken" value="%s"><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="%s"><button class="btn" type="submit">%s</button></form>]],
       esc(token), esc(id), state == "on" and "Turn off" or "Turn on"
     )
-  elseif m.kind == "tool" then
-    state = "on demand"
+  elseif row.kind == "tool" then
     buttons = string.format(
-      [[<form method="post" action="/genesis/" style="display:inline"><input type="hidden" name="csrftoken" value="%s"><input type="hidden" name="action" value="lookup"><input type="hidden" name="id" value="%s"><button class="btn" type="submit">Lookup</button></form> <form method="post" action="/genesis/" style="display:inline"><input type="hidden" name="csrftoken" value="%s"><input type="hidden" name="action" value="usage"><input type="hidden" name="id" value="%s"><button class="btn" type="submit">Usage</button></form>]],
+      [[<form method="post" action="/genesis/" style="display:inline"><input type="hidden" name="CSRFtoken" value="%s"><input type="hidden" name="action" value="lookup"><input type="hidden" name="id" value="%s"><button class="btn" type="submit">Lookup</button></form> <form method="post" action="/genesis/" style="display:inline"><input type="hidden" name="CSRFtoken" value="%s"><input type="hidden" name="action" value="usage"><input type="hidden" name="id" value="%s"><button class="btn" type="submit">Usage</button></form>]],
       esc(token), esc(id), esc(token), esc(id)
     )
   end
   ngx.say(string.format(
     "<tr><td>%s</td><td>%s</td><td class=\"state\">%s</td><td>%s</td></tr>",
-    esc(m.name or id), esc(m.kind or ""), esc(state), buttons
+    esc(row.name), esc(row.kind), esc(state), buttons
   ))
 end
 

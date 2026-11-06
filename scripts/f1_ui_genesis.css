@@ -1,8 +1,8 @@
-/* Overlay skin for the Homeware UI. Loaded after gw.css. */
+/* Dashboard skin. The stock cards stay. The watermark icons and the old grid do not. */
 
 body {
-  background: #0c0d10 !important;
-  color: #eceae6 !important;
+  background: #090a0c !important;
+  color: #e7e5e4 !important;
   font-family: "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif !important;
 }
 
@@ -15,19 +15,133 @@ a:focus {
 }
 
 .container {
-  width: 1040px;
+  width: 1120px !important;
+  max-width: calc(100% - 32px);
+  margin: 28px auto 48px !important;
+}
+
+.row {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 0 !important;
+}
+
+.row > .span12,
+.row > .header.span12 {
+  float: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.row > .span3 {
+  float: none !important;
+  width: calc(33.333% - 10px) !important;
+  margin: 0 !important;
+  box-sizing: border-box;
+}
+
+.smallcard {
+  text-transform: none !important;
+  background: #14161b !important;
+  border: 1px solid #262a31 !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  color: #e7e5e4 !important;
+  margin: 0 0 0 0 !important;
+  min-height: 128px;
+  overflow: hidden !important;
+}
+
+.card_bg:after,
+.smallcard .content img.someInfos,
+.smallcard img.someInfos {
+  content: none !important;
+  display: none !important;
+}
+
+.smallcard .header {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 12px 14px !important;
+  background: transparent !important;
+  background-image: none !important;
+  border-bottom: 1px solid #262a31 !important;
+  box-shadow: none !important;
+  color: #f5f4f1 !important;
+  text-shadow: none !important;
+}
+
+.smallcard .header .pull-left,
+.smallcard .header .header-title {
+  float: none !important;
+}
+
+.smallcard .header p {
+  margin: 0 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
+  text-transform: none !important;
+  color: #f5f4f1 !important;
+}
+
+.smallcard .header .settings {
+  float: none !important;
+  margin: 0 !important;
+  opacity: 1 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.smallcard .header .settings i {
+  color: #a8a29e !important;
+  background: transparent !important;
+  text-shadow: none !important;
+}
+
+.smallcard .content {
+  position: relative !important;
+  height: auto !important;
+  min-height: 72px;
+  overflow: hidden !important;
+  padding: 12px 14px 14px !important;
+  background: transparent !important;
+  color: #d6d3d1 !important;
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+
+.smallcard .subinfos,
+.smallcard .subinfosBroadband,
+.smallcard .simple-desc,
+.smallcard .content p,
+.smallcard .content strong {
+  max-width: none !important;
+  color: #e7e5e4 !important;
+  background: transparent !important;
+  text-shadow: none !important;
+}
+
+.smallcard .simple-desc {
+  display: block !important;
+  white-space: normal !important;
 }
 
 .logo-technicolor,
 #logo_mobiletab img,
 .header img.logo {
-  max-height: 36px !important;
+  max-height: 32px !important;
 }
 
 .login {
   margin-top: 16vh !important;
-  background: #16181d !important;
-  border: 1px solid #2c313a !important;
+  background: #14161b !important;
+  border: 1px solid #262a31 !important;
   border-radius: 16px !important;
   box-shadow: none !important;
   padding: 28px 28px 12px !important;
@@ -38,51 +152,37 @@ a:focus {
 .modal h3,
 legend {
   color: #f5f4f1 !important;
-  font-weight: 560;
+  font-weight: 600;
   letter-spacing: -0.02em;
   border: 0;
 }
 
-.smallcard,
 .modal,
 .well,
 .dropdown-menu,
 .popover {
-  background: #16181d !important;
-  border: 1px solid #2c313a !important;
-  border-radius: 14px !important;
+  background: #14161b !important;
+  border: 1px solid #262a31 !important;
+  border-radius: 12px !important;
   box-shadow: none !important;
-  color: #eceae6 !important;
+  color: #e7e5e4 !important;
 }
 
-.smallcard {
-  overflow: hidden;
-}
-
-.smallcard .header {
-  height: auto !important;
-  background: #12141a !important;
-  background-image: none !important;
-  color: #f5f4f1 !important;
-  text-shadow: none !important;
-  border-bottom: 1px solid #2c313a !important;
-  box-shadow: none !important;
-}
-
-.smallcard .content,
-.smallcard .subinfos,
-.smallcard .subinfosBroadband,
-.smallcard .someInfos,
 .modal-body,
 .modal-footer {
   background: transparent !important;
   color: #d6d3d1 !important;
 }
 
+.modal-header {
+  background: transparent !important;
+  border-bottom: 1px solid #262a31 !important;
+}
+
 .btn,
 .btn-primary,
 .btn-group .btn {
-  background: #eceae6 !important;
+  background: #e7e5e4 !important;
   background-image: none !important;
   color: #111111 !important;
   text-shadow: none !important;
@@ -101,7 +201,7 @@ input,
 select,
 textarea,
 .uneditable-input {
-  background: #0c0d10 !important;
+  background: #090a0c !important;
   color: #f5f4f1 !important;
   border: 1px solid #3a4150 !important;
   border-radius: 8px !important;
@@ -112,33 +212,30 @@ textarea,
 .table td,
 .table th {
   background: transparent !important;
-  color: #eceae6 !important;
-  border-color: #2c313a !important;
+  color: #e7e5e4 !important;
+  border-color: #262a31 !important;
 }
 
 .alert {
   background: #1c1917 !important;
-  color: #eceae6 !important;
+  color: #e7e5e4 !important;
   border: 1px solid #44403c !important;
   border-radius: 10px !important;
   text-shadow: none !important;
 }
 
-.nav-tabs > li > a,
-.nav > li > a {
-  color: #d6d3d1 !important;
-  background: transparent !important;
-}
-
-.modal-header {
-  background: #12141a !important;
-  border-bottom: 1px solid #2c313a !important;
-  border-radius: 14px 14px 0 0 !important;
-}
-
 hr {
-  border-top-color: #2c313a !important;
+  border-top-color: #262a31 !important;
   border-bottom: 0 !important;
+}
+
+.modal-action-advanced,
+#Simplified_guided_view,
+#Advanced_interface,
+.popUpBG,
+#popUp,
+.popUp {
+  display: none !important;
 }
 
 a.genesis-open {
@@ -146,11 +243,17 @@ a.genesis-open {
   top: 16px;
   right: 16px;
   z-index: 40;
-  background: #eceae6 !important;
+  background: #e7e5e4 !important;
   color: #111111 !important;
   text-decoration: none !important;
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 13px;
   line-height: 20px;
+}
+
+@media (max-width: 900px) {
+  .row > .span3 {
+    width: 100% !important;
+  }
 }

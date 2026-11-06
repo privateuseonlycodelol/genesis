@@ -9,8 +9,9 @@ One foreground loop owns the overlay plugins. The page is `/genesis/` on the exi
 | DNS | service | `dnsproxy` with the existing `/etc/dnsproxy.yaml`. The supervisor restarts it if `example.com` through `127.0.0.1` fails for about a minute, and if the public address of `dns.rilah.app` from `9.9.9.9` changes. Same intervals as the retired watcher. The URL file is not in the plugin directory. |
 | Diagnostics | tool | Lookup and usage run when the button is pressed. Nothing stays running. |
 | Redesign | files | `genesis.css` and the nginx skin filter. |
+| Telemetry | enforce | Keeps the usage meter, `cwmpd`, and Telia MQTT stopped. `cloud-comm` stays disabled in the Airties file. Allow puts the start links back and does not restart the Wi-Fi launcher. |
 
-Repo copies: `scripts/genesis/`. The web rule that lets those paths through the session check is `scripts/genesis/allow-web.sh`.
+Repo copies: `scripts/genesis/`. Install from the repo with `scripts/genesis/install.sh`. The web rule that lets those paths through the session check is `scripts/genesis/allow-web.sh`.
 
 ## Live
 
@@ -18,9 +19,23 @@ Repo copies: `scripts/genesis/`. The web rule that lets those paths through the 
 
 `/etc/nginx/main_genesis_ui.conf` is an exact location for `/genesis/` and `/genesis`. This nginx has no `return` directive, and a prefix location lost to the catch-all. An unknown path is rejected with 404 by the session rules before the page runs, so `uci` rules `web.genesis` and `web.genesisnoslash` were added for admin, telia, and superuser. A request without that role receives the login page. The login page includes the Plugins link. A signed-in load of the three buttons was not done.
 
-## Not shown
+## Actions, 22:14 CET
 
-Stopping DNS from the page, turning the skin off, and the diagnostics buttons were not clicked. An overlay wipe removes `/genesis`. The address-change restart was not provoked.
+**VERIFIED.** The same commands the page runs:
+
+- Lookup of `example.com` through `127.0.0.1` succeeded. Usage printed `MemAvailable` 121780 kB, `dnsproxy` 2202, and both `hostapd` pids.
+- Skin off removed `/etc/nginx/main_genesis.conf`. After the reload, `login.lp` had no `genesis.css` link. Skin on put the file back and the link returned (`genesis.css?v=2`). The manifest was left `enabled=1`.
+- DNS off set the manifest to `enabled=0`, `dnsproxy` was absent, and it was still absent 22 seconds later, so the supervisor did not start it again. DNS on started pid 8717 and the lookup succeeded. `hostapd` pids were unchanged. The supervisor stayed pid 2158.
+
+Dashboard cards are `/www/cards/000_genesis.lp`. They sort first. Each card links its gear to `/genesis/`. DNS shows DoH on or off, bootstrap `9.9.9.9`, Quad9 fallback, and `127.0.0.1:5053`. Telemetry shows whether TR-069 and MQTT are stopped. Tailscale shows whether `/usr/sbin/tailscaled` exists, whether it is running, and that `/dev/net/tun` is absent, so the only mode would be userspace. The binary is not installed. The skin card shows whether the stylesheet is on.
+
+The clicks were these commands, not a signed-in browser session. The address-change restart was not provoked. An overlay wipe removes `/genesis`.
+
+## API
+
+**VERIFIED, 22:19 CET.** `GET /genesis/api` and `GET /genesis/api/` are exact nginx locations using the same session check as the page. UCI rules `web.genesisapi` and `web.genesisapislash` allow admin, telia, and superuser. A request with no admin role got the login page (`Sign in`, 6446 bytes), not a JSON body. `dnsproxy` stayed pid 8717.
+
+A signed-in `GET` returns `ok`, `notice`, `output`, `csrf`, and `plugins` (`id`, `name`, `kind`, `state`). A signed-in `POST` takes form fields `csrftoken`, `action` (`toggle`, `lookup`, `usage`), and `id`. That response was not captured. The handler is the same file as the Plugins page.
 
 ## Undo
 

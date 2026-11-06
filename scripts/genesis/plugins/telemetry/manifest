@@ -1,0 +1,4 @@
+id=telemetry
+name=Telemetry
+kind=enforce
+enabled=1

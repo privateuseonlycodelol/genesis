@@ -1,0 +1,63 @@
+#!/bin/sh
+# block: keep Telia usage, TR-069, and MQTT from running.
+# allow: put their start links back. cloud-comm's flag is updated, and the
+# Airties launcher is left alone so Wi-Fi is not restarted.
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+MQTT_RC=/opt/lcm.technicolor.com/upper/etc/rc.d/S20pub_rgw_messages
+MQTT_INIT=/opt/lcm.technicolor.com/upper/etc/init.d/pub_rgw_messages
+CDF=/airties-edge/etc/cdf/data.xml
+
+stop_if_up() {
+	pidof "$1" >/dev/null 2>&1 || return 0
+	# shellcheck disable=SC2046
+	kill $(pidof "$1") 2>/dev/null || true
+}
+
+cloud_comm() {
+	want=$1
+	[ -f "$CDF" ] || return 0
+	awk -v want="$want" '
+		/<name>cloud-comm<\/name>/ { hit=1 }
+		hit && /<enable>/ {
+			sub(/<enable>[^<]*<\/enable>/, "<enable>" want "</enable>")
+			hit=0
+		}
+		{ print }
+	' "$CDF" > "$CDF.new" && mv "$CDF.new" "$CDF"
+}
+
+block() {
+	for init in cwmpd datausaged datausage_notifier; do
+		if [ -x "/etc/init.d/$init" ]; then
+			"/etc/init.d/$init" stop >/dev/null 2>&1 || true
+			"/etc/init.d/$init" disable >/dev/null 2>&1 || true
+		fi
+	done
+	rm -f "$MQTT_RC"
+	stop_if_up pub_rgw_messages
+	stop_if_up pub_rgw_daemon
+	rm -f /var/run/pub_rgw_messages.pid /var/run/pub_rgw_daemon.pid
+	cloud_comm false
+}
+
+allow() {
+	for init in cwmpd datausaged datausage_notifier; do
+		if [ -x "/etc/init.d/$init" ]; then
+			"/etc/init.d/$init" enable >/dev/null 2>&1 || true
+			"/etc/init.d/$init" start >/dev/null 2>&1 || true
+		fi
+	done
+	if [ -x "$MQTT_INIT" ] && [ ! -e "$MQTT_RC" ]; then
+		ln -s ../init.d/pub_rgw_messages "$MQTT_RC"
+	fi
+	if [ -x "$MQTT_INIT" ]; then
+		"$MQTT_INIT" start >/dev/null 2>&1 || true
+	fi
+	cloud_comm true
+}
+
+case "${1:-}" in
+	block) block ;;
+	allow) allow ;;
+	*) exit 1 ;;
+esac

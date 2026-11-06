@@ -107,9 +107,17 @@ sync_skin() {
 	fi
 }
 
+sync_telemetry() {
+	[ -x "$ROOT/telemetry/apply" ] || return 0
+	if enabled telemetry; then
+		"$ROOT/telemetry/apply" block >/dev/null 2>&1 || true
+	fi
+}
+
 sync_all() {
 	sync_dns
 	sync_skin
+	sync_telemetry
 }
 
 set_enabled() {
@@ -123,11 +131,14 @@ set_enabled() {
 toggle() {
 	id=$1
 	case "$id" in
-		dns|redesign) ;;
+		dns|redesign|telemetry) ;;
 		*) return 1 ;;
 	esac
 	if enabled "$id"; then
 		set_enabled "$id" 0
+		if [ "$id" = "telemetry" ]; then
+			"$ROOT/telemetry/apply" allow >/dev/null 2>&1 || true
+		fi
 	else
 		set_enabled "$id" 1
 	fi
@@ -228,5 +239,6 @@ with_lock sync_all
 while true; do
 	sleep 20
 	with_lock sync_dns
+	with_lock sync_telemetry
 	watch_dns
 done

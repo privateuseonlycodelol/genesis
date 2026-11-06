@@ -1,0 +1,35 @@
+#!/bin/sh /etc/rc.common
+# Re-seed the reset parking lot after preinit consumes it, and keep the
+# management clients and usage meter from coming back. A full rtfd --all
+# erases /overlay and this file with it. The outside reset button is plain
+# rtfd, which deletes one bank and then restores this lot.
+
+START=99
+STOP=10
+
+seed_parking_lot() {
+	list=/etc/rtfd_persistent_filelist.conf
+	[ -f "$list" ] || return 0
+	mkdir -p /overlay/rtfd_persistent_files
+	cp "$list" /overlay/rtfd_persistent_filelist.conf
+	while read file_to_copy directory; do
+		[ -n "$file_to_copy" ] || continue
+		[ -f "$file_to_copy" ] || continue
+		cp "$file_to_copy" /overlay/rtfd_persistent_files/
+	done < "$list"
+}
+
+stop_unwanted() {
+	if [ -x /genesis/plugins/telemetry/apply ]; then
+		/genesis/plugins/telemetry/apply block
+	fi
+}
+
+start() {
+	stop_unwanted
+	if [ -x /etc/init.d/genesis ]; then
+		/etc/init.d/genesis enable
+		pidof dnsproxy >/dev/null || /etc/init.d/genesis start
+	fi
+	seed_parking_lot
+}
