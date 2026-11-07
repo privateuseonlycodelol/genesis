@@ -56,6 +56,8 @@ Native host-side installer (VERIFIED, decompiled from `usr/lib/lua/lcm/execenv/n
 
 With a network position (or DNS control) an attacker can, without any secret:
 
+Also noted from the same live reads (VERIFIED, value not recorded here): the container's `/etc/config/tc_apps` stores a **plaintext MQTT credential** (`user 'rgw'` + password) for `mqtt.teliasmartrgw.com:8883` used by the `telia-pub_rgw_messages` telemetry daemon. It is only readable with root on the box (mode-0600 store, root-only overlay), so it is not a remote exposure by itself, but it is a third-party-service credential present in the image's config tier and would be used by any process running in the container.
+
 1. **Read** the apps list (contains the unit serial it was queried with) and every package.
 2. **Rewrite the apps list** (it is unsigned JSON over HTTP) to make the daemon install *any vendor-signed package that exists in the repo*, including **older versions** (downgrade), or set `requested_status`/`install_action` to drive installs/uninstalls. Install still requires a valid vendor signature, so content cannot be injected.
 3. **Block or break** the update loop (DoS).
