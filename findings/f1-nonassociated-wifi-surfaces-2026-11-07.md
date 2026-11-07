@@ -78,11 +78,25 @@ ROM hostapd, same sha256 as above:
 
 `wlc_auth_parse_chlng_ie` at `0x284640` does `memcpy` of the IE length byte with no `min` in that function, and only after a parsed word equals 1 and the word at `+4` equals 3. Those constants match shared-key authentication algorithm 1, transaction 3 (DERIVED). A SAE commit uses algorithm 3, which fails the first compare and returns without copying. The sibling at `0x2a3780` stores a pointer and does not copy. Destination size for the shared-key copy was not measured, and no shared-key frame was sent.
 
+## Scan and action parsers (VERIFIED in wl.ko, 2026-11-07 follow-up)
+
+Relocation walk of the functions named in the surface table. No frame was sent.
+
+- `wlc_recv_scan_parse_bcn_prb` (`0x3f6d00`, 0x438 bytes) and `wlc_recv_scan_parse` (`0x3f8000`, 0x4bc bytes) have **no** `memcpy` relocation. The beacon/probe-response path calls `bcm_find_tlv`, `wlc_iem_parse_frame`, and the MBSSID helpers. A direct "copy IE length into a fixed buffer" site is not in these two functions.
+- `wlc_recv_ext_csa_action` (`0x3069b0`) is a single `ret`. An extended CSA action frame is not parsed by this symbol.
+- `wlc_recv_public_csa_action` and `wlc_recv_public_coex_action` have no `memcpy`. Public CSA uses `bcm_find_tlv_min_bodylen`. Coex uses `bcm_find_tlv`.
+- `wlc_recv_csa_action` has one `memcpy` at `0x306090`. Immediately before it, `len+6` is compared with `end-cursor` and a `b.gt` skips the copy when the span is too small. The copied count is `len & 0xff`.
+- `wlc_multibssid_recv_nontransmitted_ssid_bssid` (called from the scan parser) has no `memcpy`; it calls `bcm_find_tlv` seven times. `wlc_multibssid_recv_preprocess_bcn` does copy, and one site (`0x384838`) only reaches `memcpy` of the running remainder when that remainder is not greater than 2. The other MBSSID copies were not each paired with their allocator.
+
+## SAE frame send, second look (BLOCKED)
+
+`iw` on the device is 4.1. Its authenticate command is `dev <devname> auth <SSID> <bssid> <type:open|shared> <freq>`. It has no SAE commit type. The phy reports "Device supports SAE with AUTHENTICATE command" and allows a managed vif beside the APs (`#{ AP } <= 8, #{ managed } <= 4`), but this `iw` cannot build the commit, and no vif was added. `wl pkteng`, `wl send_frame`, and `wl sae` are unsupported. `wl auth` and `wl monitor` with no argument printed `0` (getters). Afterwards hostapd on `wl0` was still `ENABLED` on channel 36 with the same station counts, uptime 50 min. No authentication frame was transmitted.
+
 ## Highest-value follow-ups
 
-1. The probe-request processor and scan parsers, audited in depth against attacker-length patterns. `acsd2` is running, so those parsers are on the live scan path. The surface map above is the entry-point inventory.
+1. Pair each remaining `memcpy` in `wlc_multibssid_recv_preprocess_bcn` with the `osl_mallocz` that feeds it. The scan parsers themselves have no `memcpy`.
 2. Deauth-vs-PMF on a PMF-optional BSS from an injector that is not the lab client's only link.
-3. SAE commit-cost measurement (anti-clog threshold 5, hunt-and-peck) from a Linux injection box, aimed at `BH-C66283` / `wl0.2` only.
+3. One SAE commit (unknown group, then a supported group) from a host whose `iw` can send SAE authenticate, aimed at `BH-C66283` / `wl0.2` only. This device's `iw` 4.1 cannot.
 
 **No packets were sent to the radios. No router state was changed.** The 05:13 session was read-only SSH (`wl ver`, `nvram get` of the DPP role keys, `hostapd_cli status` / bootstrap queries).
 
