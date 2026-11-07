@@ -108,3 +108,16 @@ Two corrections and one new result, from `scripts/cups_ipp_writeside_probe.py` (
 | CUPS-Get-PPDs (0x400C — genuinely unprobed before) | **server-error-internal**, helper failed to execute | policy passed; `cups-driverd` broken like `cups-deviced` |
 
 **Conclusions.** With no queue configured nothing changes state (post-probe `Get-Printers`/`Get-Classes` still `not-found`, `Get-Jobs` still the identical empty `successful-ok` body — verified). But the exhaustion-pass statement that the auto-created policy requires `@SYSTEM` for "state-changing printer and class operations" is **overbroad**: only Add-Modify-Printer/Class and Create-Local-Printer are walled; an unauthenticated LAN client's requests for Cancel-Job, Hold/Release-Job, Pause/Resume-Printer, Purge-Jobs, Set-Printer-Attributes, Delete-Printer, Delete-Class, Accept/Reject-Jobs, Set-Default, Move-Job, Create-Job, Validate-Job, and Authenticate-Job all pass the policy gate and stop only at resource lookup. **DERIVED exposure (queue-dependent):** if a printer/queue is ever configured on this unit, an unauthenticated LAN peer can drive these state operations against it (cancel/purge jobs, pause, delete the printer) up to the job-ownership layer; that impact remains undemonstrated because no queue exists. Job-owning ops on *other users'* jobs may still hit the `@OWNER`/`@SYSTEM` check at the job layer — the not-found responses here precede it and cannot speak to it.
+
+## Queue-dependent test — the write exposure is REFUTED for the tested ops (2026-11-07, VERIFIED)
+
+A real temporary queue was created on the device from the router's own localhost (`CUPS-Create-Local-Printer` `0x4028` as root, printer-attrs group with `printer-name`/`device-uri`, plus the operation-group `printer-uri` that cupsd's generic pre-check requires — the local-users gate passes for 127.0.0.1). The anonymous LAN client was then re-run against the existing queue:
+
+| Operation (anonymous LAN) | Queue exists | Verdict |
+| --- | --- | --- |
+| `Get-Printer-Attributes` | `successful-ok`, **6384 bytes of attributes** (state, device-uri, everything) | **Full anonymous attribute disclosure confirmed** |
+| `Pause-Printer` | **HTTP 401** | auth wall |
+| `Resume-Printer` | **HTTP 401** | auth wall |
+| `Delete-Printer` (LAN and localhost, no credentials) | **HTTP 401** | auth wall |
+
+**Correction (supersedes the DERIVED queue-dependent exposure above):** the earlier write-side "policy passed" verdicts were an artifact of probing *nonexistent* resources — with the resource present, the auto-created policy's `@SYSTEM` requirement blocks state-changing operations for unauthenticated clients (including from localhost without credentials). The realistic anonymous exposure on an existing queue is therefore **reads and attribute disclosure, not state changes**. The temporary queue was removed by restarting `cupsd` (temp queues are memory-only); post-restart `Get-Printer-Attributes` returns `not-found` and `printersharing.config.enabled` is unchanged.
