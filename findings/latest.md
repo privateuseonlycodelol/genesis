@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-11-07T03:44:08Z
+**Generated:** 2026-11-07T04:00:43Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -127,6 +127,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-cups-ipp-readonly-matrix-2026-10-12.md`](f1-cups-ipp-readonly-matrix-2026-10-12.md)
 - [`f1-diagnostics-connection-restart-2026-10-12.md`](f1-diagnostics-connection-restart-2026-10-12.md)
 - [`f1-doh-and-tracking-2026-11-06.md`](f1-doh-and-tracking-2026-11-06.md)
+- [`f1-dpp-radio-emission-pass-2026-11-07.md`](f1-dpp-radio-emission-pass-2026-11-07.md)
 - [`f1-dpp-shell-chain-demonstrated-2026-11-07.md`](f1-dpp-shell-chain-demonstrated-2026-11-07.md)
 - [`f1-export-log-modal-2026-10-28.md`](f1-export-log-modal-2026-10-28.md)
 - [`f1-firmware-acquisition-paths-2026-10-27.md`](f1-firmware-acquisition-paths-2026-10-27.md)
