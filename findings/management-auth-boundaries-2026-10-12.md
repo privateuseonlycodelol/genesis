@@ -123,3 +123,16 @@ WPS-over-UPnP on 49152 was subsequently exercised in [f1-wfa-wlanconfig-49152-20
 - [f1-cups-ipp-policy-2026-10-12.md](f1-cups-ipp-policy-2026-10-12.md) — ipptool PASS on job lists; `cups-driverd`/`cups-deviced` failures; **CUPS-Create-Local-Printer** forbidden from LAN; vendor opcode drift (`CUPS-Set-Default` / `0x4004` do not match upstream 2.2.10 create paths); **503** stopped authenticated `logviewer?process=cupsd` harvest.
 
 Tools: `scripts/cups_ipp_readonly_matrix.py`, `scripts/cups_ipp_followup.py`, `scripts/cups_ipp_policy_probe.py`.
+
+## Exhaustion-pass boundary updates (2026-11-06/07)
+
+Dated addendum from the [miniupnpd/cwmpd pass](f1-miniupnpd-cwmpd-2026-11-06.md), which triaged every live listener, web handler, and message-taking binary:
+
+- **Live listener set verified**: nginx 80/443/8080/55556 (+ localhost 55555), xinetd IPv6 60443 → local 443 (assistance login fails closed on the empty verifier), cupsd 631, websockd 7681, dnsmasq 53/67, dropbear 22, hostapd 49152 + UDP 1900, charon 500/4500 (no connections configured), tailscaled 49037/41641, ntpd IPv6 123, DHCP 68/546/547. Every process shares the host network namespace; the `lxc_ee` container differs only by mount namespace and currently runs no listener.
+- **websockd 7681**: connects are accepted; the `mpstat → system()` path needs a session key that no shipped component ever sets — dead code.
+- **tailscaled 49037**: refuses connections addressed to the LAN address despite the `0.0.0.0` bind; loopback/tailnet only.
+- **Local sockets**: `/tmp/wifi_msg_bus` mode 755 (a 31-char prefix-checked word reaches `ifconfig`/`brctl` shell lines), `/var/run/ubus.sock` mode 666 (any local user incl. `nobody` passes the null-policy check), mosquitto and hostapd control sockets root-only (770). None is a LAN port.
+- **RA guard absent**: ebtables filter tables empty; a main-LAN client can emit RAs that other main-LAN clients process.
+- **Versions and public issues**: dnsmasq 2.85 (inside the CVE-2026-2291 range; the crafted response cannot pass the local dnsproxy's `miekg/dns` v1.1.72 255-octet budget), dropbear 2020.81 (no pre-auth server fix after it in the upstream changelog), cupsd 2.2.10 (policy resolved; SNMP CVEs unreachable; `httpPrintf` overflow present in binary form but trigger-closed), busybox 1.34.1, hostapd 2.10 (RADIUS/H2E/MLO advisories inapplicable), kernel 4.19.235 (h323 and sip conntrack CVEs in range, parser-confusion class).
+- **Onboarding-gated shell chain**: DPP credential strings flow from a completed exchange into `hostapd_cli`/`wpa_cli` lines with quotes-only protection; gated on a user-initiated onboarding window.
+- **core-lcm package channel**: token-authenticated, backend cert is Amazon Root CA 1 (public root, not a vendor pin), package signatures verified against `tc_public.pem`.
