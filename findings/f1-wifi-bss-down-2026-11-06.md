@@ -40,3 +40,7 @@ Read-only check from the Mac on `en10` (`192.168.1.100`) to `192.168.1.1`. Ping 
 No `wl bss up`, no `wifi` reload, no hostapd restart. The init scripts present are `bcm-wlan-drivers.sh`, `wifi.sh`, `wifi_md.sh`, and `wlan_mgr`. A start was not the obvious recovery: the Wi-Fi processes are still running, and `hostapd_cli` already says ENABLED. Killing them was out of scope.
 
 Earlier the same day, process checks described the radios as up. That was process and `iwinfo` state at those passes. This check supersedes it for the air state. See [f1-idle-services-stopped-2026-11-06.md](f1-idle-services-stopped-2026-11-06.md).
+
+## Later recheck (2026-11-07 14:48 CET)
+
+**VERIFIED, read-only:** `iwinfo` reported `Telia-C66283` on `wl0` channel 36 / 5180 MHz and `wl1` channel 11 / 2462 MHz. `hostapd_cli all_sta` counted one associated station on `wl0`, none on `wl1`; both hostapd interfaces reported ENABLED. This supersedes the 2026-11-06 observation that the user SSID was not visible at that time. No Wi-Fi settings or processes were changed.

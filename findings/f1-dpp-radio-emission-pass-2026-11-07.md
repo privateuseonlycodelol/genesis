@@ -99,3 +99,13 @@ Reproduction/evidence: `artifacts/lcm-demo-2026-11-07/dpp_ctrl_observer.c` (SHA-
 ## Next experiment
 
 The open piece is a peer-originated connector reaching `wps_pbcd` while `wl0_dpp_role=enrollee`, with shell punctuation that survives connector verification, followed by a verified marker. The observed local TCP and control-only events were generated on-device; Wi-Fi delivery still needs an independent 5 GHz DPP peer. Do not present the shell plumbing proof as a demonstrated over-the-air RCE.
+
+## Live radio and configurator-socket recheck (2026-11-07 14:47–14:50 CET)
+
+**VERIFIED, read-only SSH on the same owned unit:** uptime was 10 h 11 min; `hostapd` PIDs were 6839 (`wl0`) and 13889 (`wl1`), and `map-dpp-configurator` PID 21884. `wl0` supported 5 GHz channels and was on channel 36 / 5180 MHz; `wl1` supported only 2.4 GHz channels and was on channel 11 / 2462 MHz. `hostapd_cli all_sta` counted one associated station on `wl0` and zero on `wl1`. Both interfaces were enabled; `wl0_dpp_role`, `wl1_dpp_role`, and `dpp_started` were empty.
+
+**DERIVED route elimination:** the two on-board radios cannot exchange same-channel DPP action frames in their present band/channel configuration. Retuning `wl0` would interrupt its associated station, so the proposed same-device over-air pairing was not attempted. This does not rule out a compatible external 5 GHz peer or a later no-client maintenance window.
+
+The live configurator process is root inside mount namespace `mnt:[4026532602]` (an LCM container). Its bound datagram socket inode 118080 appeared in `/proc/net/unix` as `/tmp/dpp.sock`; the path is visible at `/proc/21884/root/tmp/dpp.sock` but not in the host namespace's `/tmp`. The executable's receive loop accepts up to 1024 bytes and copies at most 256 bytes to its callback buffer before dispatch. **No datagram was sent:** the callback message format and a harmless request/response exchange remain unestablished, and the socket is local to the container. No network exposure or exploit was demonstrated.
+
+**What was not shown:** an over-air DPP exchange, a peer-controlled connector reaching `wps_pbcd`, or command execution from a genuine connector. The next high-value experiment still requires a compatible 5 GHz DPP peer (or an empty-client window) and a capture/observer that preserves sanitized event metadata.
