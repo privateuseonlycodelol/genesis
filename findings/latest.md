@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-11-07T01:12:40Z
+**Generated:** 2026-11-07T01:50:41Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -21,12 +21,13 @@
 ## `artifacts/firmware`
 ```
 total 629216
-drwxr-xr-x  20 user  staff       640 Nov  6 22:54 .
+drwxr-xr-x  21 user  staff       672 Nov  7 02:26 .
 drwxr-xr-x  24 user  staff       768 Nov  6 02:01 ..
 -rw-r--r--@  1 user  staff      6148 Nov  6 19:51 .DS_Store
 -rw-r--r--@  1 user  staff  63470903 Nov  6 20:26 GCNT-X-23.1.b-bank1.itb
 -rw-r--r--@  1 user  staff  68803903 Nov  6 20:26 GCNT-X-23.1.b-bank2.itb
 -rw-r--r--@  1 user  staff  32759365 Oct 11 05:48 REFERENCE-GCNT-X-19.x-DO-NOT-FLASH.rbi
+drwxr-xr-x@ 32 user  staff      1024 Nov  7 02:49 container-2026-11-07
 drwxr-xr-x@  7 user  staff       224 Nov  4 12:12 dryrun-2026-11-04
 drwxr-xr-x@ 18 user  staff       576 Nov  6 20:08 flash-2026-11-06
 -r--r--r--@  1 user  staff     24968 Nov  6 22:54 kernel-config-23.1.b.gz
@@ -157,6 +158,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-ipping-host-2026-10-12.md`](f1-ipping-host-2026-10-12.md)
 - [`f1-js-deep-2026-10-12.md`](f1-js-deep-2026-10-12.md)
 - [`f1-kernel-rip-keystore-decomp-2026-10-29.md`](f1-kernel-rip-keystore-decomp-2026-10-29.md)
+- [`f1-lcm-package-channel-deep-audit-2026-11-07.md`](f1-lcm-package-channel-deep-audit-2026-11-07.md)
 - [`f1-live-overlay-injection-2026-11-06.md`](f1-live-overlay-injection-2026-11-06.md)
 - [`f1-logviewer.md`](f1-logviewer.md)
 - [`f1-miniupnpd-cwmpd-2026-11-06.md`](f1-miniupnpd-cwmpd-2026-11-06.md)

@@ -23,7 +23,8 @@ The 2026-10-27 note that recovery flashing needs no vendor signature is overstat
 | Tailscale UI | The Tailscale address loads the Sign in page. A foreign Host header stays rejected | [Tailscale UI](findings/f1-tailscale-ui-2026-11-06.md) |
 | GPL source | No public 23.1.b tree. The running kernel config is saved. 188 packages are tagged GPL-2.0 | [GPL request](findings/f1-gpl-source-request-2026-10-29.md) |
 | WPS on port 49152 | No demonstrated pre-login bug | [WPS parser](findings/f1-hostapd-wps-parser-2026-11-06.md) |
-| LAN surface | Exhaustion pass 2026-11-06/07: every live listener, web handler, and message-taking binary triaged. No unauthenticated RCE. Open items: unauth WAN restart page (fixed command), CUPS anonymous reads, onboarding-gated DPP→shell chain, `core-lcm` Amazon-root package channel | [miniupnpd/cwmpd pass](findings/f1-miniupnpd-cwmpd-2026-11-06.md) |
+| LAN surface | Exhaustion pass 2026-11-06/07: every live listener, web handler, and message-taking binary triaged. No unauthenticated RCE. Open items: unauth WAN restart page (fixed command), CUPS anonymous reads, onboarding-gated DPP→shell chain | [miniupnpd/cwmpd pass](findings/f1-miniupnpd-cwmpd-2026-11-06.md) |
+| LCM package channel | Deep audit 2026-11-07: plain-HTTP backend, no auth, per-member RSA-2048 sigs vs `tc_public.pem`, fail-closed; residual = MITM downgrade of vendor-signed packages via unsigned apps list. Native installer verified against per-device board cert, EFU skip absent | [LCM deep audit](findings/f1-lcm-package-channel-deep-audit-2026-11-07.md) |
 | Closed-case recovery | The boot flag exists. The web action that sets it has not been sent | [Closed-case BOOT-P](findings/f1-closed-case-bootp-2026-11-06.md) |
 
 Usage dashboard refresh: `python3 scripts/f1_usage_snapshot.py`. Index rebuild: `./scripts/report.sh`.
