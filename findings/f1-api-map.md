@@ -154,6 +154,8 @@ This file maps **session-gated** `*.lp` / `gateway.lp` / `authenticate` on **por
 
 The admin **WPS form** (`/modals/wireless-wps-modal-newEM.lp`) is still Homeware UI state; **49152** is the separate Wi‑Fi Alliance UPnP registrar/enrollee control plane documented in the WFA finding. No demonstrated chain from UI session to unauthenticated 49152 bypass was shown.
 
+**LCM DPP runtime update (2026-11-07):** `map-dpp-configurator` runs in a separate PID/mount namespace but shares the host user and network namespaces. Its observed effective capability mask includes `CAP_NET_ADMIN` and `CAP_SYS_ADMIN`, and the `lxc_ee` device cgroup allows `a *:* rwm`; all sampled `lxc_ee` processes had that same mask. This raises the potential impact of a future DPP parser RCE but does **not** demonstrate a namespace escape. The live `/tmp/dpp.sock` remains a container-local Unix datagram endpoint with no known request protocol; no datagram was sent. See [DPP radio emission pass](f1-dpp-radio-emission-pass-2026-11-07.md).
+
 Drivers for 49152: `scripts/wfa_wlanconfig_*.py`, `scripts/wps_device_info.py`.
 
 CUPS :631 index: [docs/f1-cups-631.md](../docs/f1-cups-631.md). Drivers: `scripts/cups_ipp_readonly_matrix.py`, `scripts/cups_ipp_followup.py`, `scripts/cups_ipp_policy_probe.py` (`scripts/test_cups_ipp_readonly_matrix.py` for encoder fixture).

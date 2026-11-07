@@ -32,6 +32,8 @@ Usage dashboard refresh: `python3 scripts/f1_usage_snapshot.py`. Index rebuild: 
 
 DPP follow-up: [localhost TCP config exchange emitted a 445-character connector; over-air path still open](findings/f1-dpp-radio-emission-pass-2026-11-07.md). The earlier event-to-shell plumbing result used a fabricated ctrl event: [details and limits](findings/f1-dpp-shell-chain-demonstrated-2026-11-07.md).
 
+The live DPP configurator also shares the host user/network namespaces and has `CAP_NET_ADMIN` / `CAP_SYS_ADMIN` with an all-devices LXC cgroup. This raises the impact of a future parser compromise; no namespace escape or DPP exploit was demonstrated.
+
 ## Layout
 
 - [Software pass summary](findings/software-pass-summary.md) is the running inventory.
