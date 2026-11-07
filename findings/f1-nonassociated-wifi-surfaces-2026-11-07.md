@@ -86,7 +86,13 @@ Relocation walk of the functions named in the surface table. No frame was sent.
 - `wlc_recv_ext_csa_action` (`0x3069b0`) is a single `ret`. An extended CSA action frame is not parsed by this symbol.
 - `wlc_recv_public_csa_action` and `wlc_recv_public_coex_action` have no `memcpy`. Public CSA uses `bcm_find_tlv_min_bodylen`. Coex uses `bcm_find_tlv`.
 - `wlc_recv_csa_action` has one `memcpy` at `0x306090`. Immediately before it, `len+6` is compared with `end-cursor` and a `b.gt` skips the copy when the span is too small. The copied count is `len & 0xff`.
-- `wlc_multibssid_recv_nontransmitted_ssid_bssid` (called from the scan parser) has no `memcpy`; it calls `bcm_find_tlv` seven times. `wlc_multibssid_recv_preprocess_bcn` does copy, and one site (`0x384838`) only reaches `memcpy` of the running remainder when that remainder is not greater than 2. The other MBSSID copies were not each paired with their allocator.
+- `wlc_multibssid_recv_nontransmitted_ssid_bssid` (called from the scan parser) has no `memcpy`; it calls `bcm_find_tlv` seven times.
+- `wlc_multibssid_recv_preprocess_bcn` (`0x3845a0`) allocates with `osl_mallocz`. The main buffer size is argument 4 minus 12 (`0x384698`). The running output offset at `sp+0x68` is stored as zero before the walk (`0x3847b0`). Three copies are bounded by that allocation:
+  - `0x3847c8`: an element is not consumed when `IE_len+2` is greater than the remaining allocation (`cmp` / `b.gt`).
+  - `0x3849b8`: copy length is `(IE_len+2)` masked to 8 bits, and the copy is skipped when that exceeds allocation minus offset (`b.lo`).
+  - `0x384cd4`: copy length is `IE_len+2`, skipped when that exceeds allocation minus offset (`b.hi`).
+  - `0x384ad8`: the input remainder is initialized to the allocation size (`0x384a90`), and the loop copies an element only after `remainder >= IE_len+2`. The sum copied cannot exceed the allocation.
+- The multiple-BSSID element path (tag `0x47`, `0x384b98`) allocates the sum of two length bytes and then copies argument-1-masked-to-8-bits plus the second length byte. Those two lengths were not shown to be the allocation size. No overflow was established. No beacon was sent.
 
 ## SAE frame send, second look (BLOCKED)
 
@@ -94,7 +100,7 @@ Relocation walk of the functions named in the surface table. No frame was sent.
 
 ## Highest-value follow-ups
 
-1. Pair each remaining `memcpy` in `wlc_multibssid_recv_preprocess_bcn` with the `osl_mallocz` that feeds it. The scan parsers themselves have no `memcpy`.
+1. The tag-`0x47` allocation in `wlc_multibssid_recv_preprocess_bcn` (`w27+w28`) is the one copy pair whose length is still a different register from the allocation size.
 2. Deauth-vs-PMF on a PMF-optional BSS from an injector that is not the lab client's only link.
 3. One SAE commit (unknown group, then a supported group) from a host whose `iw` can send SAE authenticate, aimed at `BH-C66283` / `wl0.2` only. This device's `iw` 4.1 cannot.
 
