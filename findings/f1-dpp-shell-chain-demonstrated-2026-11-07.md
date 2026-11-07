@@ -40,7 +40,7 @@ and `/tmp/genesis_dpp_marker` was created — the shell parsed the `;` inside th
 
 - The **radio transport and real field encoding**: the root-command proof used a fabricated event at `wpa_ctrl_recv`; the later genuine DPP exchange used localhost TCP, not 802.11, and the onboarding role gate was closed. Vendor-matching ROM disassembly and the live TCP event confirm that the connector is emitted as a string. The decoder skips non-alphabet bytes while the original connector text is retained. A semicolon in the third JWS segment can therefore survive signature checking in principle; this was verified offline with a public test vector, but a live punctuated connector has not passed the parser. C-sign and network-access keys are emitted as hex and do not offer the same punctuation route. See the [DPP radio-side finding](f1-dpp-radio-emission-pass-2026-11-07.md).
 - The **state**: `wl0_dpp_role=enrollee` (plus the natural `wl0_mode=ap`) was set by root for this test. In the real attack the same state is created by the device being in the user-initiated DPP-onboarding window; outside that window the gate blocks the `system()` sites (also observed live: with the role unset, the parse ran and skipped the command).
-- No radio-side DPP exchange was performed; no Wi-Fi state was changed.
+- Radio attempts are in the [DPP radio-side finding](f1-dpp-radio-emission-pass-2026-11-07.md). They transmitted authentication requests and did not complete an exchange. The genuine connector event was the later localhost TCP exchange, with the role gate closed.
 
 ## Restore (VERIFIED)
 
