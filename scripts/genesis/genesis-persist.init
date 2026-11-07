@@ -25,7 +25,26 @@ stop_unwanted() {
 	fi
 }
 
+# The mesh slave turns the customer SSIDs off when it owns those radios and
+# has not joined a controller. Keep only the backhaul interface in its list.
+keep_customer_wifi() {
+	current=$(nvram get wbd_ifnames)
+	nvram set wbd_ifnames="wl0.1"
+	nvram set non_map_ifnames="wl0 wl1"
+	nvram commit
+	if [ "$current" != "wl0.1" ] && pidof wbd_slave >/dev/null 2>&1; then
+		# shellcheck disable=SC2046
+		kill $(pidof wbd_slave) 2>/dev/null || true
+		sleep 1
+		pidof wbd_slave >/dev/null 2>&1 || /usr/sbin/wbd_slave >/dev/null 2>&1 &
+		sleep 1
+	fi
+	wl -i wl0 bss | grep -q '^up$' || wl -i wl0 bss up
+	wl -i wl1 bss | grep -q '^up$' || wl -i wl1 bss up
+}
+
 start() {
+	keep_customer_wifi
 	stop_unwanted
 	if [ -x /etc/init.d/genesis ]; then
 		/etc/init.d/genesis enable

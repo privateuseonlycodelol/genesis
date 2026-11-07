@@ -4,6 +4,8 @@
 
 **Tailscale UI, live 2026-11-06:** [f1-tailscale-ui-2026-11-06.md](f1-tailscale-ui-2026-11-06.md). `http://100.91.82.75/` was nginx 401 because the Host header was not a LAN address. The login page now loads for this node's Tailscale address. A foreign Host header stays 401.
 
+**miniupnpd and cwmpd, offline 2026-11-06:** [f1-miniupnpd-cwmpd-2026-11-06.md](f1-miniupnpd-cwmpd-2026-11-06.md). SOAP action names are matched against a fixed table. The only `popen` runs the configured WAN script. Shipped UPnP is off. `cwmpd` has no `system` or `popen` symbol. No live request.
+
 **Closed-case BOOT-P, offline 2026-11-06:** [f1-closed-case-bootp-2026-11-06.md](f1-closed-case-bootp-2026-11-06.md). The `system_bootp` POST is still session-gated and untested live. U-Boot itself enters BOOT-P when the prozone bootp bit is set. No new unauthenticated listener.
 
 **Physical-console follow-up, offline 2026-10-12:** [owned F1 boot review](f1-boot-log-2026-10-12.md) observes bootloader `serial0`, Linux `ttyS0` at 115200n8, BOOT-P and Enter invitations, plus a JTAG-unlock warning. These define separate physical/debug leads; serial input, login/shell authorization and JTAG permission were not tested. `ubus (running as root!)` is a daemon status message, not an anonymous management boundary. No listener/session/CUPS/WPS behavior was retested or changed by this review.
@@ -74,7 +76,7 @@ The extracted relative routes are `wps_control`, `wps_event`, and `wps_scpd.xml`
 
 [Offline executor evidence](management-offline-service-evidence.md) records exact fields and related-source line references. The Luna xhigh subagent only parsed the specified local files and inspected source; the parent selected experiments, executed live checks, and interpreted results. Parent review removed an incorrect path-mismatch sentence from the executor draft.
 
-**VERIFIED in related community source only:** port 8080 is configured with `tproxy` and `web.intercept.process()`, while the main UI uses session checks and exact `/api` uses a token authenticator. **HYPOTHESIS:** the live 8080 service may be a traffic-interception handler rather than an alternate UI listener. Its three route 404s do not identify the implementation. The community snapshot is not the shipped 23.1.b configuration. **Extended (2026-10-12):** eleven additional GET paths on **8080** also returned the same **404** / 146-byte stub — [f1-gateway-url-action-2026-10-12.md](f1-gateway-url-action-2026-10-12.md).
+**At the time of this pass:** port 8080 direct GETs returned 404, and the community snapshot was not the shipped configuration. **Superseded for the shipped config (2026-11-07):** `etc/nginx/nginx.conf` in the 23.1.b root listens on 8080 with `tproxy` and redirects to the LAN address plus `/intercept.lp` or `/no-internet-connection-intercept.lp`. That second page does not call `handleAuth`, and its restart action queues `ifup wan`. See [f1-miniupnpd-cwmpd-2026-11-06.md](f1-miniupnpd-cwmpd-2026-11-06.md). The earlier direct 404s are unchanged; this pass did not connect to 8080.
 
 ## Reproduction and evidence locations
 

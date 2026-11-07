@@ -154,6 +154,10 @@ Drivers for 49152: `scripts/wfa_wlanconfig_*.py`, `scripts/wps_device_info.py`.
 
 CUPS :631 index: [docs/f1-cups-631.md](../docs/f1-cups-631.md). Drivers: `scripts/cups_ipp_readonly_matrix.py`, `scripts/cups_ipp_followup.py`, `scripts/cups_ipp_policy_probe.py` (`scripts/test_cups_ipp_readonly_matrix.py` for encoder fixture).
 
+## Locations that skip the session check (firmware file, not sent)
+
+In the 23.1.b `etc/nginx/nginx.conf`, `/no-internet-connection-intercept.lp` does not call `handleAuth`. Its restart query sets `rpc.network.wan_up` to `1`. The commit-apply rule for that token is the fixed command `ifup wan`. `/intercept.lp` likewise skips `handleAuth`; its POST names are `ignore_limit` and `ignore_threshold`. A later live GET with no cookie returned the reconnect page. The restart action was not sent. Detail: [f1-miniupnpd-cwmpd-2026-11-06.md](f1-miniupnpd-cwmpd-2026-11-06.md).
+
 ## Not fetched on purpose
 
 `/modals/wireless-qrcode-modal.lp` returns Wi-Fi QR markup (includes key material in the response). **VERIFIED 2026-10-12:** bare GET → HTTP **500**; GET with AP-modal query (`iface`, `broadcastiface`, `splitState`, `band6gOnly`, …) → HTTP **200** when authenticated. See [f1-wireless-qrcode-context-2026-10-12.md](f1-wireless-qrcode-context-2026-10-12.md). Do not archive bodies in git.

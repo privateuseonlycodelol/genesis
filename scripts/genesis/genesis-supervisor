@@ -110,7 +110,7 @@ sync_skin() {
 sync_telemetry() {
 	[ -x "$ROOT/telemetry/apply" ] || return 0
 	if enabled telemetry; then
-		"$ROOT/telemetry/apply" block >/dev/null 2>&1 || true
+		"$ROOT/telemetry/apply" sync >/dev/null 2>&1 || true
 	fi
 }
 

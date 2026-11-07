@@ -11,10 +11,11 @@ The 2026-10-27 note that recovery flashing needs no vendor signature is overstat
 | Topic | Status | Note |
 | --- | --- | --- |
 | Root | Overlay SSH, after one serial recovery | [Do it again](docs/root-again.md), [what happened](findings/f1-quad-overlay-flash-2026-11-06.md) |
-| Signed boot | Vendor `bootfs` is checked. `rootfs_data` is not | [FLD gate](findings/f1-uboot-fld-secure-boot-gate-2026-11-04.md) |
+| Signed boot | Vendor `bootfs` is checked. `rootfs_data` is not. An aarch64 musl userspace runs under this kernel | [FLD gate](findings/f1-uboot-fld-secure-boot-gate-2026-11-04.md), [OpenWrt userspace](findings/f1-openwrt-userspace-2026-11-06.md) |
 | Flash and OSCK | Both banks and the 19.x reference image unwrap. Do not flash the 19.x image | [Flash volumes](findings/f1-flash-volumes-2026-11-06.md) |
 | LAN DNS | dnsmasq forwards to a local DoH proxy for `dns.rilah.app`. The URL is only on the router | [DNS and phone-home](findings/f1-doh-and-tracking-2026-11-06.md) |
-| Idle services | Usage meter and Airties `cloud-comm` disabled. `cwmpd` stopped. Telia MQTT still up. Wi-Fi left up | [Idle services](findings/f1-idle-services-stopped-2026-11-06.md), [reset parking lot](findings/f1-reset-persistence-2026-11-06.md) |
+| Idle services | Usage meter and Airties `cloud-comm` disabled. `cwmpd` stopped. Telia MQTT still up. Wi-Fi processes were left running | [Idle services](findings/f1-idle-services-stopped-2026-11-06.md), [reset parking lot](findings/f1-reset-persistence-2026-11-06.md) |
+| Wi-Fi | User SSID `Telia-C66283` is not beaconing. `hostapd` is still running and was not restarted | [Wi-Fi BSS](findings/f1-wifi-bss-down-2026-11-06.md) |
 | Reset | Parking lot re-seeded across an unplanned reboot. A button reset is still untested. `rtfd --all` still wipes it | [Reset parking lot](findings/f1-reset-persistence-2026-11-06.md) |
 | Upgrade wipe | A restore script is on the `opt` volume, which the flasher does not name. The launcher was left dormant and has not been shown running it | [Opt restore](findings/f1-opt-keep-root-2026-11-06.md) |
 | Admin UI | Overlay stylesheet, injected into HTML by nginx. Login page restyled. Templates unchanged | [UI skin](findings/f1-ui-skin-2026-11-06.md) |

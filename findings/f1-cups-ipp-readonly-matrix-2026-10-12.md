@@ -44,7 +44,7 @@ All rows: `POST http://192.168.2.1:631/`, `application/ipp`, IPP **1.1**. Classi
 | Get-Subscription-Attributes | `0x000D` | `0x0400` | Yes | `Missing required attributes.` |
 | Get-Notifications | `0x000E` | `0x0400` | Yes | `Missing required attributes.` |
 
-**Not observed in this matrix:** HTTP **401** on any `application/ipp` read probe. Upstream template lists `CUPS-Get-Devices` under administrator `<Limit>` with `Require user @SYSTEM`; the live device still entered `get_devices()` and attempted `cups-deviced` (internal error, not auth refusal). **UNKNOWN:** effective `cupsd.conf` / policy on the router; may differ from template or use a permissive default-policy tail (`<Limit All> Order deny,allow`).
+**Not observed in this matrix:** HTTP **401** on any `application/ipp` read probe. Upstream template lists `CUPS-Get-Devices` under administrator `<Limit>` with `Require user @SYSTEM`; the live device still entered `get_devices()` and attempted `cups-deviced` (internal error, not auth refusal). ~~**UNKNOWN:** effective `cupsd.conf` / policy on the router; may differ from template or use a permissive default-policy tail (`<Limit All> Order deny,allow`).~~ **Superseded (2026-11-07):** the live `cupsd.conf` was obtained read-only. It has no `<Policy>` section, so cupsd auto-creates the `default` policy from upstream `conf.c`; that auto-created policy has the permissive all-operations tail named above and requires `@SYSTEM` for the state-changing printer operations, which explains both the unauthenticated reads and the forbidden `CUPS-Create-Local-Printer`. See [f1-miniupnpd-cwmpd-2026-11-06.md](f1-miniupnpd-cwmpd-2026-11-06.md).
 
 ## Impact assessment (honest)
 

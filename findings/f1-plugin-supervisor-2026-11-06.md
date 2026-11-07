@@ -35,6 +35,10 @@ At 22:14 the Tailscale card looked for `/usr/sbin/tailscaled` and reported the b
 
 The clicks were these commands, not a signed-in browser session. The address-change restart was not provoked. An overlay wipe removes `/genesis`.
 
+## Per-setting buttons, 23:03 CET
+
+**VERIFIED.** The settings page is no longer one switch per plugin. DNS has on/off, cache, bootstrap address, and Quad9 fallback. Each one calls `/genesis/plugins/dns/apply` and restarts `dnsproxy` only when DNS is enabled. Tailscale has start/stop and accept or ignore advertised routes (`RouteAll` was false). Telemetry has separate Allow/Block for the usage meter, TR-069, and MQTT. Those choices are `/genesis/plugins/telemetry/services`. The supervisor calls `apply sync`, so a later loop keeps the saved choice. `cloud-comm` stays false unless all three are allowed. The Airties launcher was not restarted. After `/etc/init.d/genesis restart` and an nginx reload, `dnsproxy` was still 8717, `hostapd` still 16174 and 14927, and `cwmpd` and MQTT were still down. A signed-in click was not made from here.
+
 ## API
 
 **VERIFIED, 22:19 CET.** `GET /genesis/api` and `GET /genesis/api/` are exact nginx locations using the same session check as the page. UCI rules `web.genesisapi` and `web.genesisapislash` allow admin, telia, and superuser. A request with no admin role got the login page (`Sign in`, 6446 bytes), not a JSON body. `dnsproxy` stayed pid 8717.

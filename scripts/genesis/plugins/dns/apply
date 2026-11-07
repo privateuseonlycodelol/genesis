@@ -1,0 +1,62 @@
+#!/bin/sh
+# Change one dnsproxy setting and restart the proxy when DNS is enabled.
+# The upstream URL stays in /etc/doh-rilah.url. This script never prints it.
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+YAML=/etc/dnsproxy.yaml
+MANIFEST=/genesis/plugins/dns/manifest
+
+restart() {
+	if [ -f "$MANIFEST" ] && grep -q '^enabled=1$' "$MANIFEST"; then
+		if pidof dnsproxy >/dev/null 2>&1; then
+			# shellcheck disable=SC2046
+			kill $(pidof dnsproxy) 2>/dev/null || true
+			sleep 1
+		fi
+		/usr/sbin/dnsproxy --config-path="$YAML" --output=/dev/null >/dev/null 2>&1 &
+	fi
+}
+
+case "${1:-}" in
+	cache)
+		case "${2:-}" in
+			1) bit=true ;;
+			0) bit=false ;;
+			*) exit 1 ;;
+		esac
+		awk -v bit="$bit" '
+			/^cache:/ { print "cache: " bit; next }
+			{ print }
+		' "$YAML" > "$YAML.new" && mv "$YAML.new" "$YAML"
+		restart
+		;;
+	bootstrap)
+		printf '%s\n' "${2:-}" | grep -Eq '^[0-9]{1,3}(\.[0-9]{1,3}){3}$' || exit 1
+		awk -v ip="$2" '
+			/^bootstrap:/ { print; print "  - \"" ip ":53\""; skip=1; next }
+			skip && /^  - / { skip=0; next }
+			{ print }
+		' "$YAML" > "$YAML.new" && mv "$YAML.new" "$YAML"
+		restart
+		;;
+	fallback)
+		case "${2:-}" in
+			1)
+				grep -q 'dns.quad9.net' "$YAML" && exit 0
+				printf 'fallback:\n  - "https://dns.quad9.net/dns-query"\n' >> "$YAML"
+				;;
+			0)
+				awk '
+					/^fallback:/ { skip=1; next }
+					skip && /^  - / { next }
+					skip { skip=0 }
+					{ print }
+				' "$YAML" > "$YAML.new" && mv "$YAML.new" "$YAML"
+				;;
+			*) exit 1 ;;
+		esac
+		restart
+		;;
+	*)
+		exit 1
+		;;
+esac

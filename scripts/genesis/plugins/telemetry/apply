@@ -56,8 +56,90 @@ allow() {
 	cloud_comm true
 }
 
+SERVICES=/genesis/plugins/telemetry/services
+
+want() {
+	key=$1
+	val=$(sed -n "s/^${key}=//p" "$SERVICES" 2>/dev/null | head -n 1)
+	[ "$val" = "allow" ] && echo allow || echo block
+}
+
+one() {
+	key=$1
+	mode=$2
+	case "$key" in
+		cwmp|usage|mqtt) ;;
+		*) return 1 ;;
+	esac
+	case "$mode" in
+		block|allow) ;;
+		*) return 1 ;;
+	esac
+	[ -f "$SERVICES" ] || printf 'cwmp=block\nusage=block\nmqtt=block\n' > "$SERVICES"
+	if grep -q "^${key}=" "$SERVICES"; then
+		sed -i "s/^${key}=.*/${key}=${mode}/" "$SERVICES"
+	else
+		printf '%s=%s\n' "$key" "$mode" >> "$SERVICES"
+	fi
+	case "$key:$mode" in
+		cwmp:block)
+			[ -x /etc/init.d/cwmpd ] && /etc/init.d/cwmpd stop >/dev/null 2>&1 || true
+			[ -x /etc/init.d/cwmpd ] && /etc/init.d/cwmpd disable >/dev/null 2>&1 || true
+			;;
+		cwmp:allow)
+			[ -x /etc/init.d/cwmpd ] && /etc/init.d/cwmpd enable >/dev/null 2>&1 || true
+			[ -x /etc/init.d/cwmpd ] && /etc/init.d/cwmpd start >/dev/null 2>&1 || true
+			;;
+		usage:block)
+			for init in datausaged datausage_notifier; do
+				[ -x "/etc/init.d/$init" ] && "/etc/init.d/$init" stop >/dev/null 2>&1 || true
+				[ -x "/etc/init.d/$init" ] && "/etc/init.d/$init" disable >/dev/null 2>&1 || true
+			done
+			;;
+		usage:allow)
+			for init in datausaged datausage_notifier; do
+				[ -x "/etc/init.d/$init" ] && "/etc/init.d/$init" enable >/dev/null 2>&1 || true
+				[ -x "/etc/init.d/$init" ] && "/etc/init.d/$init" start >/dev/null 2>&1 || true
+			done
+			;;
+		mqtt:block)
+			rm -f "$MQTT_RC"
+			stop_if_up pub_rgw_messages
+			stop_if_up pub_rgw_daemon
+			rm -f /var/run/pub_rgw_messages.pid /var/run/pub_rgw_daemon.pid
+			;;
+		mqtt:allow)
+			if [ -x "$MQTT_INIT" ] && [ ! -e "$MQTT_RC" ]; then
+				ln -s ../init.d/pub_rgw_messages "$MQTT_RC"
+			fi
+			[ -x "$MQTT_INIT" ] && "$MQTT_INIT" start >/dev/null 2>&1 || true
+			;;
+	esac
+}
+
+sync_services() {
+	[ -f "$SERVICES" ] || printf 'cwmp=block\nusage=block\nmqtt=block\n' > "$SERVICES"
+	one cwmp "$(want cwmp)"
+	one usage "$(want usage)"
+	one mqtt "$(want mqtt)"
+	if [ "$(want cwmp)" = "allow" ] && [ "$(want usage)" = "allow" ] && [ "$(want mqtt)" = "allow" ]; then
+		cloud_comm true
+	else
+		cloud_comm false
+	fi
+}
+
 case "${1:-}" in
 	block) block ;;
 	allow) allow ;;
+	set)
+		one "$2" "$3" || exit 1
+		if [ "$(want cwmp)" = "allow" ] && [ "$(want usage)" = "allow" ] && [ "$(want mqtt)" = "allow" ]; then
+			cloud_comm true
+		else
+			cloud_comm false
+		fi
+		;;
+	sync) sync_services ;;
 	*) exit 1 ;;
 esac

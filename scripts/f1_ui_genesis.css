@@ -232,9 +232,7 @@ hr {
 .modal-action-advanced,
 #Simplified_guided_view,
 #Advanced_interface,
-.popUpBG,
-#popUp,
-.popUp {
+.popUpBG {
   display: none !important;
 }
 

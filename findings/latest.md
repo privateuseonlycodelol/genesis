@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-11-06T21:55:11Z
+**Generated:** 2026-11-07T00:57:46Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -159,9 +159,11 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-kernel-rip-keystore-decomp-2026-10-29.md`](f1-kernel-rip-keystore-decomp-2026-10-29.md)
 - [`f1-live-overlay-injection-2026-11-06.md`](f1-live-overlay-injection-2026-11-06.md)
 - [`f1-logviewer.md`](f1-logviewer.md)
+- [`f1-miniupnpd-cwmpd-2026-11-06.md`](f1-miniupnpd-cwmpd-2026-11-06.md)
 - [`f1-mount-root-rtfd-and-clash-deconstruction-2026-11-06.md`](f1-mount-root-rtfd-and-clash-deconstruction-2026-11-06.md)
 - [`f1-nand-read-plan-2026-10-27.md`](f1-nand-read-plan-2026-10-27.md)
 - [`f1-offline-overlay-pipeline-2026-11-05.md`](f1-offline-overlay-pipeline-2026-11-05.md)
+- [`f1-openwrt-userspace-2026-11-06.md`](f1-openwrt-userspace-2026-11-06.md)
 - [`f1-opt-keep-root-2026-11-06.md`](f1-opt-keep-root-2026-11-06.md)
 - [`f1-password-encoding-cli-trace-2026-10-15.md`](f1-password-encoding-cli-trace-2026-10-15.md)
 - [`f1-plugin-supervisor-2026-11-06.md`](f1-plugin-supervisor-2026-11-06.md)
@@ -192,6 +194,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-usage-dashboard-2026-11-06.md`](f1-usage-dashboard-2026-11-06.md)
 - [`f1-usp-ipping-2026-10-12.md`](f1-usp-ipping-2026-10-12.md)
 - [`f1-wfa-wlanconfig-49152-2026-10-12.md`](f1-wfa-wlanconfig-49152-2026-10-12.md)
+- [`f1-wifi-bss-down-2026-11-06.md`](f1-wifi-bss-down-2026-11-06.md)
 - [`f1-wireless-qrcode-context-2026-10-12.md`](f1-wireless-qrcode-context-2026-10-12.md)
 - [`gcnt-x-19x-deep.md`](gcnt-x-19x-deep.md)
 - [`gcnt-x-public-hardware.md`](gcnt-x-public-hardware.md)

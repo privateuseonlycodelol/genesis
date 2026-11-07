@@ -41,7 +41,7 @@ On a later boot, `aircdf-daemon` is started with `--parser.path_ro` pointed at t
 ## Checks after the stops
 
 - `nslookup example.com 127.0.0.1` returned IPv4 and IPv6 addresses.
-- `iwinfo` showed `wl0` and `wl1` in Master mode. `wlan_mgr` and both `hostapd` processes were still running.
+- `iwinfo` showed `wl0` and `wl1` in Master mode. `wlan_mgr` and both `hostapd` processes were still running. **Superseded later the same evening for the air state:** those processes can stay up while the user BSS is down. See [f1-wifi-bss-down-2026-11-06.md](f1-wifi-bss-down-2026-11-06.md).
 - SSH still authenticated.
 - Left running: `cwmpd`, `wlan_mgr`, `wbd_slave`, `mesh_broker` (new pid, see above), nginx, `acsd2`, `wifi_md`, dnsmasq, `/usr/bin/lua /usr/sbin/doh-proxy.lua`, dropbear, hostapd. The Lua forwarder named here was the one running at this pass. Later the same day it was replaced by dnsproxy; see [f1-doh-and-tracking-2026-11-06.md](f1-doh-and-tracking-2026-11-06.md).
 

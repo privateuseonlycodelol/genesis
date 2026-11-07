@@ -15,10 +15,11 @@
 
 1. [f1-cups-ipp-policy-2026-10-12.md](../findings/f1-cups-ipp-policy-2026-10-12.md) — policy model, ipptool, safe write probes, `cupsd.conf` ground-truth paths  
 2. [f1-cups-ipp-readonly-matrix-2026-10-12.md](../findings/f1-cups-ipp-readonly-matrix-2026-10-12.md) — full read-operation matrix  
-3. [management-auth-boundaries-2026-10-12.md](../findings/management-auth-boundaries-2026-10-12.md) — initial boundary pass  
-4. [cups-http-ipp-source-boundary.md](../findings/cups-http-ipp-source-boundary.md) — upstream CUPS 2.2.10/2.2.12 source vs live  
-5. [f1-printersharing-webui-2026-10-29.md](../findings/f1-printersharing-webui-2026-10-29.md) — printersharing modal read-back: Enabled=1, no webui control served; the earlier POST used field names the form lacks  
-6. [cups-udp631-browse-source-2026-10-29.md](../findings/cups-udp631-browse-source-2026-10-29.md) — UDP 631: pinned 2.2.10 `cupsd` has no browse listener (DERIVED); the open|filtered UDP reading is probably `cups-browsed`, version UNKNOWN  
+3. Policy resolution and public-issue applicability (2026-11-07): the live conf has no `<Policy>` block, so the upstream auto-created `default` policy applies — reads anonymous, state-changing printer operations require `@SYSTEM`; post-2.2.10 fixes mapped — see [f1-miniupnpd-cwmpd-2026-11-06.md](../findings/f1-miniupnpd-cwmpd-2026-11-06.md)  
+4. [management-auth-boundaries-2026-10-12.md](../findings/management-auth-boundaries-2026-10-12.md) — initial boundary pass  
+5. [cups-http-ipp-source-boundary.md](../findings/cups-http-ipp-source-boundary.md) — upstream CUPS 2.2.10/2.2.12 source vs live  
+6. [f1-printersharing-webui-2026-10-29.md](../findings/f1-printersharing-webui-2026-10-29.md) — printersharing modal read-back: Enabled=1, no webui control served; the earlier POST used field names the form lacks  
+7. [cups-udp631-browse-source-2026-10-29.md](../findings/cups-udp631-browse-source-2026-10-29.md) — UDP 631: pinned 2.2.10 `cupsd` has no browse listener (DERIVED); the open|filtered UDP reading is probably `cups-browsed`, version UNKNOWN
 
 Homeware **:80** routes: [f1-api-map.md](../findings/f1-api-map.md) (**Parallel surfaces** table).
 

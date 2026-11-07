@@ -14,6 +14,8 @@ No public source tarball for GCNT-X 23.1.b turned up. Vantiva's published EWA133
 
 The signing key is not in any of this. An unsigned `bootfs` still hangs the board.
 
+The same config sets `CONFIG_MODULE_SIG_FORCE`, `CONFIG_MODULE_SIG_ALL`, and `CONFIG_MODULE_SIG_SHA256`. The key path is the build-time `certs/signing_key.pem`. On the running kernel, `/proc/sys/kernel/modules_disabled` is `0` and `/proc/sys/kernel/sysrq` is `0`. Root can ask the kernel to load a module. The kernel accepts only modules signed with that key, so a TUN module built here will not load. `/proc/kcore` is present and mode `0400`. `/dev/mem` exists with `CONFIG_STRICT_DEVMEM`.
+
 ## Purpose
 
 Document the formal open-source compliance request for the complete corresponding source code of GPL/LGPL components running on the **Telia F1 / Vantiva GCNT-X (EWA1330)** on build **`23.1.b.0448-7241017-20260223134332`**.
