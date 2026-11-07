@@ -117,3 +117,23 @@ The live configurator process is root inside mount namespace `mnt:[4026532602]` 
 **DERIVED impact if a DPP parser compromise is found:** code execution in this root process would have network-administration capability in the host's shared network namespace and broad device-cgroup access. This materially raises the impact of a future parser exploit. It is **not** proof of a mount/PID namespace escape or host filesystem write; none was attempted. No capabilities, devices, networking, or container state were changed in this check.
 
 **Next experiment:** prioritize offline review/fuzzing of the DPP event/configuration parsers using the shipped binary and libraries; separately obtain a compatible 5 GHz peer for the live protocol path. The local datagram socket protocol remains unknown and was not probed.
+
+## Bounded static review of the LCM DPP payload parsers (2026-11-07)
+
+**VERIFIED as static disassembly, not runtime behavior:** the exact ROM binary above was reviewed with Rizin 0.9.1. `handle_gas_initial_request` is at `0x25a34`; `handle_config_result` is at `0x262fc`; both call the shared attribute helpers `dpp_check_attrs` at `0x2fc84` and attribute lookup at `0x2fc2c`, plus the AES-SIV routine at `0x1cf08`.
+
+- `dpp_check_attrs` calculates the end from the supplied buffer and length, requires enough bytes for each four-byte attribute header, compares each 16-bit declared value length with the remaining input before advancing, and rejects truncated or trailing bytes.
+- The lookup helper applies the same remaining-length check before advancing and returning the requested attribute.
+- Both DPP handlers require the Wrapped Data attribute (`0x1004`) to be at least the 16-byte SIV tag before subtracting the tag and allocating plaintext storage. The GAS request path allocates one additional zero byte; the config-result path allocates the exact plaintext length. Both then pass the matched input and length into the common SIV routine.
+- Before copying the Enrollee Nonce (`0x1014`), each handler checks that its declared length exactly matches the current session's expected nonce length.
+
+**Assessment:** these checks narrow the straightforward TLV overread and tag-subtraction hypotheses for these two paths; I did not find an obvious bounds violation in the instructions reviewed. This is not evidence that the whole binary is safe. The subsequent `acu_json_loads` handling of Config Attributes (`0x100e`) has not yet been proven to honor the attribute's explicit length, and other DPP handlers have not been reviewed. No parser harness or runtime DPP frame was exercised; the local machine has no ARM emulator, and the compatible live peer is still absent.
+
+Reproduction commands (from the repository root):
+
+```sh
+rizin -e scr.color=false -q -A -c 'pdf @ 0x25a34' artifacts/firmware/rom-2026-11-06/rom/airties-edge/usr/sbin/map-dpp-configurator
+rizin -e scr.color=false -q -A -c 'pdf @ 0x262fc' artifacts/firmware/rom-2026-11-06/rom/airties-edge/usr/sbin/map-dpp-configurator
+rizin -e scr.color=false -q -A -c 'pdf @ 0x2fc84' artifacts/firmware/rom-2026-11-06/rom/airties-edge/usr/sbin/map-dpp-configurator
+rizin -e scr.color=false -q -A -c 'pdf @ 0x2fc2c' artifacts/firmware/rom-2026-11-06/rom/airties-edge/usr/sbin/map-dpp-configurator
+```

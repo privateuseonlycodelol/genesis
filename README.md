@@ -34,6 +34,8 @@ DPP follow-up: [localhost TCP config exchange emitted a 445-character connector;
 
 The live DPP configurator also shares the host user/network namespaces and has `CAP_NET_ADMIN` / `CAP_SYS_ADMIN` with an all-devices LXC cgroup. This raises the impact of a future parser compromise; no namespace escape or DPP exploit was demonstrated.
 
+An offline review of two LCM DPP GAS handlers found bounded attribute walks, a minimum SIV-tag check before length subtraction, and a session-length check before copying the enrollee nonce. The JSON attribute length handling and other DPP handlers remain open; no parser fuzzing or live frame was performed.
+
 ## Layout
 
 - [Software pass summary](findings/software-pass-summary.md) is the running inventory.
