@@ -80,3 +80,24 @@ What this does **not** give: code execution with attacker-chosen bytes (needs th
 - `control.tar.gz` (postinst/maintainer scripts) of vendor packages was not audited — vendor scripts run as root by design.
 - The `EncryptDecrypt`/`EncryptDecryptImpl` signer class (create_signature path) was not audited beyond identifying it; it is the vendor-side signing code embedded in the binary, not a device-side check.
 - Whether the backend validates the serial in `/sn/` beyond routing was not tested.
+
+## Live demonstration: apps-list substitution → forced install (2026-11-07, VERIFIED)
+
+The DERIVED downgrade exposure above was demonstrated end-to-end on the owned unit, under controlled conditions (our root on the box substitutes the backend locally; the equivalent network-position attack substitutes the plain-HTTP traffic without touching the box).
+
+Method: save the original `/etc/telia_app_config/tc_lcm` (md5 `4bd8c20e43d72dcbd4f7f7040a78cf59`, backup at `/tmp/tc_lcm.orig.bak`); point `backend_url` at a local lab server; restart `core-lcm` (TERM; the container does not auto-respawn the daemon — it was restarted via `chroot /proc/18070/root /etc/init.d/core-lcm start`, which is this lab's own root access). The server served a crafted apps list (`core-lcm` at its real installed version, plus `core-watchdog` at an attacker-chosen **downgrade** version `5.0.23.10` with the URL/filename pointing at the *genuine vendor-signed* `core-watchdog_5.0.23.16.ipk` verified earlier in this finding) and that package, gzip-wrapped to match the real backend's transport encoding.
+
+**Result (daemon log + server access log, VERIFIED):**
+
+1. The daemon built the apps-list URL from the substituted backend (`fetching from backend: http://<local>/ipk/hw/GCNT-X/fw/23.1/chan/F1_5.04_prod/sn/<serial>`) and fetched it (access log 03:24:34).
+2. It **obeyed the attacker-chosen version**: `LCM upgrade core-watchdog v5.0.23.10` — lower than the installed 5.0.23.16. **No downgrade protection in the state machine.**
+3. It downloaded the package **from the attacker-specified path on the substituted server** (`GET /files/technicolor/23.1/arm/f1x/5.0.23.16/core-watchdog_5.0.23.16.ipk`).
+4. Signature verification passed (genuine package) → **`install: /tmp/core-watchdog_5.0.23.16.ipk` → `install done`** — the attacker-chosen package was installed.
+
+An intermediate run also verified fail-closed against transport tampering: the same genuine package served **without** the backend's gzip transport wrapping was refused (`Exception in decompress!! / Package NOT verified / Will not be used.`) and not installed. A first attempt with a lab-Mac HTTP server was refused by the macOS application firewall (`Failed to connect to 192.168.1.150 port 8000`); a loopback server on the router was used instead.
+
+**Restore (VERIFIED):** `backend_url` restored to `http://lcm.teliasmartrgw.com/` (file md5 identical to the original backup), daemon restarted, next cycle fetched the real backend normally, `core-watchdog` running unchanged (pid 18070 before and after). Demo files removed from the router `/tmp`.
+
+**What this proves:** an attacker who controls the channel (network position or DNS, no credentials) can make the router download, verify, and **install any package present in the vendor's repository, at a version of the attacker's choosing, including downgrades**. **Not proven:** execution of attacker-authored code (vendor RSA-2048 signature still gates content), and no MITM was performed in the router's WAN path — the substitution was local as root, equivalent from the daemon's perspective. Realistic exploitation: install a *historical* vendor-signed package with known vulnerabilities, or force the Airties suite on.
+
+**Evidence (private):** `artifacts/lcm-demo-2026-11-07/` — server root with the crafted list and package, `router-side-access.log` (7 requests incl. both fetch windows), `daemon-log-demo-window.log`, handler and serve scripts.
