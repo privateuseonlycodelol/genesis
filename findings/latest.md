@@ -1,6 +1,6 @@
 # Genesis report
 
-**Generated:** 2026-11-07T03:17:21Z
+**Generated:** 2026-11-07T03:44:08Z
 **Host:** (omitted)
 
 ## Owned-unit boot evidence
@@ -165,6 +165,7 @@ drwx------@  7 user  staff    224 Oct 12 04:17 software-pass-ssdp
 - [`f1-miniupnpd-cwmpd-2026-11-06.md`](f1-miniupnpd-cwmpd-2026-11-06.md)
 - [`f1-mount-root-rtfd-and-clash-deconstruction-2026-11-06.md`](f1-mount-root-rtfd-and-clash-deconstruction-2026-11-06.md)
 - [`f1-nand-read-plan-2026-10-27.md`](f1-nand-read-plan-2026-10-27.md)
+- [`f1-nonassociated-wifi-surfaces-2026-11-07.md`](f1-nonassociated-wifi-surfaces-2026-11-07.md)
 - [`f1-offline-overlay-pipeline-2026-11-05.md`](f1-offline-overlay-pipeline-2026-11-05.md)
 - [`f1-openwrt-userspace-2026-11-06.md`](f1-openwrt-userspace-2026-11-06.md)
 - [`f1-opt-keep-root-2026-11-06.md`](f1-opt-keep-root-2026-11-06.md)
