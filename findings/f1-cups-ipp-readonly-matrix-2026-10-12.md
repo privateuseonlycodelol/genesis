@@ -84,3 +84,27 @@ cd scripts && python3 cups_ipp_policy_probe.py  # safe write/limit discriminator
 ```
 
 Private evidence: `artifacts/management/cups-ipp-matrix-*`, `cups-ipp-followup-*`, `cups-ipp-policy-*`.
+
+## Write-side policy probe and opcode-map correction (2026-11-07, VERIFIED)
+
+Two corrections and one new result, from `scripts/cups_ipp_writeside_probe.py` (22 paced unauthenticated IPP POSTs against nonexistent printers/classes/job-ids at `192.168.1.1:631`; raw responses in `artifacts/cups-writeside-2026-11-07/`).
+
+**Opcode-map correction (supersedes several labels in the tables above).** The matrix above used an incorrect CUPS private-opcode map. Against the authoritative public `cups/ipp.h` (values stable since CUPS 1.x): `0x4003` is **CUPS-Add-Modify-Printer**, not CUPS-Get-Classes; `0x4005` is **CUPS-Get-Classes**; `0x400A` is CUPS-Set-Default; `0x400E` is CUPS-Authenticate-Job, not CUPS-Get-PPD; `0x400F` is CUPS-Get-PPD, not CUPS-Get-PPDs; `0x000C`/`0x000D`/`0x000E` are **Hold-Job/Release-Job/Restart-Job**, not the subscription reads; `0x0013` is **Set-Printer-Attributes**, not Get-Printer-Supported-Values. Consequences:
+
+1. The "read-only matrix" above **accidentally probed six write operations** — Add-Modify-Printer (0x4003), Set-Printer-Attributes (0x0013), Hold-Job (0x000C), Release-Job (0x000D), Restart-Job (0x000E) — plus CUPS-Get-PPD (0x400F). Their recorded responses stand as data; the labels were wrong.
+2. The [policy finding's](f1-cups-ipp-policy-2026-10-12.md) "Vendor IPP dispatch does not match upstream 2.2.10 for `CUPS-Set-Default` (`0x4005`)" is **superseded**: `0x4005` is upstream CUPS-Get-Classes, whose empty-list response is exactly the "No destinations added." body observed (same handler family as CUPS-Get-Printers). There is no vendor divergence; the real CUPS-Set-Default (`0x400A`) probe below behaves upstream-consistently.
+
+**Write-side results (correct opcodes, nonexistent targets only).** Distinguishing policy rejection from resource lookup by response (HTTP 401 HTML = auth wall; IPP `client-error-not-found*` = policy passed, resource missing):
+
+| Operation (opcode) | Anonymous result | Interpretation |
+| --- | --- | --- |
+| CUPS-Add-Modify-Printer (0x4003), CUPS-Add-Modify-Class (0x4006) | **HTTP 401** (HTML) | auth wall — the only walled ops (plus CUPS-Create-Local-Printer forbidden per prior matrix) |
+| Cancel-Job / Hold-Job / Release-Job (0x0008/C/D, job-id 999) | not-found | policy passed |
+| Pause-Printer / Resume-Printer (0x0010/11) | not-found ("printer does not exist") | policy passed |
+| Purge-Jobs (0x0012), Set-Printer-Attributes (0x0013), Validate-Job (0x0004), Create-Job (0x0005) | not-found | policy passed |
+| CUPS-Delete-Printer (0x4004), CUPS-Delete-Class (0x4007) | not-found | policy passed |
+| CUPS-Accept-Jobs / CUPS-Reject-Jobs (0x4008/9), CUPS-Set-Default (0x400A), CUPS-Move-Job (0x400D), CUPS-Authenticate-Job (0x400E), CUPS-Get-Document (0x4027) | not-found | policy passed |
+| Cancel-Jobs (0x0033) | operation-not-supported (0x0501) | op newer than 2.2.10 — consistent |
+| CUPS-Get-PPDs (0x400C — genuinely unprobed before) | **server-error-internal**, helper failed to execute | policy passed; `cups-driverd` broken like `cups-deviced` |
+
+**Conclusions.** With no queue configured nothing changes state (post-probe `Get-Printers`/`Get-Classes` still `not-found`, `Get-Jobs` still the identical empty `successful-ok` body — verified). But the exhaustion-pass statement that the auto-created policy requires `@SYSTEM` for "state-changing printer and class operations" is **overbroad**: only Add-Modify-Printer/Class and Create-Local-Printer are walled; an unauthenticated LAN client's requests for Cancel-Job, Hold/Release-Job, Pause/Resume-Printer, Purge-Jobs, Set-Printer-Attributes, Delete-Printer, Delete-Class, Accept/Reject-Jobs, Set-Default, Move-Job, Create-Job, Validate-Job, and Authenticate-Job all pass the policy gate and stop only at resource lookup. **DERIVED exposure (queue-dependent):** if a printer/queue is ever configured on this unit, an unauthenticated LAN peer can drive these state operations against it (cancel/purge jobs, pause, delete the printer) up to the job-ownership layer; that impact remains undemonstrated because no queue exists. Job-owning ops on *other users'* jobs may still hit the `@OWNER`/`@SYSTEM` check at the job layer — the not-found responses here precede it and cannot speak to it.

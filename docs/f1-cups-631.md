@@ -41,3 +41,9 @@ Private evidence under `artifacts/management/cups-ipp-matrix-*`, `cups-ipp-follo
 ## Open blockers
 
 - Shipped **`/etc/cups/cupsd.conf`** is now on disk (1,052 bytes, same file on `/rom` and live). HTTP `/` and `/admin/` from `192.168.1.100` are still **403**. See [f1-quad-overlay-flash-2026-11-06.md](../findings/f1-quad-overlay-flash-2026-11-06.md) and [f1-cups-ipp-policy-2026-10-12.md](../findings/f1-cups-ipp-policy-2026-10-12.md).
+
+## Update 2026-11-07 — write-side policy probe, opcode corrections
+
+- The historical CUPS private-opcode map used by the earlier matrices was wrong in several places (`0x4003`=Add-Modify-Printer not Get-Classes, `0x4005`=Get-Classes not Set-Default, `0x400E`=Authenticate-Job not Get-PPD, `0x400F`=Get-PPD not Get-PPDs, `0x000C/D/E`=Hold/Release/Restart-Job). The "vendor Set-Default divergence" is dissolved — it was a probe mislabel.
+- New paced probe (`scripts/cups_ipp_writeside_probe.py`, 22 ops, nonexistent targets): anonymous requests **pass the policy gate** for Cancel/Hold/Release-Job, Pause/Resume-Printer, Purge-Jobs, Set-Printer-Attributes, Create/Validate-Job, Delete-Printer, Delete-Class, Accept/Reject-Jobs, Set-Default, Move-Job, Authenticate-Job, Get-Document (all stop at not-found since no queue exists). Only CUPS-Add-Modify-Printer/Class return **HTTP 401**; CUPS-Create-Local-Printer stays forbidden. CUPS-Get-PPDs (0x400C) executes with a broken `cups-driverd` helper.
+- DERIVED queue-dependent exposure: with a configured queue, an unauthenticated LAN peer can drive printer/job state ops up to the job-ownership layer. Not demonstrated (no queue on this unit). Full table: [matrix finding](../findings/f1-cups-ipp-readonly-matrix-2026-10-12.md).

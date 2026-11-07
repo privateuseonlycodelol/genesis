@@ -44,6 +44,8 @@ Driver: `scripts/cups_ipp_policy_probe.py`. Evidence: `artifacts/management/cups
 
 **Not observed:** HTTP **401** on any tested `application/ipp` operation. **Not demonstrated:** administrative write success, PPD dump, device list, or config file disclosure.
 
+**Opcode-map correction (2026-11-07, supersedes three rows above).** The opcodes in the rows above were mislabeled against the authoritative public `cups/ipp.h`: `0x4004` is **CUPS-Delete-Printer** (so the "Add-Modify-Printer ... does not match upstream add_printer()" row actually probed Delete-Printer, and its not-found response is upstream-consistent); `0x4005` is **CUPS-Get-Classes** (so the "CUPS-Set-Default vendor divergence" row actually probed Get-Classes — "No destinations added." is Get-Classes' empty list; no vendor divergence); the "CUPS-Get-Classes" row probed **CUPS-Add-Modify-Printer** (0x4003). The "no HTTP 401 observed" statement above is also superseded: with the correct opcode, **CUPS-Add-Modify-Printer (0x4003) and CUPS-Add-Modify-Class (0x4006) return HTTP 401** for anonymous clients. Corrected map and full write-side results: [f1-cups-ipp-readonly-matrix-2026-10-12.md](f1-cups-ipp-readonly-matrix-2026-10-12.md) write-side section.
+
 ## Version / CVE context (REPORTED + DERIVED)
 
 - Body and header claim **CUPS 2.2.x**; **2.2.10** appears in the HTML forbidden page. **Binary identity unverified.**
