@@ -92,7 +92,7 @@ Relocation walk of the functions named in the surface table. No frame was sent.
   - `0x3849b8`: copy length is `(IE_len+2)` masked to 8 bits, and the copy is skipped when that exceeds allocation minus offset (`b.lo`).
   - `0x384cd4`: copy length is `IE_len+2`, skipped when that exceeds allocation minus offset (`b.hi`).
   - `0x384ad8`: the input remainder is initialized to the allocation size (`0x384a90`), and the loop copies an element only after `remainder >= IE_len+2`. The sum copied cannot exceed the allocation.
-- The multiple-BSSID element path (tag `0x47`, `0x384b98`) allocates the sum of two length bytes and then copies argument-1-masked-to-8-bits plus the second length byte. Those two lengths were not shown to be the allocation size. No overflow was established. No beacon was sent.
+- The multiple-BSSID element path (the halfword compare against `0x47` at `0x38468c`) allocates `w27+w28`, both loaded with `ldrb`. Before that compare, `0x38467c` replaces `w23` with `w27` masked to 16 bits, so `w23` equals the first length byte. The following copies are `w23` bytes and then `w28` masked to 8 bits, at `alloc` and `alloc+w23`. The sum equals the allocation. Both callers pass a constant in argument 1 (`1` from `wlc_recv_scan_parse`, `0` from `wlc_recv_scan_parse_handle_prb_resp`); that constant is not the copy length. No overflow on this path. No beacon was sent.
 
 ## SAE frame send, second look (BLOCKED)
 
@@ -100,9 +100,8 @@ Relocation walk of the functions named in the surface table. No frame was sent.
 
 ## Highest-value follow-ups
 
-1. The tag-`0x47` allocation in `wlc_multibssid_recv_preprocess_bcn` (`w27+w28`) is the one copy pair whose length is still a different register from the allocation size.
-2. Deauth-vs-PMF on a PMF-optional BSS from an injector that is not the lab client's only link.
-3. One SAE commit (unknown group, then a supported group) from a host whose `iw` can send SAE authenticate, aimed at `BH-C66283` / `wl0.2` only. This device's `iw` 4.1 cannot.
+1. Deauth-vs-PMF on a PMF-optional BSS from an injector that is not the lab client's only link. This Mac cannot open a monitor interface, and no virtual interface was added.
+2. One SAE commit (unknown group, then a supported group) from a host whose `iw` can send SAE authenticate, aimed at `BH-C66283` / `wl0.2` only. This device's `iw` 4.1 cannot. The binary result, unverified on the air, is status 77 for a group outside 19/20/21 and an anti-clog token once five SAE sessions are open.
 
 **No packets were sent to the radios. No router state was changed.** The 05:13 session was read-only SSH (`wl ver`, `nvram get` of the DPP role keys, `hostapd_cli status` / bootstrap queries).
 
